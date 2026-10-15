@@ -1,0 +1,53 @@
+﻿@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Stock Balance"; ViewData["Subtitle"] = "Current stock position by product"; ViewData["Icon"] = "bi-box-seam";
+    int low = Model.Count(x => x.StockStatus == "Low");
+    int outOfStock = Model.Count(x => x.StockStatus == "Out");
+}
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="bi bi-list-ul"></i>Stock<span class="count-chip">@Model.Count()</span>
+            @if (low > 0)
+            {
+                <span class="pill pill--warn ms-2">@low low</span>
+            }
+            @if (outOfStock > 0)
+            {
+                <span class="pill pill--bad ms-1">@outOfStock out</span>
+            }
+        </h5>
+        <div class="grid-tools">
+            <label class="grid-search"><i class="bi bi-search"></i><input type="search" placeholder="Search products…" aria-label="Search products" data-table-filter="#stock-grid" /></label>
+            <a asp-action="Movements" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left-right"></i>Movements</a>
+            <a asp-action="Adjust" class="btn btn-primary btn-sm" data-modal="true" data-modal-title="Adjust Stock" data-modal-size="md" data-modal-icon="bi-sliders"><i class="bi bi-sliders"></i>Adjust stock</a>
+        </div>
+    </div>
+    <div class="table-responsive table-scroll" id="stock-grid">
+        @if (!Model.Any())
+        {
+            <partial name="_EmptyState" model='"No stock records yet."' />
+        }
+        else
+        {
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Code</th><th>Product</th><th class="num">On hand</th><th>UOM</th><th class="num">Min level</th><th>Status</th></tr></thead>
+                <tbody>
+                    @foreach (var s in Model)
+                    {
+                        <tr>
+                            <td><strong>@s.ProductCode</strong></td>
+                            <td>@s.ProductName</td>
+                            <td class="num">@Fmt.Qty(s.TotalQuantity)</td>
+                            <td>@s.UOMCode</td>
+                            <td class="num">@Fmt.Qty(s.MinStockLevel)</td>
+                            <td><partial name="_StatusPill" model="s.StockStatus" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

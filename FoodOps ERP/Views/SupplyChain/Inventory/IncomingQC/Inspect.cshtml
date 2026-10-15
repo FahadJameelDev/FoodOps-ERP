@@ -1,0 +1,6 @@
+﻿@model QCDecisionViewModel
+@{
+    ViewData["Title"] = "Inspect Batch"; ViewData["Subtitle"] = "Record the QC decision for this batch"; ViewData["Icon"] = "bi-patch-check";
+}
+<partial name="_PageHeader" />
+<div class="card"><partial name="_QCForm" model="Model" /></div>

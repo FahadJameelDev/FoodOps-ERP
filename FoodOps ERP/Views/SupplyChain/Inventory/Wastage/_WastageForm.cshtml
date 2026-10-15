@@ -1,0 +1,37 @@
+﻿@model WastageViewModel
+@{
+    var batches = ViewData["Batches"] as List<SelectListItem> ?? new List<SelectListItem>();
+}
+<form asp-action="Create" method="post" data-spa-form data-reload-url="@Url.Action("Index")" data-refresh="#grid-card" novalidate>
+    <div class="fo-modal__body">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+        <div class="row g-3">
+            <div class="col-12">
+                <label asp-for="BatchId" class="form-label">Batch <span class="text-danger">*</span></label>
+                <select asp-for="BatchId" asp-items="batches" class="form-select"><option value="">Select batch…</option></select><span asp-validation-for="BatchId"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Qty" class="form-label">Wasted quantity <span class="text-danger">*</span></label>
+                <input asp-for="Qty" type="number" step="0.0001" min="0.0001" class="form-control num" placeholder="e.g., 3.5" /><span asp-validation-for="Qty"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Reason" class="form-label">Reason <span class="text-danger">*</span></label>
+                <select asp-for="Reason" class="form-select">
+                    <option value="">Select reason…</option>
+                    @foreach (var r in WastageViewModel.ReasonOptions)
+                    {
+                        <option value="@r" selected="@(Model.Reason == r)">@r</option>
+                    }
+                </select><span asp-validation-for="Reason"></span>
+            </div>
+            <div class="col-12">
+                <label asp-for="Remarks" class="form-label">Remarks</label>
+                <textarea asp-for="Remarks" class="form-control" rows="2" placeholder="What happened? Shift, line, witness…"></textarea><span asp-validation-for="Remarks"></span>
+            </div>
+        </div>
+    </div>
+    <div class="fo-modal__footer">
+        <button type="button" class="btn btn-outline-secondary" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-danger"><i class="bi bi-check-lg"></i><span>Record wastage</span></button>
+    </div>
+</form>

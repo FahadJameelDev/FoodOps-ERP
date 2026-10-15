@@ -1,0 +1,99 @@
+﻿@model PurchaseOrderViewModel
+@{
+    var isEdit = Model.POID != 0;
+    var suppliers = ViewData["Suppliers"] as List<SelectListItem> ?? new List<SelectListItem>();
+    var plants = ViewData["Plants"] as List<SelectListItem> ?? new List<SelectListItem>();
+    var products = ViewData["Products"] as List<SelectListItem> ?? new List<SelectListItem>();
+    var uoms = ViewData["Uoms"] as List<SelectListItem> ?? new List<SelectListItem>();
+    var rows = Model.Items?.Count ?? 0;
+
+    // naya row (JS template + khali form ke liye ek hi markup)
+    Func<string, object> blank = @<div class="repeater-row">
+        <input type="hidden" name="Items.Index" value="@item" />
+        <select name="Items[@item].ProductID" class="form-select" required>
+            <option value="">Select product…</option>
+            @foreach (var o in products)
+            {
+                <option value="@o.Value">@o.Text</option>
+            }
+        </select>
+        <select name="Items[@item].UOMID" class="form-select" required>
+            <option value="">UOM</option>
+            @foreach (var o in uoms)
+            {
+                <option value="@o.Value">@o.Text</option>
+            }
+        </select>
+        <input name="Items[@item].OrderedQty" type="number" step="0.0001" min="0.0001" class="form-control num" data-qty required />
+        <input name="Items[@item].UnitCost" type="number" step="0.0001" min="0" class="form-control num" data-cost required />
+        <span class="line-total" data-line>0.00</span>
+        <button type="button" class="btn-icon" data-repeater-remove title="Remove item"><i class="bi bi-x-lg"></i></button>
+    </div>;
+}
+<form asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@(isEdit ? Model.POID.ToString() : null)" method="post"
+      data-spa-form data-reload-url="@Url.Action("Index")" data-refresh="#grid-card" novalidate>
+    <div class="fo-modal__body">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+        @if (isEdit)
+        {
+            <input type="hidden" asp-for="POID" />
+            <input type="hidden" asp-for="Status" />
+        }
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <label asp-for="SupplierID" class="form-label">Supplier <span class="text-danger">*</span></label>
+                <select asp-for="SupplierID" asp-items="suppliers" class="form-select"><option value="">Select supplier…</option></select><span asp-validation-for="SupplierID"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="PlantID" class="form-label">Plant <span class="text-danger">*</span></label>
+                <select asp-for="PlantID" asp-items="plants" class="form-select"><option value="">Select plant…</option></select><span asp-validation-for="PlantID"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="OrderDate" class="form-label">Order date <span class="text-danger">*</span></label>
+                <input asp-for="OrderDate" type="date" class="form-control" /><span asp-validation-for="OrderDate"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="ExpectedDate" class="form-label">Expected delivery</label>
+                <input asp-for="ExpectedDate" type="date" class="form-control" /><span asp-validation-for="ExpectedDate"></span>
+            </div>
+            <div class="col-md-4"><label class="form-label">Status</label><div><partial name="_StatusPill" model="Model.Status" /></div></div>
+            <div class="col-12">
+                <label asp-for="Remarks" class="form-label">Remarks</label>
+                <textarea asp-for="Remarks" class="form-control" rows="2" placeholder="Optional notes for this order…"></textarea><span asp-validation-for="Remarks"></span>
+            </div>
+        </div>
+
+        <h6 class="mb-2">Items</h6>
+        <div data-repeater id="po-items" data-next="@Math.Max(rows, 1)">
+            <div class="repeater-head"><span>Product</span><span>UOM</span><span class="num">Qty</span><span class="num">Unit cost</span><span class="num">Amount</span><span></span></div>
+            <div class="repeater-rows">
+                @for (var i = 0; i < rows; i++)
+                {
+                    <div class="repeater-row">
+                        <input type="hidden" name="Items.Index" value="@i" />
+                        <div><select asp-for="Items[i].ProductID" asp-items="products" class="form-select"><option value="">Select product…</option></select><span asp-validation-for="Items[i].ProductID"></span></div>
+                        <div><select asp-for="Items[i].UOMID" asp-items="uoms" class="form-select"><option value="">UOM</option></select></div>
+                        <div><input asp-for="Items[i].OrderedQty" type="number" step="0.0001" min="0.0001" class="form-control num" data-qty /><span asp-validation-for="Items[i].OrderedQty"></span></div>
+                        <div><input asp-for="Items[i].UnitCost" type="number" step="0.0001" min="0" class="form-control num" data-cost /><span asp-validation-for="Items[i].UnitCost"></span></div>
+                        <span class="line-total" data-line>0.00</span>
+                        <button type="button" class="btn-icon" data-repeater-remove title="Remove item"><i class="bi bi-x-lg"></i></button>
+                    </div>
+                }
+                @if (rows == 0)
+                {
+                    @blank("0")
+                }
+            </div>
+            <template>@blank("__i__")</template>
+            <div class="repeater-foot">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-repeater-add="#po-items"><i class="bi bi-plus-lg"></i>Add item</button>
+                <div>Total: <strong data-repeater-total>0.00</strong></div>
+            </div>
+        </div>
+    </div>
+    <div class="fo-modal__footer">
+        <button type="button" class="btn btn-outline-secondary" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i><span>@(isEdit ? "Update order" : "Create order")</span></button>
+    </div>
+</form>

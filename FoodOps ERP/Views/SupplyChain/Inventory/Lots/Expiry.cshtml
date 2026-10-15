@@ -1,0 +1,20 @@
+﻿@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Expiring Lots"; ViewData["Subtitle"] = "Lots expiring in the selected window"; ViewData["Icon"] = "bi-hourglass-split"; ViewData["Mode"] = "expiry";
+    int days = (int)ViewBag.Days;
+}
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    <div class="card-header">
+        <h5 class="card-title"><i class="bi bi-exclamation-triangle"></i>Expiring within @days days<span class="count-chip">@Model.Count()</span></h5>
+        <div class="grid-tools">
+            @foreach (var d in new[] { 7, 15, 30, 60, 90 })
+            {
+                <a asp-action="Expiry" asp-route-days="@d" class="btn btn-sm @(d == days ? "btn-primary" : "btn-outline-secondary")">@d d</a>
+            }
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm"><i class="bi bi-list-ul"></i>All lots</a>
+        </div>
+    </div>
+    <div class="table-responsive table-scroll"><partial name="_LotsTable" model="Model" /></div>
+</div>

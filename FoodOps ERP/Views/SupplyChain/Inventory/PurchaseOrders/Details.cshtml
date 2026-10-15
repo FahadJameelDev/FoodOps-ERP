@@ -1,0 +1,62 @@
+﻿@model PurchaseOrderViewModel
+@{
+    ViewData["Title"] = $"PO {Model.POCode}";
+    ViewData["Subtitle"] = "Purchase order details";
+    ViewData["Icon"] = "bi-cart3";
+    bool isDraft = string.Equals(Model.Status, "Draft", StringComparison.OrdinalIgnoreCase);
+}
+<partial name="_PageHeader" />
+
+<div class="card mb-3">
+    <div class="card-header">
+        <h5 class="card-title"><i class="bi bi-info-circle"></i>Summary <partial name="_StatusPill" model="Model.Status" /></h5>
+        <div class="grid-tools">
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i>Back</a>
+            @if (isDraft)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.POID" class="btn btn-outline-secondary btn-sm" data-modal="true" data-modal-title="Edit Purchase Order" data-modal-size="xl"><i class="bi bi-pencil"></i>Edit</a>
+                <button type="button" class="btn btn-primary btn-sm" data-action-url="@Url.Action("Approve", new { id = Model.POID })" data-name="@Model.POCode"
+                        data-confirm-title="Approve purchase order?" data-confirm-text="Approve" data-reload-url="@Url.Action("Details", new { id = Model.POID })">
+                    <i class="bi bi-check2-circle"></i>Approve
+                </button>
+            }
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="info-strip mb-0">
+            <div><span>Supplier</span><b>@Model.SupplierName</b></div>
+            <div><span>Order date</span><b>@Fmt.Date(Model.OrderDate)</b></div>
+            <div><span>Expected</span><b>@Fmt.Date(Model.ExpectedDate)</b></div>
+            <div><span>Total</span><b>@Fmt.Money(Model.TotalAmount)</b></div>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(Model.Remarks))
+        {
+            <p class="mt-3 mb-0 text-muted">@Model.Remarks</p>
+        }
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h5 class="card-title"><i class="bi bi-list-check"></i>Items</h5></div>
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead><tr><th>Product</th><th>UOM</th><th class="num">Ordered</th><th class="num">Received</th><th class="num">Unit cost</th><th class="num">Amount</th></tr></thead>
+            <tbody>
+                @if (Model.Items is not null)
+                {
+                    foreach (dynamic it in Model.Items)
+                    {
+                        <tr>
+                            <td>@it.ProductName</td>
+                            <td>@it.UOMCode</td>
+                            <td class="num">@Fmt.Qty(it.OrderedQty)</td>
+                            <td class="num">@Fmt.Qty(it.ReceivedQty)</td>
+                            <td class="num">@Fmt.Money(it.UnitCost)</td>
+                            <td class="num">@Fmt.Money((decimal)it.OrderedQty * (decimal)it.UnitCost)</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

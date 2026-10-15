@@ -1,0 +1,288 @@
+﻿@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    Func<string, string, string> activeClass = (ctrl, act) =>
+        (currentController.Equals(ctrl, StringComparison.OrdinalIgnoreCase) &&
+         currentAction.Equals(act, StringComparison.OrdinalIgnoreCase)) ? "active" : "";
+}
+
+<aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+
+    <!-- ═══ SIDEBAR HEADER — Logo ═══ -->
+    <div class="sidebar-header">
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 4C20 4 16 2 12 6C8 10 6 16 6 16C6 16 12 14 16 10C20 6 20 4 20 4Z"
+                          fill="none"
+                          stroke="#10B981" stroke-width="1.75" stroke-linejoin="round" />
+                    <path d="M6 16C6 16 11 12 18 5"
+                          stroke="#10B981" stroke-width="1.75" stroke-linecap="round" />
+                </svg>
+            </div>
+            <div class="sidebar-brand-text">
+                <span class="sidebar-brand-title">FoodOps <span>ERP</span></span>
+                <span class="sidebar-brand-subtitle">Food Manufacturing Operations</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ SIDEBAR NAVIGATION ═══ -->
+    <nav class="sidebar-nav">
+        <ul class="nav flex-column">
+
+            <!-- ═══ ✅ NEW: DASHBOARD — Alag Top Pe ═══ -->
+            <li class="nav-dashboard">
+                <a class="nav-link @activeClass("Home", "Index")" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-house-door-fill" aria-hidden="true"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <!-- ═══ GROUP 1: EXECUTIVE & GOVERNANCE ═══ -->
+            <li class="nav-group">
+                <button class="nav-group-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#group1" aria-expanded="false">
+                    <i class="bi bi-speedometer2" aria-hidden="true"></i>
+                    <span>Executive &amp; Governance</span>
+                    <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                </button>
+                <div class="collapse" id="group1">
+                    <ul class="nav flex-column nav-sub">
+                        <li class="nav-item">
+                            <button class="nav-module-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-exec" aria-expanded="false">
+                                <i class="bi bi-grid-1x2" aria-hidden="true"></i>
+                                <span>Executive Dashboard</span>
+                                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                            </button>
+                            <div class="collapse" id="mod-exec">
+                                <ul class="nav flex-column nav-features">
+
+                                    <li><a class="nav-link" href="#">Production KPIs</a></li>
+                                    <li><a class="nav-link" href="#">Inventory KPIs</a></li>
+                                    <li><a class="nav-link" href="#">Quality KPIs</a></li>
+                                    <li><a class="nav-link" href="#">Cost &amp; Variance KPIs</a></li>
+                                    <li><a class="nav-link" href="#">Workforce KPIs</a></li>
+                                    <li><a class="nav-link" href="#">Critical Alerts</a></li>
+                                    <li><a class="nav-link" href="#">Action Queue</a></li>
+                                    <li><a class="nav-link" href="#">Trends</a></li>
+                                    <li><a class="nav-link" href="#">AI Summary</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-module-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-reports" aria-expanded="false">
+                                <i class="bi bi-file-earmark-bar-graph" aria-hidden="true"></i>
+                                <span>Reports &amp; Analytics</span>
+                                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                            </button>
+                            <div class="collapse" id="mod-reports">
+                                <ul class="nav flex-column nav-features">
+                                    <li><a class="nav-link" href="#">Production Reports</a></li>
+                                    <li><a class="nav-link" href="#">Inventory Reports</a></li>
+                                    <li><a class="nav-link" href="#">Quality Reports</a></li>
+                                    <li><a class="nav-link" href="#">Cost Reports</a></li>
+                                    <li><a class="nav-link" href="#">Workforce Reports</a></li>
+                                    <li><a class="nav-link" href="#">Executive Reports</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- ═══ GROUP 2: SUPPLY CHAIN & INVENTORY ═══ -->
+            <li class="nav-group">
+                <button class="nav-group-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#group2" aria-expanded="false">
+                    <i class="bi bi-boxes" aria-hidden="true"></i>
+                    <span>Supply Chain &amp; Inventory</span>
+                    <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                </button>
+                <div class="collapse" id="group2">
+                    <ul class="nav flex-column nav-sub">
+                        <li class="nav-item">
+                            <button class="nav-module-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-proc" aria-expanded="false">
+                                <i class="bi bi-truck" aria-hidden="true"></i>
+                                <span>Procurement &amp; Inventory</span>
+                                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                            </button>
+                            <div class="collapse" id="mod-proc">
+                                <ul class="nav flex-column nav-features">
+                                    <li><a class="nav-link @activeClass("Suppliers", "Index")" asp-controller="Suppliers" asp-action="Index">Supplier Management</a></li>
+                                    <li><a class="nav-link @activeClass("PurchaseOrders", "Index")" asp-controller="PurchaseOrders" asp-action="Index">Purchase Management</a></li>
+                                    <li><a class="nav-link @activeClass("GoodsReceiving", "Index")" asp-controller="GoodsReceiving" asp-action="Index">Goods Receiving (GRN)</a></li>
+                                    <li><a class="nav-link @activeClass("IncomingQC", "Index")" asp-controller="IncomingQC" asp-action="Index">Incoming QC</a></li>
+                                    <li><a class="nav-link @activeClass("Stock", "Balance")" asp-controller="Stock" asp-action="Balance">Stock Management</a></li>
+                                    <li><a class="nav-link @activeClass("Lots", "Index")" asp-controller="Lots" asp-action="Index">Lot &amp; Expiry Tracking</a></li>
+                                    <li><a class="nav-link @activeClass("Stock", "Balance")" asp-controller="Stock" asp-action="Balance">Stock Control</a></li>
+                                    <li><a class="nav-link @activeClass("MaterialIssue", "Index")" asp-controller="MaterialIssue" asp-action="Index">Material Issue &amp; Return</a></li>
+                                    <li><a class="nav-link @activeClass("Wastage", "Index")" asp-controller="Wastage" asp-action="Index">Inventory Wastage</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- ═══ GROUP 3: MANUFACTURING & QUALITY ═══ -->
+            <li class="nav-group">
+                <button class="nav-group-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#group3" aria-expanded="false">
+                    <i class="bi bi-gear-wide-connected" aria-hidden="true"></i>
+                    <span>Manufacturing &amp; Quality</span>
+                    <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                </button>
+                <div class="collapse" id="group3">
+                    <ul class="nav flex-column nav-sub">
+                        <li class="nav-item">
+                            <button class="nav-module-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-products" aria-expanded="false">
+                                <i class="bi bi-journal-text" aria-hidden="true"></i>
+                                <span>Products &amp; Recipes</span>
+                                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                            </button>
+                            <div class="collapse" id="mod-products">
+                                <ul class="nav flex-column nav-features">
+                                    <li><a class="nav-link" href="#">Product Catalogue</a></li>
+                                    <li><a class="nav-link" href="#">Product Packaging Configuration</a></li>
+                                    <li><a class="nav-link" href="#">Recipe Management</a></li>
+                                    <li><a class="nav-link" href="#">Recipe Versioning</a></li>
+                                    <li><a class="nav-link" href="#">Recipe Approval</a></li>
+                                    <li><a class="nav-link" href="#">Recipe Change Control</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-module-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-prod" aria-expanded="false">
+                                <i class="bi bi-diagram-3" aria-hidden="true"></i>
+                                <span>Production &amp; Manufacturing</span>
+                                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                            </button>
+                            <div class="collapse" id="mod-prod">
+                                <ul class="nav flex-column nav-features">
+                                    <li><a class="nav-link" href="#">Demand Management</a></li>
+                                    <li><a class="nav-link" href="#">Production Planning</a></li>
+                                    <li><a class="nav-link" href="#">Material Planning</a></li>
+                                    <li><a class="nav-link" href="#">Plan Control</a></li>
+                                    <li><a class="nav-link" href="#">Batch Management</a></li>
+                                    <li><a class="nav-link" href="#">Material Execution</a></li>
+                                    <li><a class="nav-link" href="#">Production Execution</a></li>
+                                    <li><a class="nav-link" href="#">Wastage &amp; Variance</a></li>
+                                    <li><a class="nav-link" href="#">Production Exceptions</a></li>
+                                    <li><a class="nav-link" href="#">Batch Control</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-module-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-quality" aria-expanded="false">
+                                <i class="bi bi-patch-check" aria-hidden="true"></i>
+                                <span>Quality Control</span>
+                                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                            </button>
+                            <div class="collapse" id="mod-quality">
+                                <ul class="nav flex-column nav-features">
+                                    <li><a class="nav-link" href="#">QC Setup</a></li>
+                                    <li><a class="nav-link" href="#">Incoming QC</a></li>
+                                    <li><a class="nav-link" href="#">Production QC</a></li>
+                                    <li><a class="nav-link" href="#">Quality Decision</a></li>
+                                    <li><a class="nav-link" href="#">Release Control</a></li>
+                                    <li><a class="nav-link" href="#">Quality Records</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-module-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-costing" aria-expanded="false">
+                                <i class="bi bi-calculator" aria-hidden="true"></i>
+                                <span>Costing &amp; Variance</span>
+                                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                            </button>
+                            <div class="collapse" id="mod-costing">
+                                <ul class="nav flex-column nav-features">
+                                    <li><a class="nav-link" href="#">Batch Costing</a></li>
+                                    <li><a class="nav-link" href="#">Cost Components</a></li>
+                                    <li><a class="nav-link" href="#">Unit Cost</a></li>
+                                    <li><a class="nav-link" href="#">Variance Analysis</a></li>
+                                    <li><a class="nav-link" href="#">Variance Control</a></li>
+                                    <li><a class="nav-link" href="#">Loss Analysis</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- ═══ GROUP 4: WORKFORCE & HUMAN CAPITAL ═══ -->
+            <li class="nav-group">
+                <button class="nav-group-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#group4" aria-expanded="false">
+                    <i class="bi bi-people" aria-hidden="true"></i>
+                    <span>Workforce &amp; Human Capital</span>
+                    <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                </button>
+                <div class="collapse" id="group4">
+                    <ul class="nav flex-column nav-sub">
+                        <li class="nav-item">
+                            <button class="nav-module-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-hr" aria-expanded="false">
+                                <i class="bi bi-person-badge" aria-hidden="true"></i>
+                                <span>HR &amp; Payroll</span>
+                                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                            </button>
+                            <div class="collapse" id="mod-hr">
+                                <ul class="nav flex-column nav-features">
+                                    <li><a class="nav-link" href="#">Employee Management</a></li>
+                                    <li><a class="nav-link" href="#">Workforce Setup</a></li>
+                                    <li><a class="nav-link" href="#">Compensation Setup</a></li>
+                                    <li><a class="nav-link" href="#">Leave Management</a></li>
+                                    <li><a class="nav-link" href="#">Attendance</a></li>
+                                    <li><a class="nav-link" href="#">Attendance Control</a></li>
+                                    <li><a class="nav-link" href="#">Overtime</a></li>
+                                    <li><a class="nav-link" href="#">Payroll Processing</a></li>
+                                    <li><a class="nav-link" href="#">Payroll Review</a></li>
+                                    <li><a class="nav-link" href="#">Payroll Finalization</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- ═══ GROUP 5: AI ENGINE & INTELLIGENCE ═══ -->
+            <li class="nav-group">
+                <button class="nav-group-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#group5" aria-expanded="false">
+                    <i class="bi bi-robot" aria-hidden="true"></i>
+                    <span>AI Engine &amp; Intelligence</span>
+                    <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                </button>
+                <div class="collapse" id="group5">
+                    <ul class="nav flex-column nav-sub">
+                        <li class="nav-item">
+                            <button class="nav-module-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-ai" aria-expanded="false">
+                                <i class="bi bi-chat-square-dots" aria-hidden="true"></i>
+                                <span>AI Assistant</span>
+                                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                            </button>
+                            <div class="collapse" id="mod-ai">
+                                <ul class="nav flex-column nav-features">
+                                    <li><a class="nav-link" href="#">Inventory Assistant</a></li>
+                                    <li><a class="nav-link" href="#">Production Assistant</a></li>
+                                    <li><a class="nav-link" href="#">Quality Assistant</a></li>
+                                    <li><a class="nav-link" href="#">Cost Assistant</a></li>
+                                    <li><a class="nav-link" href="#">Payroll Assistant</a></li>
+                                    <li><a class="nav-link" href="#">Management Assistant</a></li>
+                                    <li><a class="nav-link" href="#">AI Safety</a></li>
+                                    <li><a class="nav-link" href="#">AI Evidence</a></li>
+                                    <li><a class="nav-link" href="#">AI Audit</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+        </ul>
+    </nav>
+
+    <!-- ═══ ✅ NEW: SIDEBAR FOOTER — Light, Slim, 1 Line ═══ -->
+    <div class="sidebar-footer">
+        <div class="sidebar-footer-text">
+            Better Operations<span class="dot-sep">·</span>Safer Food<span class="dot-sep">·</span>Higher Profits
+        </div>
+    </div>
+
+</aside>

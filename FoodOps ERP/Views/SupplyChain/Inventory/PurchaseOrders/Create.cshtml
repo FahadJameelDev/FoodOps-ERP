@@ -1,0 +1,8 @@
+﻿@model PurchaseOrderViewModel
+@{
+    ViewData["Title"] = "New Purchase Order";
+    ViewData["Subtitle"] = "Create a purchase order";
+    ViewData["Icon"] = "bi-cart-plus";
+}
+<partial name="_PageHeader" />
+<div class="card"><partial name="_PurchaseOrderForm" model="Model" /></div>

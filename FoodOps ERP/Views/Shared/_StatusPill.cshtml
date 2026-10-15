@@ -1,0 +1,13 @@
+﻿@model object?
+@{
+    var s = (Convert.ToString(Model) ?? "").Trim();
+    var cls = s.ToLowerInvariant() switch
+    {
+        "active" or "approved" or "passed" or "pass" or "received" or "released" or "completed" or "ok" or "normal" or "in stock" => "pill--ok",
+        "pending" or "draft" or "partial" or "submitted" or "low" or "expiring" or "under inspection" or "in progress" => "pill--warn",
+        "failed" or "fail" or "rejected" or "out" or "expired" or "cancelled" or "hold" or "on hold" or "quarantine" or "quarantined" => "pill--bad",
+        "inactive" or "closed" => "pill--muted",
+        _ => "pill--info"
+    };
+}
+<span class="pill @cls">@(s.Length == 0 ? "—" : s)</span>

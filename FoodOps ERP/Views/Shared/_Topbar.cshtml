@@ -1,0 +1,229 @@
+﻿@using System.Security.Claims
+@{
+    // ✅ FIX: Real user info from claims (fallback = Guest)
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+
+    var userEmail = isAuthenticated
+        ? (User.FindFirst(ClaimTypes.Email)?.Value
+           ?? User.FindFirst("email")?.Value
+           ?? User.Identity?.Name
+           ?? "Guest")
+        : "Guest";
+
+    var userRole = isAuthenticated
+        ? (User.FindFirst(ClaimTypes.Role)?.Value
+           ?? (User.IsInRole("Admin") ? "System Admin"
+             : User.IsInRole("Manager") ? "Manager"
+             : "User"))
+        : "Guest";
+
+    // ✅ Safe initial
+    var userInitial = !string.IsNullOrEmpty(userEmail) && userEmail != "Guest"
+        ? userEmail.Substring(0, 1).ToUpper()
+        : "G";
+
+    var today = DateTime.Now.ToString("MMM dd, yyyy");
+}
+
+<header class="topbar" id="topbar" role="banner">
+
+    <div class="topbar-left">
+        <button type="button"
+                class="btn-icon d-lg-none"
+                id="mobileSidebarToggle"
+                aria-label="Open navigation menu">
+            <i class="bi bi-list" aria-hidden="true"></i>
+        </button>
+
+        <!-- Search bar with ⌘K + ⚡AI -->
+        <form class="topbar-search"
+              method="get"
+              asp-controller="Search"
+              asp-action="Index"
+              role="search"
+              id="globalSearchForm">
+            <i class="bi bi-search topbar-search-icon" aria-hidden="true"></i>
+            <input type="search"
+                   name="q"
+                   id="globalSearch"
+                   placeholder="Search anything..."
+                   aria-label="Global search"
+                   autocomplete="off" />
+            <kbd class="topbar-search-kbd d-none d-md-inline">⌘K</kbd>
+            <button type="button" class="topbar-search-ai" title="Ask AI" aria-label="Ask AI">
+                <i class="bi bi-stars" aria-hidden="true"></i>
+                <span class="d-none d-lg-inline">AI</span>
+            </button>
+        </form>
+    </div>
+
+    <div class="topbar-right">
+
+        <!-- ✅ FIX: Date/Time picker — data-filter-group added -->
+        <div class="dropdown d-none d-md-block">
+            <button type="button" class="btn btn-sm btn-outline-secondary topbar-filter-btn"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-calendar3" aria-hidden="true"></i>
+                <span class="d-none d-lg-inline">Today, @today</span>
+                <i class="bi bi-chevron-down" style="font-size:9px;" aria-hidden="true"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 topbar-filter-menu">
+                <li class="px-3 py-2 border-bottom">
+                    <strong class="fs-xs text-muted text-uppercase">Time Range</strong>
+                </li>
+                <li><a class="dropdown-item fs-sm" href="#" data-filter-group="time range" data-filter-value="Today"><i class="bi bi-circle-fill text-success me-2" style="font-size:6px;"></i>Today</a></li>
+                <li><a class="dropdown-item fs-sm" href="#" data-filter-group="time range" data-filter-value="Yesterday"><i class="bi bi-circle me-2" style="font-size:6px;"></i>Yesterday</a></li>
+                <li><a class="dropdown-item fs-sm" href="#" data-filter-group="time range" data-filter-value="This Week"><i class="bi bi-circle me-2" style="font-size:6px;"></i>This Week</a></li>
+                <li><a class="dropdown-item fs-sm" href="#" data-filter-group="time range" data-filter-value="This Month"><i class="bi bi-circle me-2" style="font-size:6px;"></i>This Month</a></li>
+                <li><a class="dropdown-item fs-sm" href="#" data-filter-group="time range" data-filter-value="This Year"><i class="bi bi-circle me-2" style="font-size:6px;"></i>This Year</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li class="px-3 py-1">
+                    <strong class="fs-xs text-muted text-uppercase">Shift</strong>
+                </li>
+                <li><a class="dropdown-item fs-sm" href="#" data-filter-group="shift" data-filter-value="All Shifts"><i class="bi bi-circle-fill text-success me-2" style="font-size:6px;"></i>All Shifts</a></li>
+                <li><a class="dropdown-item fs-sm" href="#" data-filter-group="shift" data-filter-value="Morning"><i class="bi bi-circle me-2" style="font-size:6px;"></i>Morning <span class="text-muted ms-1">6AM - 2PM</span></a></li>
+                <li><a class="dropdown-item fs-sm" href="#" data-filter-group="shift" data-filter-value="Evening"><i class="bi bi-circle me-2" style="font-size:6px;"></i>Evening <span class="text-muted ms-1">2PM - 10PM</span></a></li>
+                <li><a class="dropdown-item fs-sm" href="#" data-filter-group="shift" data-filter-value="Night"><i class="bi bi-circle me-2" style="font-size:6px;"></i>Night <span class="text-muted ms-1">10PM - 6AM</span></a></li>
+            </ul>
+        </div>
+
+        <!-- ✅ FIX: Plant/Department/Warehouse — data-filter-group added -->
+        <div class="dropdown d-none d-md-block">
+            <button type="button" class="btn btn-sm btn-outline-secondary topbar-filter-btn"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-building" aria-hidden="true"></i>
+                <span class="d-none d-lg-inline">Main Plant</span>
+                <i class="bi bi-chevron-down" style="font-size:9px;" aria-hidden="true"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 topbar-filter-menu">
+                <li class="px-3 py-2 border-bottom">
+                    <strong class="fs-xs text-muted text-uppercase">Department</strong>
+                </li>
+                <li><a class="dropdown-item fs-sm" href="#" data-filter-group="department" data-filter-value="All Departments"><i class="bi bi-circle-fill text-success me-2" style="font-size:6px;"></i>All Departments</a></li>
+                <li><a class="dropdown-item fs-sm" href="#" data-filter-group="department" data-filter-value="Production"><i class="bi bi-circle me-2" style="font-size:6px;"></i>Production</a></li>
+                <li><a class="dropdown-item fs-sm" href="#" data-filter-group="department" data-filter-value="Quality Control"><i class="bi bi-circle me-2" style="font-size:6px;"></i>Quality Control</a></li>
+                <li><a class="dropdown-item fs-sm" href="#" data-filter-group="department" data-filter-value="Packaging"><i class="bi bi-circle me-2" style="font-size:6px;"></i>Packaging</a></li>
+                <li><a class="dropdown-item fs-sm" href="#" data-filter-group="department" data-filter-value="Warehouse"><i class="bi bi-circle me-2" style="font-size:6px;"></i>Warehouse</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li class="px-3 py-1">
+                    <strong class="fs-xs text-muted text-uppercase">Warehouse</strong>
+                </li>
+                <li><a class="dropdown-item fs-sm" href="#" data-filter-group="warehouse" data-filter-value="All Warehouses"><i class="bi bi-circle-fill text-success me-2" style="font-size:6px;"></i>All Warehouses</a></li>
+                <li><a class="dropdown-item fs-sm" href="#" data-filter-group="warehouse" data-filter-value="Main Store"><i class="bi bi-circle me-2" style="font-size:6px;"></i>Main Store</a></li>
+                <li><a class="dropdown-item fs-sm" href="#" data-filter-group="warehouse" data-filter-value="Cold Storage"><i class="bi bi-circle me-2" style="font-size:6px;"></i>Cold Storage</a></li>
+                <li><a class="dropdown-item fs-sm" href="#" data-filter-group="warehouse" data-filter-value="Packing Area"><i class="bi bi-circle me-2" style="font-size:6px;"></i>Packing Area</a></li>
+            </ul>
+        </div>
+
+        <!-- Bell icon with badge -->
+        <div class="dropdown">
+            <button type="button"
+                    class="btn-icon position-relative"
+                    data-bs-toggle="dropdown"
+                    data-bs-offset="0,12"
+                    aria-expanded="false"
+                    aria-label="Notifications">
+                <i class="bi bi-bell" aria-hidden="true"></i>
+                <span class="notification-badge">3</span>
+            </button>
+
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 topbar-dropdown-menu" style="min-width: 340px;">
+                <li class="px-3 py-2 border-bottom d-flex justify-content-between align-items-center">
+                    <strong class="fs-sm">Notifications</strong>
+                    <a href="#" class="text-emerald fs-xs">Mark all read</a>
+                </li>
+                <li class="px-2 py-1">
+                    <a class="notification-item d-flex gap-2 py-2 text-decoration-none" href="#">
+                        <div class="bg-danger-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; flex-shrink: 0;">
+                            <i class="bi bi-exclamation-triangle text-danger"></i>
+                        </div>
+                        <div>
+                            <div class="fw-semibold text-heading fs-xs">Material Shortage</div>
+                            <div class="text-muted fs-xs">Sugar below reorder level</div>
+                            <div class="text-light" style="font-size: 10px;">5 minutes ago</div>
+                        </div>
+                    </a>
+                </li>
+                <li class="px-2 py-1">
+                    <a class="notification-item d-flex gap-2 py-2 text-decoration-none" href="#">
+                        <div class="bg-success-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; flex-shrink: 0;">
+                            <i class="bi bi-check-circle text-success"></i>
+                        </div>
+                        <div>
+                            <div class="fw-semibold text-heading fs-xs">QC Inspection Passed</div>
+                            <div class="text-muted fs-xs">Batch B-104 approved</div>
+                            <div class="text-light" style="font-size: 10px;">20 minutes ago</div>
+                        </div>
+                    </a>
+                </li>
+                <li class="px-2 py-1">
+                    <a class="notification-item d-flex gap-2 py-2 text-decoration-none" href="#">
+                        <div class="bg-info-subtle rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; flex-shrink: 0;">
+                            <i class="bi bi-info-circle text-info"></i>
+                        </div>
+                        <div>
+                            <div class="fw-semibold text-heading fs-xs">Payroll Pending</div>
+                            <div class="text-muted fs-xs">October payroll awaiting approval</div>
+                            <div class="text-light" style="font-size: 10px;">1 hour ago</div>
+                        </div>
+                    </a>
+                </li>
+                <li class="text-center py-2 border-top">
+                    <a href="#" class="text-muted fs-xs">View all notifications</a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- ✅ FIX: User dropdown — Guest fallback + POST logout -->
+        <div class="dropdown">
+            <a href="#" class="topbar-user" data-bs-toggle="dropdown" data-bs-offset="0,12" aria-expanded="false" aria-label="User menu">
+                <div class="user-avatar" aria-hidden="true">@userInitial</div>
+                <div class="user-info d-none d-md-flex">
+                    <span class="user-name">@userEmail</span>
+                    <span class="user-role">@userRole</span>
+                </div>
+                <i class="bi bi-chevron-down text-muted ms-1 d-none d-md-inline" aria-hidden="true" style="font-size: 10px;"></i>
+            </a>
+
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 topbar-dropdown-menu" style="min-width: 280px;">
+                <!-- Email header -->
+                <li class="px-3 py-3 border-bottom">
+                    <div class="fw-semibold text-heading" style="font-size: var(--fs-sm); word-break: break-all;">@userEmail</div>
+                    <div class="text-muted" style="font-size: var(--fs-xs);">@userRole</div>
+                </li>
+
+                @if (isAuthenticated)
+                {
+                    <!-- Notifications shortcut -->
+                    <li>
+                        <a class="dropdown-item fs-sm d-flex align-items-center justify-content-between" href="#">
+                            <span><i class="bi bi-bell me-2"></i>Notifications</span>
+                            <span class="badge bg-danger">3</span>
+                        </a>
+                    </li>
+
+                    <li><hr class="dropdown-divider"></li>
+
+                    <!-- ✅ FIX: Logout as POST form (CSRF protected) -->
+                    <li>
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="dropdown-item fs-sm text-danger border-0 bg-transparent w-100 text-start">
+                                <i class="bi bi-box-arrow-right me-2"></i>Logout
+                            </button>
+                        </form>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <a class="dropdown-item fs-sm" asp-controller="Account" asp-action="Login">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+
+    </div>
+</header>

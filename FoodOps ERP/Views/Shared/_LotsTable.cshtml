@@ -1,0 +1,59 @@
+﻿@model IEnumerable<dynamic>
+@{
+    var mode = ViewData["Mode"] as string ?? "lots";
+}
+@if (!Model.Any())
+{
+    <partial name="_EmptyState" model='"No lots found."' />
+}
+else
+{
+    <table class="table table-hover mb-0">
+        <thead><tr><th>Batch #</th><th>Product</th><th class="num">Quantity</th><th>Expiry</th><th>QC status</th><th class="text-end">Actions</th></tr></thead>
+        <tbody>
+            @foreach (var lot in Model)
+            {
+                int? days = Fmt.DaysLeft(lot.ExpiryDate);
+                <tr>
+                    <td><strong>@lot.BatchNumber</strong></td>
+                    <td>@lot.ProductName</td>
+                    <td class="num">@Fmt.Qty(lot.CurrentQuantity)</td>
+                    <td>
+                        @if (days is null)
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                        else
+                        {
+
+                            <span class="pill @Fmt.ExpiryClass(days)">@Fmt.ExpiryText(days)</span>
+                            <small class="text-muted ms-1">@Fmt.Date(lot.ExpiryDate)</small>
+                        }
+                    </td>
+                    <td><partial name="_StatusPill" model="lot.QCStatus" /></td>
+                    <td class="text-end">
+                        <div class="row-actions">
+                            @if (mode == "issue")
+                            {
+                                <a asp-controller="MaterialIssue" asp-action="Create" asp-route-batchId="@lot.BatchID" class="btn btn-primary btn-sm" data-modal="true" data-modal-title="Issue material" data-modal-size="md" data-modal-icon="bi-box-arrow-up"><i class="bi bi-box-arrow-up"></i>Issue</a>
+                                <a asp-controller="MaterialIssue" asp-action="Return" asp-route-batchId="@lot.BatchID" class="btn btn-outline-secondary btn-sm" data-modal="true" data-modal-title="Return material" data-modal-size="md" data-modal-icon="bi-box-arrow-in-down"><i class="bi bi-box-arrow-in-down"></i>Return</a>
+                            }
+                            else if (mode == "wastage")
+                            {
+                                <a asp-controller="Wastage" asp-action="Create" asp-route-batchId="@lot.BatchID" class="btn btn-outline-danger btn-sm" data-modal="true" data-modal-title="Record wastage" data-modal-size="md" data-modal-icon="bi-trash3"><i class="bi bi-trash3"></i>Record wastage</a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Stock" asp-action="Adjust" asp-route-batchId="@lot.BatchID" class="btn btn-outline-secondary btn-sm" data-modal="true" data-modal-title="Adjust stock" data-modal-size="md" data-modal-icon="bi-sliders"><i class="bi bi-sliders"></i>Adjust</a>
+                                @if (mode == "expiry")
+                                {
+                                    <a asp-controller="Wastage" asp-action="Create" asp-route-batchId="@lot.BatchID" class="btn btn-outline-danger btn-sm" data-modal="true" data-modal-title="Record wastage" data-modal-size="md" data-modal-icon="bi-trash3"><i class="bi bi-trash3"></i>Write off</a>
+                                }
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

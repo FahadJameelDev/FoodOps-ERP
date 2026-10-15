@@ -1,0 +1,33 @@
+﻿@model QCDecisionViewModel
+<form asp-action="Inspect" method="post" data-spa-form data-reload-url="@Url.Action("Index")" data-refresh="#grid-card" novalidate>
+    <div class="fo-modal__body">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+        <input type="hidden" asp-for="Id" /><input type="hidden" asp-for="BatchNumber" />
+        <input type="hidden" asp-for="ProductName" /><input type="hidden" asp-for="Quantity" />
+
+        <div class="info-strip">
+            <div><span>Batch</span><b>@Model.BatchNumber</b></div>
+            <div><span>Product</span><b>@Model.ProductName</b></div>
+            <div><span>Quantity</span><b>@Fmt.Qty(Model.Quantity)</b></div>
+        </div>
+
+        <label class="form-label">Decision <span class="text-danger">*</span></label>
+        <div class="choice-group">
+            <label class="choice choice--pass"><input type="radio" asp-for="Decision" value="Pass" /><span><i class="bi bi-check-circle"></i>Pass</span></label>
+            <label class="choice choice--fail"><input type="radio" asp-for="Decision" value="Fail" /><span><i class="bi bi-x-circle"></i>Fail</span></label>
+            <label class="choice choice--hold"><input type="radio" asp-for="Decision" value="Hold" /><span><i class="bi bi-pause-circle"></i>Hold</span></label>
+        </div>
+        <span asp-validation-for="Decision"></span>
+
+        <div class="mt-3">
+            <label asp-for="Remarks" class="form-label">Remarks</label>
+            <textarea asp-for="Remarks" class="form-control" rows="3" placeholder="Findings, test readings, reason…"></textarea>
+            <div class="form-hint">Required when failing or holding a batch.</div>
+            <span asp-validation-for="Remarks"></span>
+        </div>
+    </div>
+    <div class="fo-modal__footer">
+        <button type="button" class="btn btn-outline-secondary" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i><span>Submit decision</span></button>
+    </div>
+</form>

@@ -1,0 +1,6 @@
+﻿@model WastageViewModel
+@{
+    ViewData["Title"] = "Record Wastage"; ViewData["Subtitle"] = "Write off spoiled or damaged stock"; ViewData["Icon"] = "bi-trash3";
+}
+<partial name="_PageHeader" />
+<div class="card"><partial name="_WastageForm" model="Model" /></div>
