@@ -1,18 +1,17 @@
 ﻿@model List<StockMovementRow>
 @{
-    ViewData["Title"] = "Stock Movements"; ViewData["Subtitle"] = "Latest 200 inventory transactions"; ViewData["Icon"] = "bi-arrow-left-right";
+    ViewData["Title"] = "Stock Movements";
+    ViewData["Subtitle"] = "Latest 200 inventory transactions";
 }
 <partial name="_PageHeader" />
 
 <div class="card" id="grid-card">
-    <div class="card-header">
-        <h5 class="card-title"><i class="bi bi-clock-history"></i>Transactions<span class="count-chip">@Model.Count</span></h5>
-        <div class="grid-tools">
-            <label class="grid-search"><i class="bi bi-search"></i><input type="search" placeholder="Search…" aria-label="Search" data-table-filter="#mv-grid" /></label>
-            <a asp-action="Balance" class="btn btn-outline-secondary btn-sm"><i class="bi bi-box-seam"></i>Balance</a>
-        </div>
-    </div>
-    <div class="table-responsive table-scroll" id="mv-grid">
+    @Html.GridToolbar("Search movements…", "transactions", Model.Count, null, @<text>
+        <a href="@Url.Action("Balance")" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-box-seam"></i>Stock balance
+        </a>
+    </text>)
+<div class="table-scroll">
         @if (Model.Count == 0)
         {
             <partial name="_EmptyState" model='"No stock movements recorded yet."' />
@@ -20,21 +19,39 @@
         else
         {
             <table class="table table-hover mb-0">
-                <thead><tr><th>When</th><th>Batch #</th><th>Product</th><th>Type</th><th class="num">Quantity</th><th>Remarks</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>When</th>
+                        <th>Batch #</th>
+                        <th>Product</th>
+                        <th>Type</th>
+                        <th class="num">Quantity</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
                 <tbody>
                     @foreach (var m in Model)
                     {
                         <tr>
                             <td>@m.Timestamp.ToString("dd MMM yyyy, HH:mm")</td>
-                            <td><strong>@m.BatchNumber</strong></td>
+                            <td><span class="code">@m.BatchNumber</span></td>
                             <td>@m.ProductName</td>
                             <td><partial name="_StatusPill" model="m.TransactionType" /></td>
-                            <td class="num @(m.Quantity < 0 ? "text-danger" : "text-success")">@(m.Quantity > 0 ? "+" : "")@Fmt.Qty(m.Quantity)</td>
-                            <td class="text-muted">@(m.Remarks ?? "—")</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-    </div>
+                            <td class="num @(m.Quantity < 0 ? "text-danger" : "text-success")">
+                                @(m.Quantity > 0 ? "+" : "")@Fmt.Qty(m.Quantity)
+                            </td>
+                            <td>@if (string.IsNullOrWhiteSpace(m.Remarks)) {
+                                <span class="na">—</span>
+                            } else
+                            {
+
+                                @m.Remarks
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
 </div>

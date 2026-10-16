@@ -1,12 +1,8 @@
-﻿<div class="page-header">
-    <div>
-        <div class="page-title-row">
-            <div class="page-title-icon"><i class="bi @(ViewData["Icon"] ?? "bi-grid")"></i></div>
-            <h1 class="page-title">@ViewData["Title"]</h1>
-        </div>
-        @if (ViewData["Subtitle"] is string sub)
-        {
-            <p class="page-subtitle">@sub</p>
-        }
-    </div>
+﻿@* Slim page header — no icon tile, 20px title, inline subtitle *@
+<div class="ph">
+    <h1 class="ph__title">@ViewData["Title"]</h1>
+    @if (ViewData["Subtitle"] is string sub)
+    {
+        <p class="ph__sub">@sub</p>
+    }
 </div>

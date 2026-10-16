@@ -1,16 +1,19 @@
 ﻿@model IEnumerable<dynamic>
 @{
-    ViewData["Title"] = "Inventory Wastage"; ViewData["Subtitle"] = "Record spoilage, damage and losses against a lot"; ViewData["Icon"] = "bi-trash3"; ViewData["Mode"] = "wastage";
+    ViewData["Title"] = "Inventory Wastage";
+    ViewData["Subtitle"] = "Record spoilage, damage and losses against a lot";
+    ViewData["Mode"] = "wastage";
 }
 <partial name="_PageHeader" />
 
 <div class="card" id="grid-card">
-    <div class="card-header">
-        <h5 class="card-title"><i class="bi bi-boxes"></i>Lots<span class="count-chip">@Model.Count()</span></h5>
-        <div class="grid-tools">
-            <label class="grid-search"><i class="bi bi-search"></i><input type="search" placeholder="Search lots…" aria-label="Search lots" data-table-filter="#waste-grid" /></label>
-            <a asp-action="Create" class="btn btn-danger btn-sm" data-modal="true" data-modal-title="Record wastage" data-modal-size="md" data-modal-icon="bi-trash3"><i class="bi bi-plus-lg"></i>Record wastage</a>
-        </div>
+    @Html.GridToolbar("Search lots…", "lots", Model.Count(), null, @<text>
+        <a href="@Url.Action("Create")" class="btn btn-danger btn-sm"
+               data-modal="true" data-modal-title="Record wastage" data-modal-size="md" data-modal-icon="bi-trash3">
+            <i class="bi bi-plus-lg"></i>Record wastage
+        </a>
+    </text>)
+<div class="table-scroll">
+        <partial name="_LotsTable" model="Model" />
     </div>
-    <div class="table-responsive table-scroll" id="waste-grid"><partial name="_LotsTable" model="Model" /></div>
 </div>

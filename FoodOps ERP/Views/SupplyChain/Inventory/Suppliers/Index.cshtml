@@ -1,20 +1,14 @@
 ﻿@model List<SupplierViewModel>
 @{
-    ViewData["Title"] = "Suppliers";
-    ViewData["Subtitle"] = "Manage your suppliers";
-    ViewData["Icon"] = "bi-truck";
+    ViewData["Title"] = "Suppliers"; ViewData["Subtitle"] = "Vendors you buy raw materials and packaging from";
 }
 <partial name="_PageHeader" />
 
 <div class="card" id="grid-card">
-    <div class="card-header">
-        <h5 class="card-title"><i class="bi bi-list-ul"></i>Supplier List<span class="count-chip">@Model.Count</span></h5>
-        <div class="grid-tools">
-            <label class="grid-search"><i class="bi bi-search"></i><input type="search" placeholder="Search suppliers…" aria-label="Search suppliers" data-table-filter="#supplier-grid" /></label>
-            <a asp-action="Create" class="btn btn-primary btn-sm" data-modal="true" data-modal-title="Add Supplier" data-modal-size="lg" data-modal-icon="bi-plus-circle"><i class="bi bi-plus-lg"></i>Add Supplier</a>
-        </div>
-    </div>
-    <div class="table-responsive table-scroll" id="supplier-grid">
+    @Html.GridToolbar("Search suppliers…", "suppliers", Model.Count, "All|Active|Inactive", @<text>
+        <a href="@Url.Action("Create")" class="btn btn-primary btn-sm" data-modal="true" data-modal-title="Add Supplier" data-modal-size="lg" data-modal-icon="bi-plus-circle"><i class="bi bi-plus-lg"></i>Add Supplier</a>
+    </text>)
+<div class="table-scroll">
         @if (Model.Count == 0)
         {
             <partial name="_EmptyState" model='"No suppliers yet. Click “Add Supplier” to create the first one."' />
@@ -27,37 +21,51 @@
                     @foreach (var s in Model)
                     {
                         <tr>
-                            <td><strong>@s.SupplierCode</strong></td>
+                            <td><span class="code">@s.SupplierCode</span></td>
                             <td>@s.SupplierName</td>
-                            <td>@(s.ContactPerson ?? "—")</td>
-                            <td>@(s.Email ?? "—")</td>
-                            <td>@(s.Phone ?? "—")</td>
-                            <td>
-                                @if (s.Rating.HasValue)
-                                {
-                                    <span class="text-warning"><i class="bi bi-star-fill"></i> @s.Rating.Value.ToString("0.0")</span>
-                                }
-                                else
-                                {
+                            <td>@if (string.IsNullOrWhiteSpace(s.ContactPerson)) {
+                                <span class="na">—</span>
+                            } else
+                            {
 
-                                    <span class="text-muted">—</span>
-                                }
-                            </td>
-                            <td><partial name="_StatusPill" model='s.IsActive ? "Active" : "Inactive"' /></td>
-                            <td class="text-end">
-                                <div class="row-actions">
-                                    <a asp-action="Edit" asp-route-id="@s.SupplierID" class="btn btn-sm btn-outline-secondary" title="Edit"
-                                       data-modal="true" data-modal-title="Edit Supplier" data-modal-size="lg"><i class="bi bi-pencil"></i></a>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Delete"
-                                            data-delete-url="@Url.Action("Delete", new { id = s.SupplierID })" data-name="@s.SupplierName" data-refresh="#grid-card">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                                @s.ContactPerson
+                            }
+                        </td>
+                        <td>@if (string.IsNullOrWhiteSpace(s.Email)) {
+                            <span class="na">—</span>
+                        } else
+                        {
+
+                            <a href="mailto:@s.Email">@s.Email</a>
+                        }
+                    </td>
+                    <td>@if (string.IsNullOrWhiteSpace(s.Phone)) {
+                        <span class="na">—</span>
+                    } else
+                    {
+
+                        @s.Phone
                     }
-                </tbody>
-            </table>
-        }
-    </div>
+                </td>
+                <td>@if (s.Rating.HasValue) {
+                    <span class="text-warning"><i class="bi bi-star-fill"></i> @s.Rating.Value.ToString("0.0")</span>
+                } else
+                {
+
+                    <span class="na">—</span>
+                }
+            </td>
+            <td><partial name="_StatusPill" model='s.IsActive ? "Active" : "Inactive"' /></td>
+            <td class="text-end">
+                <div class="row-actions">
+                    <a asp-action="Edit" asp-route-id="@s.SupplierID" class="btn btn-sm btn-outline-secondary" title="Edit" data-modal="true" data-modal-title="Edit Supplier" data-modal-size="lg"><i class="bi bi-pencil"></i></a>
+                    <button type="button" class="btn btn-sm btn-outline-danger" title="Delete" data-delete-url="@Url.Action("Delete", new { id = s.SupplierID })" data-name="@s.SupplierName" data-refresh="#grid-card"><i class="bi bi-trash"></i></button>
+                </div>
+            </td>
+        </tr>
+    }
+</tbody>
+</table>
+    }
+</div>
 </div>

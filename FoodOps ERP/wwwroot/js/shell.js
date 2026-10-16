@@ -1,6 +1,6 @@
 ﻿/* ============================================================
-   FoodOps ERP — Shell v7.0
-   Sidebar (hover-intent) · Accordion · Active menu · Breadcrumb
+   FoodOps ERP — Shell v8.0
+   Sidebar (hover-intent) · Accordion · Active menu · Module tabs
    Filters · Shortcuts · Row click
    ============================================================ */
 (function () {
@@ -26,7 +26,7 @@
         if (hoverCapable) {
             sb.addEventListener('mouseenter', () => schedule(true, OPEN_DELAY));
             sb.addEventListener('mouseleave', () => schedule(false, CLOSE_DELAY));
-        } else {                                      // touch: tap se kholo, bahar tap se band
+        } else {
             sb.addEventListener('click', () => { if (isDesktop()) schedule(true, 0); });
             document.addEventListener('click', e => { if (!sb.contains(e.target)) schedule(false, 0); });
         }
@@ -54,20 +54,20 @@
         document.addEventListener('foodops:navigated', close);
     }
 
-    /* ── 3. Accordion: ek time pe ek hi open (Bootstrap events) ── */
+    /* ── 3. Accordion: ek time pe ek hi open ─────────────── */
     function initAccordion() {
         const nav = document.querySelector('.sidebar-nav');
         if (!nav || !window.bootstrap) return;
         nav.addEventListener('show.bs.collapse', e => {
             const el = e.target;
-            const siblings = [...el.parentElement.parentElement.children]
+            [...el.parentElement.parentElement.children]
                 .map(li => li.querySelector(':scope > .collapse'))
-                .filter(c => c && c !== el && c.classList.contains('show'));
-            siblings.forEach(c => bootstrap.Collapse.getOrCreateInstance(c, { toggle: false }).hide());
+                .filter(c => c && c !== el && c.classList.contains('show'))
+                .forEach(c => bootstrap.Collapse.getOrCreateInstance(c, { toggle: false }).hide());
         });
     }
 
-    /* ── 4. Active menu + breadcrumb (sidebar hi single source) ── */
+    /* ── 4. Active menu (sidebar = single source of truth) ── */
     const normPath = u => {
         try { return (new URL(u, location.origin).pathname.replace(/\/+$/, '') || '/').toLowerCase(); }
         catch { return '/'; }
@@ -103,65 +103,61 @@
             if (href === '#' || a.classList.contains('is-soon')) return;
             const h = normPath(href);
             const hit = h === p || (h !== '/' && p.startsWith(h + '/'));
-            if (hit && h.length > bestLen) { best = a; bestLen = h.length; }   // sab se lamba match; tie me pehla
+            if (hit && h.length > bestLen) { best = a; bestLen = h.length; }   // sab se lamba match
         });
         if (!best) return null;
 
         best.classList.add('active');
         best.setAttribute('aria-current', 'page');
-        const mod = best.closest('.nav-item');
+        best.closest('.nav-item')?.querySelector('.nav-module-toggle')?.classList.add('active-module');
         const grp = best.closest('.nav-group');
-        mod?.querySelector('.nav-module-toggle')?.classList.add('active-module');
         grp?.querySelector('.nav-group-toggle')?.classList.add('active-group');
         openCollapse(best.closest('.nav-features')?.parentElement);
         openCollapse(grp?.querySelector(':scope > .collapse'));
         return best;
     }
 
-    function updateBreadcrumb(fallbackTitle) {
-        const el = document.querySelector('.subheader-breadcrumb');
-        if (!el) return;
-        const active = document.querySelector('.sidebar-nav a.nav-link.active');
-        const frag = document.createDocumentFragment();
-        const add = node => {
-            if (frag.childNodes.length) {
-                const s = document.createElement('span');
-                s.className = 'crumb-sep';
-                s.innerHTML = '<i class="bi bi-chevron-right"></i>';
-                frag.appendChild(s);
-            }
-            frag.appendChild(node);
-        };
-        const span = (text, cls = 'crumb') => {
-            const n = document.createElement('span');
-            n.className = cls; n.textContent = text; return n;
-        };
-        const home = (current) => {
-            const n = document.createElement(current ? 'span' : 'a');
-            n.className = 'crumb' + (current ? ' current' : '');
-            if (!current) n.href = '/';
-            n.innerHTML = '<i class="bi bi-house"></i><span>Dashboard</span>';
-            return n;
-        };
+    /* ── 5. Module tab bar (router isi ko updateBreadcrumb ke naam se bulata hai) ── */
+    function updateBreadcrumb() {
+        const bar = document.querySelector('.subheader');
+        const nav = bar?.querySelector('.modnav');
+        if (!bar || !nav) return;
 
-        if (active && active.closest('.nav-dashboard')) {
-            add(home(true));
-        } else {
-            add(home(false));
-            if (active) {
-                const grp = active.closest('.nav-group')?.querySelector('.nav-group-toggle > span')?.textContent.trim();
-                const mod = active.closest('.nav-item')?.querySelector('.nav-module-toggle > span')?.textContent.trim();
-                if (grp) add(span(grp));
-                if (mod) add(span(mod));
-                add(span(active.textContent.trim(), 'crumb current'));
-            } else if (fallbackTitle) {
-                add(span(fallbackTitle, 'crumb current'));
-            }
-        }
-        el.replaceChildren(frag);
+        const active = document.querySelector('.sidebar-nav a.nav-link.active');
+        const list = active?.closest('.nav-features');
+        const seen = new Set();
+        const links = list ? [...list.querySelectorAll('a.nav-link')].filter(a => {
+            const href = a.getAttribute('href');
+            if (!href || href === '#' || a.classList.contains('is-soon') || seen.has(href)) return false;
+            seen.add(href);
+            return true;
+        }) : [];
+
+        if (!active || links.length < 2) { bar.hidden = true; nav.replaceChildren(); return; }   // dashboard / akeli feature
+
+        const label = document.createElement('span');
+        label.className = 'modnav__label';
+        label.textContent = active.closest('.nav-item')?.querySelector('.nav-module-toggle > span')?.textContent.trim() || '';
+
+        const strip = document.createElement('div');
+        strip.className = 'modnav__tabs';
+        const activeHref = active.getAttribute('href');
+        links.forEach(a => {
+            const t = document.createElement('a');
+            const on = a.getAttribute('href') === activeHref;
+            t.className = 'modnav__tab' + (on ? ' is-active' : '');
+            t.href = a.getAttribute('href');
+            t.textContent = a.dataset.short || a.textContent.trim();
+            if (on) t.setAttribute('aria-current', 'page');
+            strip.appendChild(t);
+        });
+
+        nav.replaceChildren(label, strip);
+        bar.hidden = false;
+        strip.querySelector('.is-active')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     }
 
-    /* ── 5. Placeholder menu items ("Soon") ──────────────── */
+    /* ── 6. Placeholder menu items ("Soon") ──────────────── */
     function markPlaceholders() {
         $$('.sidebar-nav a.nav-link[href="#"]').forEach(a => {
             a.classList.add('is-soon');
@@ -171,7 +167,7 @@
         });
     }
 
-    /* ── 6. Search shortcut + AI button ──────────────────── */
+    /* ── 7. Search shortcut + AI button ──────────────────── */
     function initSearch() {
         const kbd = document.querySelector('.topbar-search-kbd');
         if (kbd && !/Mac|iPhone|iPad/i.test(navigator.platform || navigator.userAgent)) kbd.textContent = 'Ctrl K';
@@ -192,7 +188,7 @@
         });
     }
 
-    /* ── 7. Filters (group-wise selection, persist, event) ─ */
+    /* ── 8. Filters (group-wise selection, persist, event) ─ */
     const FILTER_KEY = 'foodops_filters_v1';
     const FILTER_DEFAULTS = {
         'time range': 'Today', 'shift': 'All Shifts',
@@ -205,23 +201,6 @@
 
         const state = { ...FILTER_DEFAULTS };
         try { Object.assign(state, JSON.parse(localStorage.getItem(FILTER_KEY) || '{}')); } catch { /* ignore */ }
-
-        // markup se group/value nikalo (heading <strong> = group)
-        menus.forEach(menu => {
-            let group = '';
-            $$(':scope > li', menu).forEach(li => {
-                const h = li.querySelector('strong');
-                if (h) { group = h.textContent.trim().toLowerCase(); return; }
-                const a = li.querySelector('a.dropdown-item');
-                if (a && group) {
-                    const c = a.cloneNode(true);
-                    c.querySelectorAll('i, .text-muted').forEach(n => n.remove());
-                    a.dataset.filterGroup = group;
-                    a.dataset.filterValue = c.textContent.trim();
-                    a.setAttribute('role', 'menuitemradio');
-                }
-            });
-        });
 
         const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
 
@@ -262,15 +241,14 @@
             state[a.dataset.filterGroup] = a.dataset.filterValue;
             try { localStorage.setItem(FILTER_KEY, JSON.stringify(state)); } catch { /* ignore */ }
             render();
-            // dashboards/grids is event ko sun kar refetch karen
-            document.dispatchEvent(new CustomEvent('foodops:filters', { detail: { ...state } }));
+            document.dispatchEvent(new CustomEvent('foodops:filters', { detail: { ...state } }));   // grids/dashboard sun sakte hain
         });
 
         render();
         window.FoodOps.filters = { get: () => ({ ...state }) };
     }
 
-    /* ── 8. Table row click (SPA navigate) ───────────────── */
+    /* ── 9. Table row click (SPA navigate) ───────────────── */
     function initRowClick() {
         document.addEventListener('click', e => {
             const tr = e.target.closest('tr[data-href]');
@@ -288,9 +266,8 @@
         initSearch();
         initFilters();
         initRowClick();
-
         setActive(location.pathname);
-        updateBreadcrumb(document.querySelector('.page-title')?.textContent.trim());
+        updateBreadcrumb();
     });
 
     window.FoodOps = Object.assign(window.FoodOps || {}, { nav: { setActive, updateBreadcrumb } });

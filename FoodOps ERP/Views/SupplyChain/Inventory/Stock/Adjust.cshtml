@@ -1,6 +1,9 @@
 ﻿@model StockAdjustViewModel
 @{
-    ViewData["Title"] = "Adjust Stock"; ViewData["Subtitle"] = "Correct stock for a batch"; ViewData["Icon"] = "bi-sliders";
+    ViewData["Title"] = "Adjust Stock";
+    ViewData["Subtitle"] = "Correct stock for a batch";
 }
 <partial name="_PageHeader" />
-<div class="card"><partial name="_StockAdjustForm" model="Model" /></div>
+<div class="card">
+    <partial name="_StockAdjustForm" model="Model" />
+</div>

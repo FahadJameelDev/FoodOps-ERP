@@ -1,2 +1,5 @@
 ﻿@model string
-<div class="empty-state"><i class="bi @(ViewData["EmptyIcon"] ?? "bi-inbox")"></i><div>@Model</div></div>
+<div class="empty-state">
+    <i class="bi @(ViewData["EmptyIcon"] ?? "bi-inbox")" aria-hidden="true"></i>
+    <div>@Model</div>
+</div>

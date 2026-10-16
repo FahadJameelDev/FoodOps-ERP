@@ -1,5 +1,86 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Inventory Overview";
+    ViewData["Subtitle"] = "Stock health at a glance";
 }
+<partial name="_PageHeader" />
+
+<!-- ═══ KPI TILES ═══ -->
+<div class="tile-grid">
+    <a asp-controller="Stock" asp-action="Balance" class="tile">
+        <div class="tile-icon tile-icon--ok">
+            <i class="bi bi-box-seam" aria-hidden="true"></i>
+        </div>
+        <div>
+            <div class="tile-value">@ViewBag.TotalProducts</div>
+            <div class="tile-label">Products tracked</div>
+        </div>
+    </a>
+
+    <a asp-controller="Stock" asp-action="Balance" class="tile">
+        <div class="tile-icon tile-icon--warn">
+            <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+        </div>
+        <div>
+            <div class="tile-value">@ViewBag.LowStockCount</div>
+            <div class="tile-label">Low or out of stock</div>
+        </div>
+    </a>
+
+    <a asp-controller="IncomingQC" asp-action="Index" class="tile">
+        <div class="tile-icon tile-icon--info">
+            <i class="bi bi-patch-check" aria-hidden="true"></i>
+        </div>
+        <div>
+            <div class="tile-value">@ViewBag.PendingQCCount</div>
+            <div class="tile-label">Pending QC</div>
+        </div>
+    </a>
+
+    <a asp-controller="Lots" asp-action="Expiry" class="tile">
+        <div class="tile-icon tile-icon--bad">
+            <i class="bi bi-hourglass-split" aria-hidden="true"></i>
+        </div>
+        <div>
+            <div class="tile-value">@ViewBag.ExpiringCount</div>
+            <div class="tile-label">Expiring in 30 days</div>
+        </div>
+    </a>
+</div>
+
+<!-- ═══ QUICK ACTIONS ═══ -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="bi bi-lightning-charge" aria-hidden="true"></i>Quick actions
+        </h5>
+    </div>
+    <div class="card-body d-flex flex-wrap gap-2">
+        <a asp-controller="PurchaseOrders" asp-action="Create"
+               class="btn btn-primary btn-sm"
+               data-modal="true" data-modal-title="New Purchase Order" data-modal-size="xl">
+            <i class="bi bi-cart-plus"></i>New purchase order
+        </a>
+        <a asp-controller="GoodsReceiving" asp-action="Index"
+               class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-box-arrow-in-down"></i>Receive goods
+        </a>
+        <a asp-controller="MaterialIssue" asp-action="Create"
+               class="btn btn-outline-secondary btn-sm"
+               data-modal="true" data-modal-title="Issue material" data-modal-size="md">
+            <i class="bi bi-box-arrow-up"></i>Issue material
+        </a>
+        <a asp-controller="Stock" asp-action="Movements"
+               class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left-right"></i>Stock movements
+        </a>
+        <a asp-controller="Wastage" asp-action="Create"
+               class="btn btn-outline-danger btn-sm"
+               data-modal="true" data-modal-title="Record wastage" data-modal-size="md">
+            <i class="bi bi-trash3"></i>Record wastage
+        </a>
+        <a asp-controller="Lots" asp-action="Index"
+               class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-upc-scan"></i>All lots
+        </a>
+    </div>
+</div>

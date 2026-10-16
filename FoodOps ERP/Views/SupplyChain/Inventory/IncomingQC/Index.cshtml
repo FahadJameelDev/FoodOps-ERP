@@ -1,15 +1,13 @@
 ﻿@model IEnumerable<dynamic>
 @{
-    ViewData["Title"] = "Incoming QC"; ViewData["Subtitle"] = "Inspect received batches before they enter usable stock"; ViewData["Icon"] = "bi-patch-check";
+    ViewData["Title"] = "Incoming QC";
+    ViewData["Subtitle"] = "Inspect received batches before they enter usable stock";
 }
 <partial name="_PageHeader" />
 
 <div class="card" id="grid-card">
-    <div class="card-header">
-        <h5 class="card-title"><i class="bi bi-clipboard2-check"></i>Pending inspection<span class="count-chip">@Model.Count()</span></h5>
-        <div class="grid-tools"><label class="grid-search"><i class="bi bi-search"></i><input type="search" placeholder="Search batches…" aria-label="Search" data-table-filter="#qc-grid" /></label></div>
-    </div>
-    <div class="table-responsive table-scroll" id="qc-grid">
+    @Html.GridToolbar("Search batches…", "pending", Model.Count())
+    <div class="table-scroll">
         @if (!Model.Any())
         {
             ViewData["EmptyIcon"] = "bi-check2-all";
@@ -18,14 +16,24 @@
         else
         {
             <table class="table table-hover mb-0">
-                <thead><tr><th>Batch #</th><th>Product</th><th class="num">Quantity</th><th>Received</th><th>QC status</th><th class="text-end">Actions</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>Batch #</th>
+                        <th>Product</th>
+                        <th class="num">Quantity</th>
+                        <th>Received</th>
+                        <th>QC status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
                 <tbody>
                     @foreach (var b in Model)
                     {
                         string qc = Convert.ToString(b.QCStatus) ?? "";
-                        bool held = qc.Contains("hold", StringComparison.OrdinalIgnoreCase) || qc.Contains("quarantine", StringComparison.OrdinalIgnoreCase);
+                        bool held = qc.Contains("hold", StringComparison.OrdinalIgnoreCase)
+                                 || qc.Contains("quarantine", StringComparison.OrdinalIgnoreCase);
                         <tr>
-                            <td><strong>@b.BatchNumber</strong></td>
+                            <td><span class="code">@b.BatchNumber</span></td>
                             <td>@b.ProductName</td>
                             <td class="num">@Fmt.Qty(b.CurrentQuantity)</td>
                             <td>@Fmt.Date(b.ReceivedDate)</td>
@@ -35,16 +43,24 @@
                                     @if (held)
                                     {
                                         <button type="button" class="btn btn-sm btn-outline-secondary"
-                                                data-action-url="@Url.Action("Release", new { id = b.BatchID })" data-name="@b.BatchNumber"
-                                                data-confirm-title="Release batch?" data-confirm-message="The batch will leave hold and become available."
-                                                data-confirm-text="Release" data-refresh="#grid-card">
+                                                data-action-url="@Url.Action("Release", new { id = b.BatchID })"
+                                                data-name="@b.BatchNumber"
+                                                data-confirm-title="Release batch?"
+                                                data-confirm-message="The batch will leave hold and become available."
+                                                data-confirm-text="Release"
+                                                data-refresh="#grid-card">
                                             <i class="bi bi-unlock"></i>Release
                                         </button>
                                     }
                                     else
                                     {
                                         <a asp-action="Inspect" asp-route-id="@b.BatchID" class="btn btn-primary btn-sm"
-                                           data-modal="true" data-modal-title="Inspect batch @b.BatchNumber" data-modal-size="md" data-modal-icon="bi-patch-check"><i class="bi bi-search"></i>Inspect</a>
+                                               data-modal="true"
+                                               data-modal-title="Inspect batch @b.BatchNumber"
+                                               data-modal-size="md"
+                                               data-modal-icon="bi-patch-check">
+                                            <i class="bi bi-search"></i>Inspect
+                                        </a>
                                     }
                                 </div>
                             </td>

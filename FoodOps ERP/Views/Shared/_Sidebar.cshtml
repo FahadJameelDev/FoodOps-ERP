@@ -91,6 +91,7 @@
             </li>
 
             <!-- ═══ GROUP 2: SUPPLY CHAIN & INVENTORY ═══ -->
+            <!-- ═══ GROUP 2: SUPPLY CHAIN & INVENTORY ═══ -->
             <li class="nav-group">
                 <button class="nav-group-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#group2" aria-expanded="false">
                     <i class="bi bi-boxes" aria-hidden="true"></i>
@@ -107,15 +108,15 @@
                             </button>
                             <div class="collapse" id="mod-proc">
                                 <ul class="nav flex-column nav-features">
-                                    <li><a class="nav-link @activeClass("Suppliers", "Index")" asp-controller="Suppliers" asp-action="Index">Supplier Management</a></li>
-                                    <li><a class="nav-link @activeClass("PurchaseOrders", "Index")" asp-controller="PurchaseOrders" asp-action="Index">Purchase Management</a></li>
-                                    <li><a class="nav-link @activeClass("GoodsReceiving", "Index")" asp-controller="GoodsReceiving" asp-action="Index">Goods Receiving (GRN)</a></li>
-                                    <li><a class="nav-link @activeClass("IncomingQC", "Index")" asp-controller="IncomingQC" asp-action="Index">Incoming QC</a></li>
-                                    <li><a class="nav-link @activeClass("Stock", "Balance")" asp-controller="Stock" asp-action="Balance">Stock Management</a></li>
-                                    <li><a class="nav-link @activeClass("Lots", "Index")" asp-controller="Lots" asp-action="Index">Lot &amp; Expiry Tracking</a></li>
-                                    <li><a class="nav-link @activeClass("Stock", "Balance")" asp-controller="Stock" asp-action="Balance">Stock Control</a></li>
-                                    <li><a class="nav-link @activeClass("MaterialIssue", "Index")" asp-controller="MaterialIssue" asp-action="Index">Material Issue &amp; Return</a></li>
-                                    <li><a class="nav-link @activeClass("Wastage", "Index")" asp-controller="Wastage" asp-action="Index">Inventory Wastage</a></li>
+                                    <li><a class="nav-link @activeClass("Suppliers", "Index")" asp-controller="Suppliers" asp-action="Index" data-short="Suppliers">Supplier Management</a></li>
+                                    <li><a class="nav-link @activeClass("PurchaseOrders", "Index")" asp-controller="PurchaseOrders" asp-action="Index" data-short="Purchase Orders">Purchase Management</a></li>
+                                    <li><a class="nav-link @activeClass("GoodsReceiving", "Index")" asp-controller="GoodsReceiving" asp-action="Index" data-short="Goods Receiving">Goods Receiving (GRN)</a></li>
+                                    <li><a class="nav-link @activeClass("IncomingQC", "Index")" asp-controller="IncomingQC" asp-action="Index" data-short="Incoming QC">Incoming QC</a></li>
+                                    <li><a class="nav-link @activeClass("Stock", "Balance")" asp-controller="Stock" asp-action="Balance" data-short="Stock">Stock Management</a></li>
+                                    <li><a class="nav-link @activeClass("Stock", "Movements")" asp-controller="Stock" asp-action="Movements" data-short="Movements">Stock Movements</a></li>
+                                    <li><a class="nav-link @activeClass("Lots", "Index")" asp-controller="Lots" asp-action="Index" data-short="Lots &amp; Expiry">Lot &amp; Expiry Tracking</a></li>
+                                    <li><a class="nav-link @activeClass("MaterialIssue", "Index")" asp-controller="MaterialIssue" asp-action="Index" data-short="Material Issue">Material Issue &amp; Return</a></li>
+                                    <li><a class="nav-link @activeClass("Wastage", "Index")" asp-controller="Wastage" asp-action="Index" data-short="Wastage">Inventory Wastage</a></li>
                                 </ul>
                             </div>
                         </li>

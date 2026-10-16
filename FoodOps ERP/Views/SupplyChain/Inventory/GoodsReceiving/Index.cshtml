@@ -1,15 +1,13 @@
 ﻿@model IEnumerable<dynamic>
 @{
-    ViewData["Title"] = "Goods Receiving (GRN)"; ViewData["Subtitle"] = "Receive goods against approved purchase orders"; ViewData["Icon"] = "bi-box-arrow-in-down";
+    ViewData["Title"] = "Goods Receiving (GRN)";
+    ViewData["Subtitle"] = "Receive goods against approved purchase orders";
 }
 <partial name="_PageHeader" />
 
 <div class="card" id="grid-card">
-    <div class="card-header">
-        <h5 class="card-title"><i class="bi bi-hourglass-split"></i>Awaiting receipt<span class="count-chip">@Model.Count()</span></h5>
-        <div class="grid-tools"><label class="grid-search"><i class="bi bi-search"></i><input type="search" placeholder="Search…" aria-label="Search" data-table-filter="#grn-grid" /></label></div>
-    </div>
-    <div class="table-responsive table-scroll" id="grn-grid">
+    @Html.GridToolbar("Search orders…", "awaiting receipt", Model.Count())
+    <div class="table-scroll">
         @if (!Model.Any())
         {
             ViewData["EmptyIcon"] = "bi-check2-all";
@@ -18,19 +16,33 @@
         else
         {
             <table class="table table-hover mb-0">
-                <thead><tr><th>PO #</th><th>Supplier</th><th>Order date</th><th>Expected</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>PO #</th>
+                        <th>Supplier</th>
+                        <th>Order date</th>
+                        <th>Expected</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
                 <tbody>
                     @foreach (var po in Model)
                     {
                         <tr>
-                            <td><strong>@po.POCode</strong></td>
+                            <td><span class="code">@po.POCode</span></td>
                             <td>@po.SupplierName</td>
                             <td>@Fmt.Date(po.OrderDate)</td>
                             <td>@Fmt.Date(po.ExpectedDate)</td>
                             <td><partial name="_StatusPill" model="po.Status" /></td>
                             <td class="text-end">
                                 <a asp-action="Create" asp-route-id="@po.POID" class="btn btn-primary btn-sm"
-                                   data-modal="true" data-modal-title="Receive goods — @po.POCode" data-modal-size="xl" data-modal-icon="bi-box-arrow-in-down"><i class="bi bi-box-arrow-in-down"></i>Receive</a>
+                                       data-modal="true"
+                                       data-modal-title="Receive goods — @po.POCode"
+                                       data-modal-size="xl"
+                                       data-modal-icon="bi-box-arrow-in-down">
+                                    <i class="bi bi-box-arrow-in-down"></i>Receive
+                                </a>
                             </td>
                         </tr>
                     }

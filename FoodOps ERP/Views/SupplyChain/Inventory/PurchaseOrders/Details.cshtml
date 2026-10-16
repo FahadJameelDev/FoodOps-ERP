@@ -2,21 +2,32 @@
 @{
     ViewData["Title"] = $"PO {Model.POCode}";
     ViewData["Subtitle"] = "Purchase order details";
-    ViewData["Icon"] = "bi-cart3";
     bool isDraft = string.Equals(Model.Status, "Draft", StringComparison.OrdinalIgnoreCase);
 }
 <partial name="_PageHeader" />
 
 <div class="card mb-3">
     <div class="card-header">
-        <h5 class="card-title"><i class="bi bi-info-circle"></i>Summary <partial name="_StatusPill" model="Model.Status" /></h5>
+        <h5 class="card-title">
+            <i class="bi bi-info-circle"></i>Summary
+            <partial name="_StatusPill" model="Model.Status" />
+        </h5>
         <div class="grid-tools">
-            <a asp-action="Index" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i>Back</a>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i>Back
+            </a>
             @if (isDraft)
             {
-                <a asp-action="Edit" asp-route-id="@Model.POID" class="btn btn-outline-secondary btn-sm" data-modal="true" data-modal-title="Edit Purchase Order" data-modal-size="xl"><i class="bi bi-pencil"></i>Edit</a>
-                <button type="button" class="btn btn-primary btn-sm" data-action-url="@Url.Action("Approve", new { id = Model.POID })" data-name="@Model.POCode"
-                        data-confirm-title="Approve purchase order?" data-confirm-text="Approve" data-reload-url="@Url.Action("Details", new { id = Model.POID })">
+                <a asp-action="Edit" asp-route-id="@Model.POID" class="btn btn-outline-secondary btn-sm"
+                       data-modal="true" data-modal-title="Edit Purchase Order" data-modal-size="xl">
+                    <i class="bi bi-pencil"></i>Edit
+                </a>
+                <button type="button" class="btn btn-primary btn-sm"
+                        data-action-url="@Url.Action("Approve", new { id = Model.POID })"
+                        data-name="@Model.POCode"
+                        data-confirm-title="Approve purchase order?"
+                        data-confirm-text="Approve"
+                        data-reload-url="@Url.Action("Details", new { id = Model.POID })">
                     <i class="bi bi-check2-circle"></i>Approve
                 </button>
             }
@@ -37,10 +48,21 @@
 </div>
 
 <div class="card">
-    <div class="card-header"><h5 class="card-title"><i class="bi bi-list-check"></i>Items</h5></div>
+    <div class="card-header">
+        <h5 class="card-title"><i class="bi bi-list-check"></i>Items</h5>
+    </div>
     <div class="table-responsive">
         <table class="table mb-0">
-            <thead><tr><th>Product</th><th>UOM</th><th class="num">Ordered</th><th class="num">Received</th><th class="num">Unit cost</th><th class="num">Amount</th></tr></thead>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>UOM</th>
+                    <th class="num">Ordered</th>
+                    <th class="num">Received</th>
+                    <th class="num">Unit cost</th>
+                    <th class="num">Amount</th>
+                </tr>
+            </thead>
             <tbody>
                 @if (Model.Items is not null)
                 {

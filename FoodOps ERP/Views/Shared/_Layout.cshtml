@@ -18,10 +18,9 @@
         <div class="main-content">
             <partial name="_Topbar" />
 
-            <div class="subheader">
-                <nav class="subheader-breadcrumb" aria-label="breadcrumb">
-                    <a class="crumb" href="/"><i class="bi bi-house"></i><span>Dashboard</span></a>
-                </nav>
+            @* Module tabs: shell.js khud bharta hai; dashboard par chhupa rehta hai *@
+            <div class="subheader" hidden>
+                <nav class="modnav" aria-label="Module navigation"></nav>
             </div>
 
             <main class="page-content" id="pageContent" role="main" tabindex="-1">
@@ -32,12 +31,20 @@
         </div>
     </div>
 
+    @if (TempData["Success"] is string okMsg)
+    {
+        <script>document.addEventListener('DOMContentLoaded',()=>window.showToast(@Json.Serialize(okMsg),'success'));</script>
+    }
+    @if (TempData["Error"] is string errMsg)
+    {
+        <script>document.addEventListener('DOMContentLoaded',()=>window.showToast(@Json.Serialize(errMsg),'error'));</script>
+    }
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
 
-    <!-- Order important: ui -> shell -> router -->
     <script src="~/js/ui.js" asp-append-version="true"></script>
     <script src="~/js/shell.js" asp-append-version="true"></script>
     <script src="~/js/spa-router.js" asp-append-version="true"></script>

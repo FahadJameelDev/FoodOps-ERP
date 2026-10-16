@@ -1,6 +1,7 @@
 ﻿/* ============================================================
-   FoodOps ERP — UI Kit v7.1
+   FoodOps ERP — UI Kit v7.2
    Toast · Success Tick · Modal · Confirm · Action · Repeater
+   Grid search · Status chips · Column sort · Row count
    ============================================================ */
 (function () {
     'use strict';
@@ -228,7 +229,7 @@
             return;
         }
 
-        // ✅ REPLACED: [data-action-url] / [data-delete-url] => confirm + POST
+        // [data-action-url] / [data-delete-url] => confirm + POST
         const d = e.target.closest('[data-action-url],[data-delete-url]');
         if (d) {
             e.preventDefault();
@@ -267,7 +268,7 @@
         }
     });
 
-    /* ✅ ADDED: Grid search + repeater rows ───────── */
+    /* ── Grid search + status chips + sort + repeater ── */
     const num = n => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     function recalcRepeater(box) {
@@ -280,16 +281,85 @@
         const t = box.querySelector('[data-repeater-total]'); if (t) t.textContent = num(total);
     }
 
+    /* ✅ NEW: Apply grid filter (text + segment + count) */
+    function applyGrid(card) {
+        if (!card) return;
+        const q = (card.querySelector('[data-table-filter]')?.value || '').trim().toLowerCase();
+        const seg = (card.querySelector('.seg .is-on')?.dataset.value || '').toLowerCase();
+        const body = card.querySelector('tbody');
+        body?.querySelector('.no-match')?.remove();
+        const rows = [...card.querySelectorAll('tbody tr')].filter(r => !r.querySelector('.empty-state'));
+        let shown = 0;
+        rows.forEach(tr => {
+            const okText = !q || tr.textContent.toLowerCase().includes(q);
+            const okSeg = !seg || [...tr.cells].some(c => c.textContent.trim().toLowerCase() === seg);
+            tr.hidden = !(okText && okSeg);
+            if (!tr.hidden) shown++;
+        });
+        if (body && rows.length && !shown) {
+            const tr = body.insertRow();
+            tr.className = 'no-match';
+            const td = tr.insertCell();
+            td.colSpan = 99; td.className = 'empty-state'; td.textContent = 'No matching records.';
+        }
+        const c = card.querySelector('[data-grid-count]');
+        if (c) {
+            const noun = c.dataset.noun || 'records';
+            c.textContent = shown === rows.length ? `${rows.length} ${noun}` : `${shown} of ${rows.length} ${noun}`;
+        }
+    }
+
+    /* ✅ UPDATED: input listener — grid filter + repeater */
     document.addEventListener('input', e => {
         const f = e.target.closest('[data-table-filter]');
-        if (f) {
-            const q = f.value.trim().toLowerCase();
-            document.querySelectorAll(`${f.dataset.tableFilter} tbody tr`).forEach(tr => { tr.hidden = !!q && !tr.textContent.toLowerCase().includes(q); });
-        }
+        if (f) applyGrid(f.closest('.card'));
         const box = e.target.closest('[data-repeater]');
         if (box) recalcRepeater(box);
     });
 
+    /* ✅ NEW: status chips (All / Active / Inactive) */
+    document.addEventListener('click', e => {
+        const b = e.target.closest('.seg button');
+        if (!b) return;
+        b.parentElement.querySelectorAll('button').forEach(x => {
+            x.classList.toggle('is-on', x === b);
+            x.setAttribute('aria-pressed', String(x === b));
+        });
+        applyGrid(b.closest('.card'));
+    });
+
+    /* ✅ NEW: column sort (header click) */
+    const cellValue = td => {
+        const t = (td?.textContent || '').trim();
+        if (t === '' || t === '—' || t === '-') return null;
+        if (/^[-+]?\d[\d,]*(\.\d+)?$/.test(t)) return parseFloat(t.replace(/,/g, ''));
+        if (/^\d{1,2} [A-Za-z]{3} \d{4}/.test(t)) { const d = Date.parse(t); if (!isNaN(d)) return d; }
+        return t.toLowerCase();
+    };
+    document.addEventListener('click', e => {
+        const th = e.target.closest('.table thead th');
+        if (!th || (th.classList.contains('text-end') && th === th.parentElement.lastElementChild)) return;   // Actions column
+        const table = th.closest('table');
+        const body = table.tBodies[0];
+        if (!body) return;
+        const dir = th.getAttribute('aria-sort') === 'ascending' ? 'descending' : 'ascending';
+        table.querySelectorAll('thead th').forEach(h => h.removeAttribute('aria-sort'));
+        th.setAttribute('aria-sort', dir);
+        const k = dir === 'ascending' ? 1 : -1, idx = th.cellIndex;
+        const rows = [...body.rows].filter(r => !r.classList.contains('no-match'));
+        rows.sort((a, b) => {
+            const x = cellValue(a.cells[idx]), y = cellValue(b.cells[idx]);
+            if (x === null && y === null) return 0;
+            if (x === null) return 1;
+            if (y === null) return -1;
+            const cmp = (typeof x === 'number' && typeof y === 'number') ? x - y
+                : String(x).localeCompare(String(y), undefined, { numeric: true });
+            return cmp * k;
+        });
+        body.append(...rows);
+    });
+
+    /* ✅ Repeater add/remove */
     document.addEventListener('click', e => {
         const add = e.target.closest('[data-repeater-add]');
         if (add) {
