@@ -1,4 +1,5 @@
 ﻿using FoodOpsERP.Models.Entities;
+using FoodOpsERP.Models.Entities.Manufacturing;
 using Microsoft.EntityFrameworkCore;
 
 namespace FoodOpsERP.Data
@@ -20,7 +21,7 @@ namespace FoodOpsERP.Data
         public DbSet<Product> Products { get; set; }
 
         // ─────────────────────────────────────────────
-        // Procurement & Inventory Entities
+        // Procurement & Inventory Entities (Group 2)
         // ─────────────────────────────────────────────
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
@@ -38,6 +39,15 @@ namespace FoodOpsERP.Data
         public DbSet<HoldQuarantineLog> HoldQuarantineLogs { get; set; }
         public DbSet<NonConformanceReport> NonConformanceReports { get; set; }
         public DbSet<CertificateOfAnalysis> CertificatesOfAnalysis { get; set; }
+
+        // ─────────────────────────────────────────────
+        // Module 3.1 : Products & Recipes (Group 3)
+        // ─────────────────────────────────────────────
+        public DbSet<Recipe> Recipes { get; set; }
+        public DbSet<RecipeItem> RecipeItems { get; set; }
+        public DbSet<RecipeApproval> RecipeApprovals { get; set; }
+        public DbSet<RecipeChangeRequest> RecipeChangeRequests { get; set; }
+        public DbSet<PackagingConfig> PackagingConfigs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -325,6 +335,138 @@ namespace FoodOpsERP.Data
                       .WithMany(b => b.CertificatesOfAnalysis)
                       .HasForeignKey(e => e.BatchID)
                       .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ═════════════════════════════════════════════
+            // MODULE 3.1 : PRODUCTS & RECIPES CONFIGURATION
+            // ═════════════════════════════════════════════
+
+            // Recipe
+            modelBuilder.Entity<Recipe>(b =>
+            {
+                b.ToTable("Recipes");
+                b.HasKey(x => x.RecipeID);
+                b.Property(x => x.RecipeCode).HasMaxLength(30);
+                b.Property(x => x.Status).HasMaxLength(20);
+                b.Property(x => x.StandardBatchSize).HasPrecision(18, 4);
+                b.Property(x => x.YieldPercentage).HasPrecision(5, 2);
+                b.Property(x => x.ChangeSummary).HasMaxLength(500);
+
+                b.HasIndex(x => x.RecipeCode).IsUnique();
+                b.HasIndex(x => new { x.ProductID, x.VersionNo }).IsUnique();
+                b.HasIndex(x => x.ProductID)
+                 .IsUnique()
+                 .HasFilter("[IsCurrent] = 1")
+                 .HasDatabaseName("UX_Recipes_OneCurrentPerProduct");
+
+                b.HasOne<Product>().WithMany().HasForeignKey(x => x.ProductID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<UnitOfMeasure>().WithMany().HasForeignKey(x => x.BatchUOMID).OnDelete(DeleteBehavior.Restrict);
+
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ApprovedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // RecipeItem
+            modelBuilder.Entity<RecipeItem>(b =>
+            {
+                b.ToTable("RecipeItems");
+                b.HasKey(x => x.RecipeItemID);
+                b.Property(x => x.RequiredQty).HasPrecision(18, 4);
+                b.Property(x => x.ScrapPercent).HasPrecision(5, 2);
+                b.Property(x => x.Remarks).HasMaxLength(200);
+
+                b.HasIndex(x => new { x.RecipeID, x.LineNo }).IsUnique();
+                b.HasIndex(x => new { x.RecipeID, x.IngredientProductID }).IsUnique();
+                b.HasIndex(x => x.IngredientProductID);
+
+                b.HasOne(x => x.Recipe)
+                 .WithMany(r => r.Items)
+                 .HasForeignKey(x => x.RecipeID)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+                b.HasOne<Product>().WithMany().HasForeignKey(x => x.IngredientProductID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<UnitOfMeasure>().WithMany().HasForeignKey(x => x.UOMID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // RecipeApproval
+            modelBuilder.Entity<RecipeApproval>(b =>
+            {
+                b.ToTable("RecipeApprovals");
+                b.HasKey(x => x.ApprovalID);
+                b.Property(x => x.Decision).HasMaxLength(15);
+                b.Property(x => x.Comments).HasMaxLength(500);
+
+                b.HasIndex(x => new { x.RecipeID, x.StepNo, x.ApproverUserID }).IsUnique();
+                b.HasIndex(x => new { x.ApproverUserID, x.Decision });
+
+                b.HasOne(x => x.Recipe)
+                 .WithMany(r => r.Approvals)
+                 .HasForeignKey(x => x.RecipeID)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.RequestedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ApproverUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // RecipeChangeRequest
+            modelBuilder.Entity<RecipeChangeRequest>(b =>
+            {
+                b.ToTable("RecipeChangeRequests");
+                b.HasKey(x => x.ChangeID);
+                b.Property(x => x.ChangeNo).HasMaxLength(30);
+                b.Property(x => x.ChangeType).HasMaxLength(30);
+                b.Property(x => x.Reason).HasMaxLength(500);
+                b.Property(x => x.ImpactAssessment).HasMaxLength(1000);
+                b.Property(x => x.Status).HasMaxLength(20);
+
+                b.HasIndex(x => x.ChangeNo).IsUnique();
+                b.HasIndex(x => x.Status);
+                b.HasIndex(x => x.RecipeID);
+
+                // Yahan (r => r.ChangeRequests) specify kiya hai
+                b.HasOne(x => x.Recipe)
+                 .WithMany(r => r.ChangeRequests)
+                 .HasForeignKey(x => x.RecipeID)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                b.HasOne(x => x.NewRecipe)
+                 .WithMany()
+                 .HasForeignKey(x => x.NewRecipeID)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ApprovedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // PackagingConfig
+            modelBuilder.Entity<PackagingConfig>(b =>
+            {
+                b.ToTable("PackagingConfigs");
+                b.HasKey(x => x.PackagingConfigID);
+                b.Property(x => x.PackageType).HasMaxLength(30);
+                b.Property(x => x.PackageName).HasMaxLength(100);
+                b.Property(x => x.NetWeight).HasPrecision(18, 4);
+                b.Property(x => x.GrossWeight).HasPrecision(18, 4);
+                b.Property(x => x.Barcode).HasMaxLength(50);
+
+                b.HasIndex(x => new { x.ProductID, x.PackageType, x.UnitsPerPack }).IsUnique();
+                b.HasIndex(x => x.ProductID)
+                 .IsUnique()
+                 .HasFilter("[IsDefault] = 1")
+                 .HasDatabaseName("UX_PackagingConfigs_OneDefaultPerProduct");
+                b.HasIndex(x => x.Barcode)
+                 .IsUnique()
+                 .HasFilter("[Barcode] IS NOT NULL");
+
+
+                // Nayi line (Sahi):
+                b.HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<UnitOfMeasure>().WithMany().HasForeignKey(x => x.WeightUOMID).OnDelete(DeleteBehavior.Restrict);
+
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
             });
         }
     }

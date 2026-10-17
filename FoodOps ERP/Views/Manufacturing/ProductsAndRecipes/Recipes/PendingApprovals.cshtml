@@ -1,0 +1,40 @@
+﻿@model List<FoodOpsERP.Models.Manufacturing.ProductsAndRecipes.ViewModels.RecipeViewModel>
+@{
+    ViewData["Title"] = "Pending Approvals";
+    ViewData["Subtitle"] = "Recipes waiting for your approval";
+}
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search approvals...", "approvals", Model.Count, null, _ => Html.Raw(@"<a href='/Recipes' class='btn btn-outline-secondary btn-sm'><i class='bi bi-arrow-left'></i> All Recipes</a>"))
+
+    <div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Recipe Code</th><th>Product</th><th>Version</th><th>Submitted</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="code">@item.RecipeCode</span></td>
+                            <td>@item.ProductName</td>
+                            <td>v@(item.VersionNo)</td>
+                            <td>@item.CreatedAt.ToString("dd MMM yyyy")</td>
+                            <td class="text-end">
+                                <div class="row-actions">
+                                    <a href="/Recipes/Details/@item.RecipeID" class="btn btn-primary btn-sm"><i class="bi bi-search"></i> Review</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            ViewData["EmptyIcon"] = "bi-check2-all";
+            <partial name="_EmptyState" model='"No pending approvals. You are all caught up!"' />
+        }
+    </div>
+</div>

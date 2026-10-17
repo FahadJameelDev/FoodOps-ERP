@@ -1,6 +1,7 @@
 using FoodOpsERP.Data;
 using FoodOpsERP.Middlewares;
 using FoodOpsERP.Services.Inventory;
+using FoodOpsERP.Services.Manufacturing.ProductsAndRecipes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,6 +31,10 @@ builder.Services.AddControllersWithViews(options =>
 })
 .AddRazorOptions(options =>
 {
+
+    // YEH NAYI LINE ADD HUI HAI:
+    options.ViewLocationExpanders.Add(new FoodOpsERP.Infrastructure.ModuleViewLocationExpander());
+
     options.ViewLocationFormats.Add("/Views/SupplyChain/Inventory/{1}/{0}.cshtml");
     options.ViewLocationFormats.Add("/Views/SupplyChain/{1}/{0}.cshtml");
     options.ViewLocationFormats.Add("/Views/Manufacturing/{1}/{0}.cshtml");
@@ -73,6 +78,11 @@ builder.Services.AddScoped<IGoodsReceivingService, GoodsReceivingService>();
 builder.Services.AddScoped<IIncomingQCService, IncomingQCService>();
 builder.Services.AddScoped<IStockService, StockService>();
 builder.Services.AddScoped<IInventoryLookupService, InventoryLookupService>();
+// Module 3.1 - Products & Recipes
+builder.Services.AddScoped<IRecipeService, RecipeService>();
+builder.Services.AddScoped<IPackagingConfigService, PackagingConfigService>();
+builder.Services.AddScoped<IRecipeChangeRequestService, RecipeChangeRequestService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 
 // ═══════════════════════════════════════════════════════════

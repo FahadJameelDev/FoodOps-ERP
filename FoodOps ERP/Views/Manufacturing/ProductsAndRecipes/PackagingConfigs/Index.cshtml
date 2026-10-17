@@ -1,0 +1,71 @@
+﻿@model List<FoodOpsERP.Models.Manufacturing.ProductsAndRecipes.ViewModels.PackagingConfigViewModel>
+@{
+    ViewData["Title"] = "Packaging Configuration";
+    ViewData["Subtitle"] = "Manage product packaging setups";
+}
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @{
+        var actions = new Func<object?, Microsoft.AspNetCore.Html.IHtmlContent>(_ =>
+            Html.Raw(@"
+                <a href='/PackagingConfigs/Create' class='btn btn-primary btn-sm' data-modal='true' data-modal-title='New Packaging Config' data-modal-size='lg'>
+                    <i class='bi bi-plus-lg'></i> Add Packaging
+                </a>
+            ")
+        );
+    }
+    @Html.GridToolbar("Search packaging...", "configs", Model.Count, null, actions)
+
+    <div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Package Type</th>
+                        <th>Package Name</th>
+                        <th class="num">Units/Pack</th>
+                        <th class="num">Net Wt</th>
+                        <th class="num">Gross Wt</th>
+                        <th>Default</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@item.ProductName</strong></td>
+                            <td>@item.PackageType</td>
+                            <td>@item.PackageName</td>
+                            <td class="num">@item.UnitsPerPack</td>
+                            <td class="num">@item.NetWeight.ToString("N4")</td>
+                            <td class="num">@item.GrossWeight.ToString("N4")</td>
+                            <td>
+                                @if (item.IsDefault)
+                                {
+                                    <span class="pill pill--ok"><i class="dot"></i>Yes</span>
+                                }
+                                else
+                                {
+                                    <span class="na">—</span>
+                                }
+                            </td>
+                            <td><partial name="_StatusPill" model='item.IsActive ? "Active" : "Inactive"' /></td>
+                            <td class="text-end">
+                                <a href="/PackagingConfigs/Edit/@item.PackagingConfigID" class="btn btn-sm btn-outline-secondary" data-modal="true" data-modal-title="Edit Packaging" data-modal-size="lg" title="Edit"><i class="bi bi-pencil"></i></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <partial name="_EmptyState" model='"No packaging configs found. Click “Add Packaging” to create one."' />
+        }
+    </div>
+</div>

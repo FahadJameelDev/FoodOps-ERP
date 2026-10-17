@@ -125,6 +125,7 @@
             </li>
 
             <!-- ═══ GROUP 3: MANUFACTURING & QUALITY ═══ -->
+            <!-- ═══ GROUP 3: MANUFACTURING & QUALITY ═══ -->
             <li class="nav-group">
                 <button class="nav-group-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#group3" aria-expanded="false">
                     <i class="bi bi-gear-wide-connected" aria-hidden="true"></i>
@@ -133,6 +134,8 @@
                 </button>
                 <div class="collapse" id="group3">
                     <ul class="nav flex-column nav-sub">
+                        
+                        <!-- Module 3.1: Products & Recipes -->
                         <li class="nav-item">
                             <button class="nav-module-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-products" aria-expanded="false">
                                 <i class="bi bi-journal-text" aria-hidden="true"></i>
@@ -141,15 +144,19 @@
                             </button>
                             <div class="collapse" id="mod-products">
                                 <ul class="nav flex-column nav-features">
-                                    <li><a class="nav-link" href="#">Product Catalogue</a></li>
-                                    <li><a class="nav-link" href="#">Product Packaging Configuration</a></li>
-                                    <li><a class="nav-link" href="#">Recipe Management</a></li>
-                                    <li><a class="nav-link" href="#">Recipe Versioning</a></li>
-                                    <li><a class="nav-link" href="#">Recipe Approval</a></li>
-                                    <li><a class="nav-link" href="#">Recipe Change Control</a></li>
+                                    <!-- Note: Product Catalogue abhi purane Products page par jayega, jab hum usko Group 3 mein shift karenge tab link update hoga -->
+                                    <li><a class="nav-link" asp-controller="Products" asp-action="Index" data-short="Catalogue">Product Catalogue</a></li>
+                                    <li><a class="nav-link @activeClass("PackagingConfigs", "Index")" asp-controller="PackagingConfigs" asp-action="Index" data-short="Packaging">Product Packaging Configuration</a></li>
+                                    <li><a class="nav-link @activeClass("Recipes", "Index")" asp-controller="Recipes" asp-action="Index" data-short="Recipes">Recipe Management</a></li>
+                                    <li><a class="nav-link @activeClass("Recipes", "PendingApprovals")" asp-controller="Recipes" asp-action="PendingApprovals" data-short="Approvals">Recipe Approval</a></li>
+                                    <li><a class="nav-link @activeClass("RecipeChangeRequests", "Index")" asp-controller="RecipeChangeRequests" asp-action="Index" data-short="Changes">Recipe Change Control</a></li>
+                                    <!-- Recipe Versioning ka apna page nahi hai, woh Details tab mein hai, isliye ise filhal Recipe Management se link kar rahe hain -->
+                                    <li><a class="nav-link @activeClass("Recipes", "Index")" asp-controller="Recipes" asp-action="Index" data-short="Versioning">Recipe Versioning</a></li>
                                 </ul>
                             </div>
                         </li>
+
+                        <!-- Module 3.2: Production & Manufacturing (Abhi Views nahi bane) -->
                         <li class="nav-item">
                             <button class="nav-module-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-prod" aria-expanded="false">
                                 <i class="bi bi-diagram-3" aria-hidden="true"></i>
@@ -171,6 +178,8 @@
                                 </ul>
                             </div>
                         </li>
+
+                        <!-- Module 3.3: Quality Control (Abhi Views nahi bane) -->
                         <li class="nav-item">
                             <button class="nav-module-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-quality" aria-expanded="false">
                                 <i class="bi bi-patch-check" aria-hidden="true"></i>
@@ -188,6 +197,8 @@
                                 </ul>
                             </div>
                         </li>
+
+                        <!-- Module 3.4: Costing & Variance (Abhi Views nahi bane) -->
                         <li class="nav-item">
                             <button class="nav-module-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-costing" aria-expanded="false">
                                 <i class="bi bi-calculator" aria-hidden="true"></i>

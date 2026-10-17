@@ -1,0 +1,92 @@
+﻿@model FoodOpsERP.Models.Manufacturing.ProductsAndRecipes.ViewModels.RecipeViewModel
+@{
+    ViewData["Title"] = $"Recipe: {Model.RecipeCode}";
+    ViewData["Subtitle"] = $"Version {Model.VersionNo} • Status: {Model.Status}";
+}
+<partial name="_PageHeader" />
+
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="card-title"><i class="bi bi-info-circle"></i>Recipe Information <partial name="_StatusPill" model="Model.Status" /></h5>
+                <div class="grid-tools">
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i>Back</a>
+                    @if (Model.Status == "Draft" || Model.Status == "Rejected")
+                    {
+                        <a asp-action="Edit" asp-route-id="@Model.RecipeID" class="btn btn-outline-primary btn-sm" data-modal="true" data-modal-title="Edit Recipe" data-modal-size="lg"><i class="bi bi-pencil"></i>Edit</a>
+                        <button type="button" class="btn btn-primary btn-sm" data-action-url="/Recipes/SubmitForApproval?id=@Model.RecipeID" data-confirm-title="Submit for approval?" data-confirm-text="Submit" data-refresh="#grid-card"><i class="bi bi-send"></i>Submit</button>
+                    }
+                    @if (Model.Status == "Approved" && !Model.IsCurrent)
+                    {
+                        <button type="button" class="btn btn-warning btn-sm text-dark" data-action-url="/Recipes/SetCurrent?id=@Model.RecipeID" data-confirm-title="Set as current version?" data-confirm-text="Set Current" data-refresh="#grid-card"><i class="bi bi-star"></i>Set Current</button>
+                    }
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Product</span><b>@Model.ProductName</b></div>
+                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Batch Size</span><b>@Model.StandardBatchSize @Model.BatchUOMName</b></div>
+                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Yield</span><b>@Model.YieldPercentage %</b></div>
+                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Effective From</span><b>@(Model.EffectiveFrom?.ToString("dd MMM yyyy") ?? "N/A")</b></div>
+                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Effective To</span><b>@(Model.EffectiveTo?.ToString("dd MMM yyyy") ?? "N/A")</b></div>
+                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Current</span><b>@(Model.IsCurrent ? "Yes" : "No")</b></div>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.ChangeSummary))
+                {
+                    <hr />
+                    <span class="text-muted d-block fs-xs mb-1">Change Summary</span>
+                    <p class="mb-0">@Model.ChangeSummary</p>
+                }
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h5 class="card-title"><i class="bi bi-list-check"></i>Ingredients</h5></div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>#</th><th>Ingredient</th><th class="num">Qty</th><th>UOM</th><th class="num">Scrap %</th><th>Critical</th></tr></thead>
+                    <tbody>
+                        @if (Model.Items != null && Model.Items.Any())
+                        {
+                            foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td>@item.LineNo</td>
+                                    <td><strong>@item.IngredientName</strong></td>
+                                    <td class="num">@item.RequiredQty</td>
+                                    <td>@item.UOMName</td>
+                                    <td class="num">@item.ScrapPercent %</td>
+                                    <td>@(item.IsCritical? Html.Raw("<span class='text-danger'>Yes</span>") : "No")</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="6" class="text-center text-muted py-3">No ingredients added yet.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header"><h5 class="card-title"><i class="bi bi-clock-history"></i>History</h5></div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="text-muted d-block fs-xs">Created At</span>
+                    <b>@Model.CreatedAt.ToString("dd MMM yyyy, HH:mm")</b>
+                </div>
+                @if (Model.ApprovedAt.HasValue)
+                {
+                    <div>
+                        <span class="text-muted d-block fs-xs">Approved At</span>
+                        <b>@Model.ApprovedAt.Value.ToString("dd MMM yyyy, HH:mm")</b>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

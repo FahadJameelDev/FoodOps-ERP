@@ -1,0 +1,83 @@
+﻿@model List<FoodOpsERP.Models.Manufacturing.ProductsAndRecipes.ViewModels.RecipeChangeRequestViewModel>
+@{
+    ViewData["Title"] = "Recipe Change Control";
+    ViewData["Subtitle"] = "Manage formal change requests for approved recipes";
+}
+
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @{
+        var actions = new Func<object?, Microsoft.AspNetCore.Html.IHtmlContent>(_ =>
+            Html.Raw(@"
+                <a href='/RecipeChangeRequests/Create' class='btn btn-primary btn-sm' data-modal='true' data-modal-title='New Change Request' data-modal-size='lg'>
+                    <i class='bi bi-plus-lg'></i> New Request
+                </a>
+            ")
+        );
+    }
+    @Html.GridToolbar("Search change requests...", "requests", Model.Count, null, actions)
+
+    <div class="table-scroll">
+        @if (Model != null && Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Change No</th>
+                        <th>Recipe Code</th>
+                        <th>Change Type</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                        <th>Requested At</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="code">@item.ChangeNo</span></td>
+                            <td><strong>@item.RecipeCode</strong></td>
+                            <td>@item.ChangeType</td>
+                            <td class="text-truncate" style="max-width: 200px;" title="@item.Reason">@item.Reason</td>
+                            <td><partial name="_StatusPill" model="item.Status" /></td>
+                            <td>@item.CreatedAt.ToString("dd MMM yyyy")</td>
+                            <td class="text-end">
+                                <div class="row-actions">
+                                    @if (item.Status == "Requested" || item.Status == "UnderReview")
+                                    {
+                                        <button type="button" class="btn btn-sm btn-outline-success" title="Approve"
+                                                data-action-url="@Url.Action("Approve", new { id = item.ChangeID })"
+                                                data-name="@item.ChangeNo"
+                                                data-confirm-title="Approve Change Request?"
+                                                data-confirm-message="This will mark the change request as approved."
+                                                data-confirm-text="Approve"
+                                                data-refresh="#grid-card">
+                                            <i class="bi bi-check2-circle"></i>
+                                        </button>
+                                    
+                                        <button type="button" class="btn btn-sm btn-outline-danger" title="Reject"
+                                                data-action-url="@Url.Action("Reject", new { id = item.ChangeID })"
+                                                data-name="@item.ChangeNo"
+                                                data-confirm-title="Reject Change Request?"
+                                                data-confirm-message="This will mark the change request as rejected."
+                                                data-confirm-text="Reject"
+                                                data-refresh="#grid-card">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            ViewData["EmptyIcon"] = "bi-clipboard-check";
+            <partial name="_EmptyState" model='"No change requests found."' />
+        }
+    </div>
+</div>

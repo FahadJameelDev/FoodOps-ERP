@@ -1,0 +1,61 @@
+﻿@model List<FoodOpsERP.Models.Manufacturing.ProductsAndRecipes.ViewModels.ProductViewModel>
+@{
+    ViewData["Title"] = "Product Catalogue";
+    ViewData["Subtitle"] = "Manage your finished goods and raw materials";
+}
+
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search products...", "products", Model.Count, "All|Active|Inactive", @<text>
+        <a href="@Url.Action("Create")" class="btn btn-primary btn-sm" data-modal="true" data-modal-title="Add Product" data-modal-size="lg" data-modal-icon="bi-plus-circle">
+            <i class="bi bi-plus-lg"></i>Add Product
+        </a>
+    </text>)
+
+<div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>UOM</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="code">@item.ProductCode</span></td>
+                            <td>@item.ProductName</td>
+                            <td>@item.CategoryName</td>
+                            <td>@item.UOMName</td>
+                            <td><partial name="_StatusPill" model="item.ProductType" /></td>
+                            <td><partial name="_StatusPill" model='item.IsActive ? "Active" : "Inactive"' /></td>
+                            <td class="text-end">
+                                <div class="row-actions">
+                                    <a asp-action="Edit" asp-route-id="@item.ProductID" class="btn btn-sm btn-outline-secondary" title="Edit" data-modal="true" data-modal-title="Edit Product" data-modal-size="lg">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Delete" data-delete-url="@Url.Action("Delete", new { id = item.ProductID })" data-name="@item.ProductName" data-refresh="#grid-card">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <partial name="_EmptyState" model='"No products found. Click Add Product to create one."' />
+        }
+    </div>
+</div>

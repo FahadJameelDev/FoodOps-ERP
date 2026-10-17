@@ -1,0 +1,12 @@
+﻿@model FoodOpsERP.Models.Manufacturing.ProductsAndRecipes.ViewModels.RecipeViewModel
+@{
+    ViewData["Title"] = "New Recipe";
+    ViewData["Subtitle"] = "Create a new product recipe";
+}
+
+<partial name="_PageHeader" />
+
+<div class="card">
+    <!-- Form ko direct card ke andar call karein -->
+    <partial name="_RecipeForm" model="Model" />
+</div>

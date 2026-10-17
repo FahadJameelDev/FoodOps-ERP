@@ -1,0 +1,73 @@
+﻿@model List<FoodOpsERP.Models.Manufacturing.ProductsAndRecipes.ViewModels.RecipeViewModel>
+@{
+    ViewData["Title"] = "Recipe Management";
+    ViewData["Subtitle"] = "Manage product recipes and versions";
+}
+
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @{
+        var actions = new Func<object?, Microsoft.AspNetCore.Html.IHtmlContent>(_ =>
+            Html.Raw(@"
+                <a href='/Recipes/PendingApprovals' class='btn btn-outline-secondary btn-sm'><i class='bi bi-clock-history'></i> Pending Approvals</a>
+                <a href='/Recipes/Create' class='btn btn-primary btn-sm' data-modal='true' data-modal-title='New Recipe' data-modal-size='lg'><i class='bi bi-plus-lg'></i> New Recipe</a>
+            ")
+        );
+    }
+    @Html.GridToolbar("Search recipes...", "recipes", Model.Count, null, actions)
+
+    <div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Recipe Code</th>
+                        <th>Product</th>
+                        <th>Version</th>
+                        <th class="num">Batch Size</th>
+                        <th class="num">Yield %</th>
+                        <th>Status</th>
+                        <th>Current</th>
+                        <th>Created</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr data-href="/Recipes/Details/@item.RecipeID">
+                            <td><span class="code">@item.RecipeCode</span></td>
+                            <td>@item.ProductName</td>
+                            <td>v@(item.VersionNo)</td>
+                            <td class="num">@item.StandardBatchSize.ToString("N4")</td>
+                            <td class="num">@item.YieldPercentage.ToString("N2") %</td>
+                            <td><partial name="_StatusPill" model="item.Status" /></td>
+                            <td>
+                                @if (item.IsCurrent)
+                                {
+                                    <span class="pill pill--ok"><i class="dot"></i>Current</span>
+                                }
+                            </td>
+                            <td>@item.CreatedAt.ToString("dd MMM yyyy")</td>
+                            <td class="text-end">
+                                <div class="row-actions">
+                                    <a href="/Recipes/Details/@item.RecipeID" class="btn btn-sm btn-outline-secondary" title="View"><i class="bi bi-eye"></i></a>
+                                    @if (item.Status == "Draft" || item.Status == "Rejected")
+                                    {
+                                        <a href="/Recipes/Edit/@item.RecipeID" class="btn btn-sm btn-outline-primary" data-modal="true" data-modal-title="Edit Recipe" data-modal-size="lg" title="Edit"><i class="bi bi-pencil"></i></a>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <partial name="_EmptyState" model='"No Recipes Found. Create your first recipe to get started."' />
+        }
+    </div>
+</div>
