@@ -1,0 +1,94 @@
+﻿@model FoodOpsERP.Models.Manufacturing.Production.ViewModels.ProductionPlanViewModel
+@{
+    ViewData["Title"] = $"Plan {Model.PlanCode}";
+    ViewData["Subtitle"] = "Production Plan Details";
+    bool isDraft = Model.Status == "Draft";
+    bool isApproved = Model.Status == "Approved";
+    bool isReleased = Model.Status == "Released";
+}
+<partial name="_PageHeader" />
+
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="card-title"><i class="bi bi-info-circle"></i>Plan Info <partial name="_StatusPill" model="Model.Status" /></h5>
+                <div class="grid-tools">
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i>Back</a>
+                    
+                    @if (isDraft)
+                    {
+                        <button type="button" class="btn btn-success btn-sm" data-action-url="@Url.Action("Approve", new { id = Model.PlanID })" data-confirm-title="Approve Plan?" data-confirm-text="Approve" data-reload-url="@Url.Action("Details", new { id = Model.PlanID })"><i class="bi bi-check2-circle"></i>Approve</button>
+                    }
+                    @if (isApproved)
+                    {
+                        <button type="button" class="btn btn-primary btn-sm" data-action-url="@Url.Action("Release", new { id = Model.PlanID })" data-confirm-title="Release Plan?" data-confirm-text="Release" data-reload-url="@Url.Action("Details", new { id = Model.PlanID })"><i class="bi bi-box-arrow-up"></i>Release</button>
+                    }
+                    @if (isReleased)
+                    {
+                        <button type="button" class="btn btn-secondary btn-sm" data-action-url="@Url.Action("Close", new { id = Model.PlanID })" data-confirm-title="Close Plan?" data-confirm-text="Close" data-reload-url="@Url.Action("Details", new { id = Model.PlanID })"><i class="bi bi-lock"></i>Close</button>
+                    }
+                    @if (Model.Status != "Closed" && Model.Status != "Cancelled")
+                    {
+                        <button type="button" class="btn btn-outline-danger btn-sm" data-action-url="@Url.Action("Cancel", new { id = Model.PlanID })" data-confirm-title="Cancel Plan?" data-confirm-text="Cancel" data-reload-url="@Url.Action("Details", new { id = Model.PlanID })"><i class="bi bi-x-circle"></i>Cancel</button>
+                    }
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Plant</span><b>@Model.PlantName</b></div>
+                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Start Date</span><b>@Model.StartDate.ToString("dd MMM yyyy")</b></div>
+                    <div class="col-md-4"><span class="text-muted d-block fs-xs">End Date</span><b>@Model.EndDate.ToString("dd MMM yyyy")</b></div>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.Notes))
+                {
+                    <hr />
+                    <span class="text-muted d-block fs-xs mb-1">Notes</span>
+                    <p class="mb-0">@Model.Notes</p>
+                }
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h5 class="card-title"><i class="bi bi-list-check"></i>Plan Lines</h5></div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>#</th><th>Product</th><th>Recipe</th><th class="num">Qty</th><th>Date</th><th>Priority</th><th>Status</th></tr></thead>
+                    <tbody>
+                        @foreach (var line in Model.Lines)
+                        {
+                            <tr>
+                                <td>@line.LineNo</td>
+                                <td><strong>@line.ProductName</strong></td>
+                                <td>@line.RecipeCode</td>
+                                <td class="num">@line.PlannedQty.ToString("N4") @line.UOMName</td>
+                                <td>@line.PlannedDate.ToString("dd MMM yyyy")</td>
+                                <td>@line.Priority</td>
+                                <td><partial name="_StatusPill" model="line.Status" /></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header"><h5 class="card-title"><i class="bi bi-clock-history"></i>History</h5></div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="text-muted d-block fs-xs">Created At</span>
+                    <b>@Model.CreatedAt.ToString("dd MMM yyyy, HH:mm")</b>
+                </div>
+                @if (Model.ApprovedAt.HasValue)
+                {
+                    <div>
+                        <span class="text-muted d-block fs-xs">Approved At</span>
+                        <b>@Model.ApprovedAt.Value.ToString("dd MMM yyyy, HH:mm")</b>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

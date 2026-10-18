@@ -1,0 +1,9 @@
+﻿@model FoodOpsERP.Models.Manufacturing.Production.ViewModels.ProductionOrderViewModel
+@{
+    ViewData["Title"] = "New Production Order";
+    ViewData["Subtitle"] = "Create a new production order";
+}
+<partial name="_PageHeader" />
+<div class="card">
+    <partial name="_OrderForm" model="Model" />
+</div>

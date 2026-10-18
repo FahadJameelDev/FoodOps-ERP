@@ -1,0 +1,90 @@
+﻿@model List<FoodOpsERP.Models.Manufacturing.Production.ViewModels.DemandViewModel>
+@{
+    ViewData["Title"] = "Demand Management";
+    ViewData["Subtitle"] = "Manage production demands";
+}
+
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search demands...", "demands", Model.Count, "All|Open|Planned|Fulfilled|Cancelled", @<text>
+        <a href="@Url.Action("Create")" class="btn btn-primary btn-sm" data-modal="true" data-modal-title="New Demand" data-modal-size="lg">
+            <i class="bi bi-plus-lg"></i> New Demand
+        </a>
+    </text>)
+
+<div class="table-scroll">
+        @if (Model != null && Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Demand Code</th>
+                        <th>Product</th>
+                        <th>Plant</th>
+                        <th>Required Date</th>
+                        <th class="num">Quantity</th>
+                        <th>Source</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="code">@item.DemandCode</span></td>
+                            <td>@item.ProductName</td>
+                            <td>@item.PlantName</td>
+                            <td>@item.RequiredDate.ToString("dd MMM yyyy")</td>
+                            <td class="num">@item.Quantity.ToString("N4") @item.UOMName</td>
+                            <td>@item.Source</td>
+                            <td>
+                                @if (item.Priority <= 2)
+                                {
+                                    <span class="pill pill--bad">@item.Priority</span>
+                                }
+                                else if (item.Priority == 3)
+                                {
+
+                                    <span class="pill pill--warn">@item.Priority</span>
+                                }
+                                else
+                                {
+
+                                    <span class="pill pill--muted">@item.Priority</span>
+                                }
+                            </td>
+                            <td><partial name="_StatusPill" model="item.Status" /></td>
+                            <td class="text-end">
+                                <div class="row-actions">
+                                    @if (item.Status == "Open")
+                                    {
+                                        <a href="@Url.Action("Edit", new { id = item.DemandID })" class="btn btn-sm btn-outline-secondary" title="Edit" data-modal="true" data-modal-title="Edit Demand" data-modal-size="lg">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" title="Cancel Demand"
+                                                data-action-url="@Url.Action("Cancel", new { id = item.DemandID })"
+                                                data-name="@item.DemandCode"
+                                                data-confirm-title="Cancel Demand?"
+                                                data-confirm-message="This will mark the demand as Cancelled."
+                                                data-confirm-text="Cancel Demand"
+                                                data-refresh="#grid-card">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+<partial name="_EmptyState" model='"No demands found. Please create one."' />
+       
+        }
+    </div>
+</div>

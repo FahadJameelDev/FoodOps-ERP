@@ -1,0 +1,9 @@
+﻿@model FoodOpsERP.Models.Manufacturing.Production.ViewModels.ProductionPlanViewModel
+@{
+    ViewData["Title"] = "Edit Production Plan";
+    ViewData["Subtitle"] = "Update plan " + Model.PlanCode;
+}
+<partial name="_PageHeader" />
+<div class="card">
+    <partial name="_PlanForm" model="Model" />
+</div>

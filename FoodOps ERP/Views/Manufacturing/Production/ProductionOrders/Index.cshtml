@@ -1,0 +1,57 @@
+﻿@model List<FoodOpsERP.Models.Manufacturing.Production.ViewModels.ProductionOrderViewModel>
+@{
+    ViewData["Title"] = "Batch Management";
+    ViewData["Subtitle"] = "Production orders and batches";
+}
+
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search orders...", "orders", Model.Count, "All|Planned|Released|InProgress|Completed|Closed", @<text>
+        <a href="@Url.Action("Create")" class="btn btn-primary btn-sm" data-modal="true" data-modal-title="New Production Order" data-modal-size="xl" data-modal-icon="bi-box-seam">
+            <i class="bi bi-plus-lg"></i> New Order
+        </a>
+    </text>)
+
+<div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Order No</th>
+                        <th>Product</th>
+                        <th class="num">Target Qty</th>
+                        <th class="num">Produced</th>
+                        <th>Planned Start</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr data-href="@Url.Action("Details", new { id = item.ProductionOrderID })">
+                            <td><span class="code">@item.OrderNumber</span></td>
+                            <td>@item.ProductName</td>
+                            <td class="num">@item.TargetQty.ToString("N2") @item.UOMName</td>
+                            <td class="num">@item.ProducedQty.ToString("N2")</td>
+                            <td>@item.PlannedStart.ToString("dd MMM yyyy")</td>
+                            <td><partial name="_StatusPill" model="item.Status" /></td>
+                            <td class="text-end">
+                                <div class="row-actions">
+                                    <a href="@Url.Action("Details", new { id = item.ProductionOrderID })" class="btn btn-sm btn-outline-secondary" title="View"><i class="bi bi-eye"></i></a>
+                                    <a href="@Url.Action("Execution", new { id = item.ProductionOrderID })" class="btn btn-sm btn-outline-primary" title="Execute"><i class="bi bi-gear"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <partial name="_EmptyState" model='"No production orders found."' />
+        }
+    </div>
+</div>

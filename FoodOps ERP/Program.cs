@@ -1,6 +1,7 @@
 using FoodOpsERP.Data;
 using FoodOpsERP.Middlewares;
 using FoodOpsERP.Services.Inventory;
+using FoodOpsERP.Services.Manufacturing.Production;
 using FoodOpsERP.Services.Manufacturing.ProductsAndRecipes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -83,6 +84,10 @@ builder.Services.AddScoped<IRecipeService, RecipeService>();
 builder.Services.AddScoped<IPackagingConfigService, PackagingConfigService>();
 builder.Services.AddScoped<IRecipeChangeRequestService, RecipeChangeRequestService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+// Module 3.2 - Production & Manufacturing (YEH NAYI LINES ADD KAREIN)
+builder.Services.AddScoped<IDemandService, DemandService>();
+builder.Services.AddScoped<IProductionPlanService, ProductionPlanService>();
+builder.Services.AddScoped<IProductionOrderService, ProductionOrderService>();
 
 
 // ═══════════════════════════════════════════════════════════

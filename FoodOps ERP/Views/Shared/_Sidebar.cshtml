@@ -156,7 +156,7 @@
                             </div>
                         </li>
 
-                        <!-- Module 3.2: Production & Manufacturing (Abhi Views nahi bane) -->
+                        <!-- ═══ Module 3.2: Production & Manufacturing ═══ -->
                         <li class="nav-item">
                             <button class="nav-module-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-prod" aria-expanded="false">
                                 <i class="bi bi-diagram-3" aria-hidden="true"></i>
@@ -165,20 +165,17 @@
                             </button>
                             <div class="collapse" id="mod-prod">
                                 <ul class="nav flex-column nav-features">
-                                    <li><a class="nav-link" href="#">Demand Management</a></li>
-                                    <li><a class="nav-link" href="#">Production Planning</a></li>
-                                    <li><a class="nav-link" href="#">Material Planning</a></li>
-                                    <li><a class="nav-link" href="#">Plan Control</a></li>
-                                    <li><a class="nav-link" href="#">Batch Management</a></li>
-                                    <li><a class="nav-link" href="#">Material Execution</a></li>
-                                    <li><a class="nav-link" href="#">Production Execution</a></li>
-                                    <li><a class="nav-link" href="#">Wastage &amp; Variance</a></li>
-                                    <li><a class="nav-link" href="#">Production Exceptions</a></li>
-                                    <li><a class="nav-link" href="#">Batch Control</a></li>
+                                    <!-- 1. Demand Management -->
+                                    <li><a class="nav-link @activeClass("Demands", "Index")" asp-controller="Demands" asp-action="Index" data-short="Demands">Demand Management</a></li>
+            
+                                    <!-- 2. Production Planning -->
+                                    <li><a class="nav-link @activeClass("ProductionPlans", "Index")" asp-controller="ProductionPlans" asp-action="Index" data-short="Plans">Production Planning</a></li>
+            
+                                    <!-- 3. Batch Management -->
+                                    <li><a class="nav-link @activeClass("ProductionOrders", "Index")" asp-controller="ProductionOrders" asp-action="Index" data-short="Batches">Batch Management</a></li>
                                 </ul>
                             </div>
                         </li>
-
                         <!-- Module 3.3: Quality Control (Abhi Views nahi bane) -->
                         <li class="nav-item">
                             <button class="nav-module-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-quality" aria-expanded="false">

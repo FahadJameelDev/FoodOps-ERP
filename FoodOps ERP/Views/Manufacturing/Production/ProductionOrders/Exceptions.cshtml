@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Report Exception";
+    ViewData["Subtitle"] = $"Order: {ViewBag.OrderNumber}";
+    var orderId = (int)ViewBag.OrderId;
+}
+<partial name="_PageHeader" />
+
+<div class="card">
+    <div class="card-body">
+        <form asp-action="RecordException" asp-route-id="@orderId" method="post" data-spa-form data-reload-url="@Url.Action("Details", new { id = orderId })">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Exception Type</label>
+                    <select name="exceptionType" class="form-select">
+                        <option value="MaterialShortage">Material Shortage</option>
+                        <option value="Equipment">Equipment</option>
+                        <option value="Quality">Quality</option>
+                        <option value="ProcessDeviation">Process Deviation</option>
+                        <option value="Safety">Safety</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Severity</label>
+                    <select name="severity" class="form-select">
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                        <option value="Critical">Critical</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Description</label>
+                    <textarea name="description" class="form-control" rows="3" required></textarea>
+                </div>
+                <div class="col-12 mt-4">
+                    <button type="submit" class="btn btn-danger">Report Exception</button>
+                    <a href="@Url.Action("Details", new { id = orderId })" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

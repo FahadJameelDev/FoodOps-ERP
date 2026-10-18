@@ -1,0 +1,124 @@
+﻿@model FoodOpsERP.Models.Manufacturing.Production.ViewModels.ProductionPlanViewModel
+@{
+    var isEdit = Model.PlanID != 0;
+    var plants = ViewData["Plants"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
+    var products = ViewData["Products"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
+    var recipes = ViewData["Recipes"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
+    var uoms = ViewData["UOMs"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
+    var demands = ViewData["Demands"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
+    var rows = Model.Lines?.Count ?? 0;
+
+    Func<string, object> blankRow = @<div class="repeater-row" style="display: grid; grid-template-columns: 2fr 2fr 1fr 1fr 1fr 40px; gap: 8px; margin-bottom: 8px; align-items: center;">
+        <input type="hidden" name="Lines.Index" value="@item" />
+        
+        <select name="Lines[@item].ProductID" class="form-select form-select-sm" required>
+            <option value="">Product...</option>
+            @foreach (var p in products)
+            {
+                <option value="@p.Value">@p.Text</option>
+            }
+        </select>
+        
+        <select name="Lines[@item].RecipeID" class="form-select form-select-sm" required>
+            <option value="">Recipe...</option>
+            @foreach (var r in recipes)
+            {
+                <option value="@r.Value">@r.Text</option>
+            }
+        </select>
+        
+        <input name="Lines[@item].PlannedQty" type="number" step="0.0001" class="form-control form-control-sm num" placeholder="Qty" required />
+        
+        <select name="Lines[@item].UOMID" class="form-select form-select-sm" required>
+            <option value="">UOM</option>
+            @foreach (var u in uoms)
+            {
+                <option value="@u.Value">@u.Text</option>
+            }
+        </select>
+        
+        <input name="Lines[@item].PlannedDate" type="date" class="form-control form-control-sm" required />
+        
+        <button type="button" class="btn-icon text-danger" data-repeater-remove><i class="bi bi-x-lg"></i></button>
+    </div>;
+}
+
+<form asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@(isEdit ? Model.PlanID.ToString() : null)"
+      method="post" data-spa-form data-reload-url="@Url.Action("Index")" data-refresh="#grid-card" novalidate>
+    
+    <div class="fo-modal__body">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+        @if (isEdit)
+        {
+            <input type="hidden" asp-for="PlanID" />
+        }
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <label asp-for="PlantID" class="form-label">Plant <span class="text-danger">*</span></label>
+                <select asp-for="PlantID" asp-items="plants" class="form-select" required>
+                    <option value="">Select Plant...</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="StartDate" class="form-label">Start Date <span class="text-danger">*</span></label>
+                <input asp-for="StartDate" class="form-control" type="date" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="EndDate" class="form-label">End Date <span class="text-danger">*</span></label>
+                <input asp-for="EndDate" class="form-control" type="date" />
+            </div>
+            <div class="col-12">
+                <label asp-for="Notes" class="form-label">Notes</label>
+                <textarea asp-for="Notes" class="form-control" rows="2"></textarea>
+            </div>
+        </div>
+
+        <hr />
+        <h6 class="mb-3">Plan Lines (Products)</h6>
+        
+        <div data-repeater id="plan-lines" data-next="@Math.Max(rows, 1)">
+            <div class="repeater-head" style="display: grid; grid-template-columns: 2fr 2fr 1fr 1fr 1fr 40px; gap: 8px; margin-bottom: 5px; font-size: 12px; font-weight: 600; color: #64748B;">
+                <span>Product</span>
+                <span>Recipe</span>
+                <span class="num">Qty</span>
+                <span>UOM</span>
+                <span>Date</span>
+                <span></span>
+            </div>
+
+            <div class="repeater-rows">
+                @for (var i = 0; i < rows; i++)
+                {
+                    <div class="repeater-row" style="display: grid; grid-template-columns: 2fr 2fr 1fr 1fr 1fr 40px; gap: 8px; margin-bottom: 8px; align-items: center;">
+                        <input type="hidden" name="Lines.Index" value="@i" />
+                        
+                        <select asp-for="Lines[i].ProductID" asp-items="products" class="form-select form-select-sm"><option value="">Product...</option></select>
+                        <select asp-for="Lines[i].RecipeID" asp-items="recipes" class="form-select form-select-sm"><option value="">Recipe...</option></select>
+                        <input asp-for="Lines[i].PlannedQty" type="number" step="0.0001" class="form-control form-control-sm num" />
+                        <select asp-for="Lines[i].UOMID" asp-items="uoms" class="form-select form-select-sm"><option value="">UOM</option></select>
+                        <input asp-for="Lines[i].PlannedDate" type="date" class="form-control form-control-sm" />
+                        <button type="button" class="btn-icon text-danger" data-repeater-remove><i class="bi bi-x-lg"></i></button>
+                    </div>
+                }
+                @if (rows == 0)
+                {
+                    @blankRow("0")
+                }
+            </div>
+
+            <template>@blankRow("__i__")</template>
+
+            <div class="repeater-foot mt-3">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-repeater-add="#plan-lines">
+                    <i class="bi bi-plus-lg"></i> Add Product Line
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="fo-modal__footer">
+        <button type="button" class="btn btn-outline-secondary" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i><span>@(isEdit ? "Update Plan" : "Create Plan")</span></button>
+    </div>
+</form>

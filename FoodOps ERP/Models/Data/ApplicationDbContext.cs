@@ -49,6 +49,25 @@ namespace FoodOpsERP.Data
         public DbSet<RecipeChangeRequest> RecipeChangeRequests { get; set; }
         public DbSet<PackagingConfig> PackagingConfigs { get; set; }
 
+        // ─────────────────────────────────────────────
+        // Module 3.2 : Production & Manufacturing (15 Tables)
+        // ─────────────────────────────────────────────
+        public DbSet<WorkCenter> WorkCenters { get; set; }
+        public DbSet<ProductionRouting> ProductionRoutings { get; set; }
+        public DbSet<Demand> Demands { get; set; }
+        public DbSet<ProductionPlan> ProductionPlans { get; set; }
+        public DbSet<ProductionPlanLine> ProductionPlanLines { get; set; }
+        public DbSet<PlanMaterialRequirement> PlanMaterialRequirements { get; set; }
+        public DbSet<ProductionStatusHistory> ProductionStatusHistory { get; set; }
+        public DbSet<ProductionOrder> ProductionOrders { get; set; }
+        public DbSet<ProductionOperation> ProductionOperations { get; set; }
+        public DbSet<BatchMaterialIssue> BatchMaterialIssues { get; set; }
+        public DbSet<BatchOutputLog> BatchOutputLogs { get; set; }
+        public DbSet<ProductionWastage> ProductionWastages { get; set; }
+        public DbSet<DowntimeReason> DowntimeReasons { get; set; }
+        public DbSet<DowntimeLog> DowntimeLogs { get; set; }
+        public DbSet<ProductionException> ProductionExceptions { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -465,6 +484,343 @@ namespace FoodOpsERP.Data
                 b.HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductID).OnDelete(DeleteBehavior.Restrict);
                 b.HasOne<UnitOfMeasure>().WithMany().HasForeignKey(x => x.WeightUOMID).OnDelete(DeleteBehavior.Restrict);
 
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+            // ═════════════════════════════════════════════
+            // MODULE 3.2 : PRODUCTION & MANUFACTURING
+            // ═════════════════════════════════════════════
+
+            // 1. WorkCenter
+            modelBuilder.Entity<WorkCenter>(b =>
+            {
+                b.ToTable("WorkCenters");
+                b.HasKey(x => x.WorkCenterID);
+
+                b.Property(x => x.WorkCenterCode).HasMaxLength(20);
+                b.Property(x => x.WorkCenterName).HasMaxLength(100);
+                b.Property(x => x.CenterType).HasMaxLength(30);
+                b.Property(x => x.CapacityPerHour).HasPrecision(18, 4);
+
+                b.HasIndex(x => new { x.PlantID, x.WorkCenterCode }).IsUnique();
+
+                b.HasOne<Plant>().WithMany().HasForeignKey(x => x.PlantID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<UnitOfMeasure>().WithMany().HasForeignKey(x => x.CapacityUOMID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 2. ProductionRouting
+            modelBuilder.Entity<ProductionRouting>(b =>
+            {
+                b.ToTable("ProductionRoutings");
+                b.HasKey(x => x.RoutingID);
+
+                b.Property(x => x.OperationName).HasMaxLength(100);
+                b.Property(x => x.StandardMinutes).HasPrecision(9, 2);
+                b.Property(x => x.SetupMinutes).HasPrecision(9, 2);
+
+                b.HasIndex(x => new { x.ProductID, x.SequenceOrder }).IsUnique();
+
+                b.HasOne<Product>().WithMany().HasForeignKey(x => x.ProductID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<WorkCenter>().WithMany().HasForeignKey(x => x.WorkCenterID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 3. Demand
+            modelBuilder.Entity<Demand>(b =>
+            {
+                b.ToTable("Demands");
+                b.HasKey(x => x.DemandID);
+
+                b.Property(x => x.DemandCode).HasMaxLength(30);
+                b.Property(x => x.Quantity).HasPrecision(18, 4);
+                b.Property(x => x.Source).HasMaxLength(20);
+                b.Property(x => x.ReferenceNo).HasMaxLength(60);
+                b.Property(x => x.Status).HasMaxLength(20);
+                b.Property(x => x.Notes).HasMaxLength(500);
+
+                b.HasIndex(x => x.DemandCode).IsUnique();
+                b.HasIndex(x => new { x.PlantID, x.Status, x.RequiredDate });
+
+                b.HasOne<Plant>().WithMany().HasForeignKey(x => x.PlantID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<Product>().WithMany().HasForeignKey(x => x.ProductID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<UnitOfMeasure>().WithMany().HasForeignKey(x => x.UOMID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 4. ProductionPlan
+            modelBuilder.Entity<ProductionPlan>(b =>
+            {
+                b.ToTable("ProductionPlans");
+                b.HasKey(x => x.PlanID);
+
+                b.Property(x => x.PlanCode).HasMaxLength(30);
+                b.Property(x => x.Status).HasMaxLength(20);
+                b.Property(x => x.Notes).HasMaxLength(500);
+
+                b.HasIndex(x => x.PlanCode).IsUnique();
+                b.HasIndex(x => new { x.PlantID, x.Status, x.StartDate });
+
+                b.HasOne<Plant>().WithMany().HasForeignKey(x => x.PlantID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ApprovedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 5. ProductionPlanLine
+            modelBuilder.Entity<ProductionPlanLine>(b =>
+            {
+                b.ToTable("ProductionPlanLines");
+                b.HasKey(x => x.PlanLineID);
+
+                b.Property(x => x.PlannedQty).HasPrecision(18, 4);
+                b.Property(x => x.Status).HasMaxLength(20);
+
+                b.HasIndex(x => new { x.PlanID, x.LineNo }).IsUnique();
+                b.HasIndex(x => x.ProductID);
+                b.HasIndex(x => x.DemandID);
+
+                b.HasOne(x => x.Plan)
+                 .WithMany(p => p.Lines)
+                 .HasForeignKey(x => x.PlanID)
+                 .OnDelete(DeleteBehavior.Cascade);   // CASCADE
+
+                b.HasOne<Product>().WithMany().HasForeignKey(x => x.ProductID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<Recipe>().WithMany().HasForeignKey(x => x.RecipeID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<UnitOfMeasure>().WithMany().HasForeignKey(x => x.UOMID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<Demand>().WithMany().HasForeignKey(x => x.DemandID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 6. PlanMaterialRequirement
+            modelBuilder.Entity<PlanMaterialRequirement>(b =>
+            {
+                b.ToTable("PlanMaterialRequirements");
+                b.HasKey(x => x.RequirementID);
+
+                b.Property(x => x.RequiredQty).HasPrecision(18, 4);
+                b.Property(x => x.AvailableQty).HasPrecision(18, 4);
+                b.Property(x => x.ShortageQty)
+                 .HasPrecision(18, 4)
+                 .HasComputedColumnSql(
+                     "CASE WHEN [RequiredQty] > [AvailableQty] THEN [RequiredQty] - [AvailableQty] ELSE CONVERT(decimal(18,4), 0) END",
+                     stored: true);
+                b.Property(x => x.SuggestedAction).HasMaxLength(20);
+
+                b.HasIndex(x => new { x.PlanLineID, x.IngredientProductID }).IsUnique();
+                b.HasIndex(x => new { x.ShortageQty, x.IngredientProductID });
+
+                b.HasOne(x => x.PlanLine)
+                 .WithMany(l => l.Requirements)
+                 .HasForeignKey(x => x.PlanLineID)
+                 .OnDelete(DeleteBehavior.Cascade);   // CASCADE
+
+                b.HasOne<Product>().WithMany().HasForeignKey(x => x.IngredientProductID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<UnitOfMeasure>().WithMany().HasForeignKey(x => x.UOMID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CalculatedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 7. ProductionStatusHistory (Append-only Log)
+            modelBuilder.Entity<ProductionStatusHistory>(b =>
+            {
+                b.ToTable("ProductionStatusHistory");
+                b.HasKey(x => x.HistoryID);
+
+                b.Property(x => x.EntityType).HasMaxLength(20);
+                b.Property(x => x.FromStatus).HasMaxLength(20);
+                b.Property(x => x.ToStatus).HasMaxLength(20);
+                b.Property(x => x.Reason).HasMaxLength(300);
+                b.Property(x => x.ChangedAt).HasDefaultValueSql("SYSUTCDATETIME()");
+
+                b.HasIndex(x => new { x.EntityType, x.EntityID, x.ChangedAt });
+
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ChangedByUserID).OnDelete(DeleteBehavior.Restrict);
+                // EntityID is polymorphic — no FK
+            });
+
+            // 8. ProductionOrder
+            modelBuilder.Entity<ProductionOrder>(b =>
+            {
+                b.ToTable("ProductionOrders");
+                b.HasKey(x => x.ProductionOrderID);
+
+                b.Property(x => x.OrderNumber).HasMaxLength(30);
+                b.Property(x => x.TargetQty).HasPrecision(18, 4);
+                b.Property(x => x.ProducedQty).HasPrecision(18, 4);
+                b.Property(x => x.RejectedQty).HasPrecision(18, 4);
+                b.Property(x => x.Status).HasMaxLength(20);
+                b.Property(x => x.Remarks).HasMaxLength(300);
+
+                b.HasIndex(x => x.OrderNumber).IsUnique();
+                b.HasIndex(x => new { x.PlantID, x.Status, x.PlannedStart });
+                b.HasIndex(x => x.ProductID);
+                b.HasIndex(x => x.PlanLineID);
+
+                b.HasOne<Plant>().WithMany().HasForeignKey(x => x.PlantID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<ProductionPlanLine>().WithMany().HasForeignKey(x => x.PlanLineID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<Product>().WithMany().HasForeignKey(x => x.ProductID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<Recipe>().WithMany().HasForeignKey(x => x.RecipeID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<UnitOfMeasure>().WithMany().HasForeignKey(x => x.UOMID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 9. ProductionOperation
+            modelBuilder.Entity<ProductionOperation>(b =>
+            {
+                b.ToTable("ProductionOperations");
+                b.HasKey(x => x.OperationID);
+
+                b.Property(x => x.OperationName).HasMaxLength(100);
+                b.Property(x => x.StandardMinutes).HasPrecision(9, 2);
+                b.Property(x => x.Status).HasMaxLength(20);
+                b.Property(x => x.ActualMinutes)
+                 .HasComputedColumnSql("DATEDIFF(MINUTE, [StartTime], [EndTime])", stored: true);
+
+                b.HasIndex(x => new { x.ProductionOrderID, x.SequenceOrder }).IsUnique();
+                b.HasIndex(x => new { x.WorkCenterID, x.Status });
+
+                b.HasOne<ProductionOrder>().WithMany().HasForeignKey(x => x.ProductionOrderID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<ProductionRouting>().WithMany().HasForeignKey(x => x.RoutingID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<WorkCenter>().WithMany().HasForeignKey(x => x.WorkCenterID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.OperatorUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 10. BatchMaterialIssue (Immutable Log)
+            modelBuilder.Entity<BatchMaterialIssue>(b =>
+            {
+                b.ToTable("BatchMaterialIssues");
+                b.HasKey(x => x.IssueID);
+
+                b.Property(x => x.IssueType).HasMaxLength(10);
+                b.Property(x => x.IssuedQty).HasPrecision(18, 4);
+                b.Property(x => x.IssuedAt).HasDefaultValueSql("SYSUTCDATETIME()");
+
+                b.HasIndex(x => x.ProductionOrderID);
+                b.HasIndex(x => x.BatchID);
+
+                b.HasOne<ProductionOrder>().WithMany().HasForeignKey(x => x.ProductionOrderID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<InventoryBatch>().WithMany().HasForeignKey(x => x.BatchID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<RecipeItem>().WithMany().HasForeignKey(x => x.RecipeItemID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<UnitOfMeasure>().WithMany().HasForeignKey(x => x.UOMID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<InventoryTransaction>().WithMany().HasForeignKey(x => x.InventoryTransactionID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.IssuedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 11. BatchOutputLog (Immutable Log)
+            modelBuilder.Entity<BatchOutputLog>(b =>
+            {
+                b.ToTable("BatchOutputLogs");
+                b.HasKey(x => x.OutputID);
+
+                b.Property(x => x.ProducedQty).HasPrecision(18, 4);
+                b.Property(x => x.RejectedQty).HasPrecision(18, 4);
+                b.Property(x => x.RecordedAt).HasDefaultValueSql("SYSUTCDATETIME()");
+                b.Property(x => x.Remarks).HasMaxLength(300);
+
+                b.HasIndex(x => x.OutputBatchID).IsUnique();
+                b.HasIndex(x => x.ProductionOrderID);
+
+                b.HasOne<ProductionOrder>().WithMany().HasForeignKey(x => x.ProductionOrderID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<InventoryBatch>().WithMany().HasForeignKey(x => x.OutputBatchID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<UnitOfMeasure>().WithMany().HasForeignKey(x => x.UOMID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<PackagingConfig>().WithMany().HasForeignKey(x => x.PackagingConfigID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.RecordedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 12. ProductionWastage
+            modelBuilder.Entity<ProductionWastage>(b =>
+            {
+                b.ToTable("ProductionWastages");
+                b.HasKey(x => x.WastageID);
+
+                b.Property(x => x.WastageType).HasMaxLength(20);
+                b.Property(x => x.Quantity).HasPrecision(18, 4);
+                b.Property(x => x.Stage).HasMaxLength(50);
+                b.Property(x => x.Reason).HasMaxLength(300);
+                b.Property(x => x.RecordedAt).HasDefaultValueSql("SYSUTCDATETIME()");
+
+                b.HasIndex(x => x.ProductionOrderID);
+                b.HasIndex(x => new { x.WastageType, x.RecordedAt });
+
+                b.HasOne<ProductionOrder>().WithMany().HasForeignKey(x => x.ProductionOrderID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<Product>().WithMany().HasForeignKey(x => x.ProductID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<InventoryBatch>().WithMany().HasForeignKey(x => x.BatchID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<WorkCenter>().WithMany().HasForeignKey(x => x.WorkCenterID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<UnitOfMeasure>().WithMany().HasForeignKey(x => x.UOMID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.RecordedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 13. DowntimeReason
+            modelBuilder.Entity<DowntimeReason>(b =>
+            {
+                b.ToTable("DowntimeReasons");
+                b.HasKey(x => x.ReasonID);
+
+                b.Property(x => x.ReasonCode).HasMaxLength(20);
+                b.Property(x => x.ReasonName).HasMaxLength(100);
+                b.Property(x => x.Category).HasMaxLength(20);
+                b.Property(x => x.SubCategory).HasMaxLength(20);
+
+                b.HasIndex(x => x.ReasonCode).IsUnique();
+
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 14. DowntimeLog
+            modelBuilder.Entity<DowntimeLog>(b =>
+            {
+                b.ToTable("DowntimeLogs");
+                b.HasKey(x => x.DowntimeID);
+
+                b.Property(x => x.DurationMinutes)
+                 .HasComputedColumnSql("DATEDIFF(MINUTE, [StartTime], [EndTime])", stored: true);
+                b.Property(x => x.Remarks).HasMaxLength(300);
+
+                // Ek machine par ek hi open downtime
+                b.HasIndex(x => x.WorkCenterID)
+                 .IsUnique()
+                 .HasFilter("[EndTime] IS NULL")
+                 .HasDatabaseName("UX_DowntimeLogs_OneOpenPerWorkCenter");
+
+                b.HasIndex(x => new { x.WorkCenterID, x.StartTime });
+                b.HasIndex(x => x.ReasonID);
+
+                b.HasOne<WorkCenter>().WithMany().HasForeignKey(x => x.WorkCenterID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<ProductionOrder>().WithMany().HasForeignKey(x => x.ProductionOrderID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<DowntimeReason>().WithMany().HasForeignKey(x => x.ReasonID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 15. ProductionException
+            modelBuilder.Entity<ProductionException>(b =>
+            {
+                b.ToTable("ProductionExceptions");
+                b.HasKey(x => x.ExceptionID);
+
+                b.Property(x => x.ExceptionNo).HasMaxLength(30);
+                b.Property(x => x.ExceptionType).HasMaxLength(30);
+                b.Property(x => x.Severity).HasMaxLength(20);
+                b.Property(x => x.Description).HasMaxLength(1000);
+                b.Property(x => x.Status).HasMaxLength(20);
+                b.Property(x => x.ResolutionNotes).HasMaxLength(1000);
+
+                b.HasIndex(x => x.ExceptionNo).IsUnique();
+                b.HasIndex(x => new { x.Status, x.Severity });
+                b.HasIndex(x => x.ProductionOrderID);
+
+                b.HasOne<ProductionOrder>().WithMany().HasForeignKey(x => x.ProductionOrderID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<WorkCenter>().WithMany().HasForeignKey(x => x.WorkCenterID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.AssignedToUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ResolvedByUserID).OnDelete(DeleteBehavior.Restrict);
                 b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
                 b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
             });

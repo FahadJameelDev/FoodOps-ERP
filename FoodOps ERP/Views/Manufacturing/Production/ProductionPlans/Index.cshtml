@@ -1,0 +1,54 @@
+﻿@model List<FoodOpsERP.Models.Manufacturing.Production.ViewModels.ProductionPlanViewModel>
+@{
+    ViewData["Title"] = "Production Planning";
+    ViewData["Subtitle"] = "Create and manage production plans";
+}
+
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search plans...", "plans", Model.Count, "All|Draft|Approved|Released|Closed", @<text>
+        <a href="@Url.Action("Create")" class="btn btn-primary btn-sm" data-modal="true" data-modal-title="New Production Plan" data-modal-size="xl" data-modal-icon="bi-calendar-plus">
+            <i class="bi bi-plus-lg"></i> New Plan
+        </a>
+    </text>)
+
+<div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Plan Code</th>
+                        <th>Plant</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr data-href="@Url.Action("Details", new { id = item.PlanID })">
+                            <td><span class="code">@item.PlanCode</span></td>
+                            <td>@item.PlantName</td>
+                            <td>@item.StartDate.ToString("dd MMM yyyy")</td>
+                            <td>@item.EndDate.ToString("dd MMM yyyy")</td>
+                            <td><partial name="_StatusPill" model="item.Status" /></td>
+                            <td>@item.CreatedAt.ToString("dd MMM yyyy")</td>
+                            <td class="text-end">
+                                <a href="@Url.Action("Details", new { id = item.PlanID })" class="btn btn-sm btn-outline-secondary" title="View"><i class="bi bi-eye"></i></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <partial name="_EmptyState" model='"No plans found. Please create one."' />
+        }
+    </div>
+</div>

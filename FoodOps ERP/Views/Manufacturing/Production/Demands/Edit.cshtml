@@ -1,0 +1,11 @@
+﻿@model FoodOpsERP.Models.Manufacturing.Production.ViewModels.DemandViewModel
+@{
+    ViewData["Title"] = "Edit Demand";
+    ViewData["Subtitle"] = "Update demand " + Model.DemandCode;
+}
+
+<partial name="_PageHeader" />
+
+<div class="card">
+    <partial name="_DemandForm" model="Model" />
+</div>

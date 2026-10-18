@@ -1,0 +1,36 @@
+﻿@model FoodOpsERP.Models.Manufacturing.Production.ViewModels.ProductionExecutionViewModel
+@{
+    ViewData["Title"] = $"Execution: {Model.Order.OrderNumber}";
+    ViewData["Subtitle"] = "Material Issue and Output Recording";
+}
+
+<partial name="_PageHeader" />
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header"><h5 class="card-title"><i class="bi bi-box-arrow-in-down"></i>Material Execution</h5></div>
+            <div class="card-body">
+                <p class="text-muted small">Yahan se material issue hoga (BatchMaterialIssues).</p>
+                <div class="mb-3">
+                    <label class="form-label">Select Batch / Lot</label>
+                    <select class="form-select"><option>Select Inventory Batch...</option></select>
+                </div>
+                <button class="btn btn-primary btn-sm">Issue Material</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header"><h5 class="card-title"><i class="bi bi-box-arrow-up"></i>Production Output</h5></div>
+            <div class="card-body">
+                <p class="text-muted small">Yahan final produced goods record hongi (BatchOutputLogs).</p>
+                <div class="mb-3">
+                    <label class="form-label">Produced Qty (@Model.Order.UOMName)</label>
+                    <input type="number" class="form-control" />
+                </div>
+                <button class="btn btn-success btn-sm">Record Output</button>
+            </div>
+        </div>
+    </div>
+</div>
