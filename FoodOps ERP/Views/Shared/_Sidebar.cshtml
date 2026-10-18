@@ -177,23 +177,32 @@
                             </div>
                         </li>
                         <!-- Module 3.3: Quality Control (Abhi Views nahi bane) -->
-                        <li class="nav-item">
-                            <button class="nav-module-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-quality" aria-expanded="false">
-                                <i class="bi bi-patch-check" aria-hidden="true"></i>
-                                <span>Quality Control</span>
-                                <i class="bi bi-chevron-down" aria-hidden="true"></i>
-                            </button>
-                            <div class="collapse" id="mod-quality">
-                                <ul class="nav flex-column nav-features">
-                                    <li><a class="nav-link" href="#">QC Setup</a></li>
-                                    <li><a class="nav-link" href="#">Incoming QC</a></li>
-                                    <li><a class="nav-link" href="#">Production QC</a></li>
-                                    <li><a class="nav-link" href="#">Quality Decision</a></li>
-                                    <li><a class="nav-link" href="#">Release Control</a></li>
-                                    <li><a class="nav-link" href="#">Quality Records</a></li>
-                                </ul>
-                            </div>
-                        </li>
+                       <!-- Module 3.3: Quality Control -->
+<li class="nav-item">
+    <button class="nav-module-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-quality" aria-expanded="false">
+        <i class="bi bi-patch-check" aria-hidden="true"></i>
+        <span>Quality Control</span>
+        <i class="bi bi-chevron-down" aria-hidden="true"></i>
+    </button>
+    <div class="collapse" id="mod-quality">
+        <ul class="nav flex-column nav-features">
+            <!-- 1. QC Setup -->
+            <li><a class="nav-link @activeClass("QCParameters", "Index")" asp-controller="QCParameters" asp-action="Index" data-short="QC Setup">QC Setup</a></li>
+            
+            <!-- 2. Production QC -->
+            <li><a class="nav-link @activeClass("QualityDecisions", "ProductionQC")" asp-controller="QualityDecisions" asp-action="ProductionQC" data-short="Production QC">Production QC</a></li>
+            
+            <!-- 3. Quality Decision -->
+            <li><a class="nav-link @activeClass("QualityDecisions", "QualityDecisions")" asp-controller="QualityDecisions" asp-action="QualityDecisions" data-short="Decisions">Quality Decision</a></li>
+            
+            <!-- 4. Release Control -->
+            <li><a class="nav-link @activeClass("QualityDecisions", "ReleaseControl")" asp-controller="QualityDecisions" asp-action="ReleaseControl" data-short="Release Control">Release Control</a></li>
+            
+            <!-- 5. Quality Records -->
+            <li><a class="nav-link @activeClass("QCParameters", "Records")" asp-controller="QCParameters" asp-action="Records" data-short="Records">Quality Records</a></li>
+        </ul>
+    </div>
+</li>
 
                         <!-- Module 3.4: Costing & Variance (Abhi Views nahi bane) -->
                         <li class="nav-item">

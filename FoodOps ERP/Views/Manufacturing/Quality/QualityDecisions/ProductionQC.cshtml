@@ -1,0 +1,48 @@
+﻿@model List<FoodOpsERP.Models.Manufacturing.Quality.ViewModels.QualityDecisionViewModel>
+@{
+    ViewData["Title"] = "Production QC";
+    ViewData["Subtitle"] = "Inspections for production batches";
+}
+
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search production QC...", "batches", Model.Count, null, @<text>
+        <a href="@Url.Action("Create")" class="btn btn-primary btn-sm" data-modal="true" data-modal-title="New Decision" data-modal-size="lg">
+            <i class="bi bi-plus-lg"></i> New Decision
+        </a>
+    </text>)
+
+<div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Batch #</th>
+                        <th>Decision</th>
+                        <th>Reason</th>
+                        <th>Decided By</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@item.BatchNumber</strong></td>
+                            <td><partial name="_StatusPill" model="item.Decision" /></td>
+                            <td class="text-truncate" style="max-width: 200px;" title="@item.Reason">@item.Reason</td>
+                            <td>@item.DecidedByName</td>
+                            <td>@item.DecidedAt.ToString("dd MMM yyyy HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <partial name="_EmptyState" model='"No production QC records found."' />
+        }
+    </div>
+</div>

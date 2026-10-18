@@ -1,0 +1,44 @@
+﻿@model FoodOpsERP.Models.Manufacturing.Quality.ViewModels.QualityDecisionViewModel
+@{
+    var batches = ViewData["Batches"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
+}
+
+<form asp-action="Create" method="post" data-spa-form data-reload-url="@Url.Action("Index")" data-refresh="#grid-card" novalidate>
+    
+    <div class="fo-modal__body">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <div class="row g-3">
+            <div class="col-md-12">
+                <label asp-for="BatchID" class="form-label">Select Batch / Lot <span class="text-danger">*</span></label>
+                <select asp-for="BatchID" asp-items="batches" class="form-select" required>
+                    <option value="">Select Batch...</option>
+                </select>
+                <span asp-validation-for="BatchID" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-12">
+                <label asp-for="Decision" class="form-label">Decision <span class="text-danger">*</span></label>
+                <select asp-for="Decision" class="form-select" required>
+                    <option value="Approve">Approve</option>
+                    <option value="Reject">Reject</option>
+                    <option value="Hold">Hold</option>
+                    <option value="Rework">Rework</option>
+                    <option value="ConditionalRelease">Conditional Release</option>
+                </select>
+                <span asp-validation-for="Decision" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-12">
+                <label asp-for="Reason" class="form-label">Reason / Remarks</label>
+                <textarea asp-for="Reason" class="form-control" rows="3" placeholder="Required if not Approve..."></textarea>
+                <span asp-validation-for="Reason" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="fo-modal__footer">
+        <button type="button" class="btn btn-outline-secondary" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i><span>Record Decision</span></button>
+    </div>
+</form>

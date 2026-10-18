@@ -1,0 +1,65 @@
+﻿@model List<FoodOpsERP.Models.Manufacturing.Quality.ViewModels.QCParameterViewModel>
+@{
+    ViewData["Title"] = "QC Setup — Parameters";
+    ViewData["Subtitle"] = "Master list of test parameters";
+}
+
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search parameters...", "params", Model.Count, "All|Active|Inactive", @<text>
+        <a href="@Url.Action("Create")" class="btn btn-primary btn-sm" data-modal="true" data-modal-title="New Parameter" data-modal-size="lg">
+            <i class="bi bi-plus-lg"></i> New Parameter
+        </a>
+    </text>)
+
+<div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Default UOM</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="code">@item.ParameterCode</span></td>
+                            <td>@item.ParameterName</td>
+                            <td>@item.ParameterType</td>
+                            <td>@item.DefaultUOMName</td>
+                            <td><partial name="_StatusPill" model='item.IsActive ? "Active" : "Inactive"' /></td>
+                            <td class="text-end">
+                                <div class="row-actions">
+                                    <a href="@Url.Action("Edit", new { id = item.ParameterID })" class="btn btn-sm btn-outline-secondary" title="Edit" data-modal="true" data-modal-title="Edit Parameter" data-modal-size="lg">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Toggle Status"
+                                            data-action-url="@Url.Action("ToggleActive", new { id = item.ParameterID })"
+                                            data-name="@item.ParameterCode"
+                                            data-confirm-title="Toggle Status?"
+                                            data-confirm-message="This will change the status of this parameter."
+                                            data-confirm-text="Toggle"
+                                            data-refresh="#grid-card">
+                                        <i class="bi bi-power"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <partial name="_EmptyState" model='"No parameters found. Click Add Parameter to create one."' />
+        }
+    </div>
+</div>

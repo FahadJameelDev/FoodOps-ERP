@@ -67,6 +67,11 @@ namespace FoodOpsERP.Data
         public DbSet<DowntimeReason> DowntimeReasons { get; set; }
         public DbSet<DowntimeLog> DowntimeLogs { get; set; }
         public DbSet<ProductionException> ProductionExceptions { get; set; }
+        // ─────────────────────────────────────────────
+        // Module 3.3 : Quality Control (2 New Tables)
+        // ─────────────────────────────────────────────
+        public DbSet<QCParameter> QCParameters { get; set; }
+        public DbSet<QualityDecision> QualityDecisions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -823,6 +828,50 @@ namespace FoodOpsERP.Data
                 b.HasOne<User>().WithMany().HasForeignKey(x => x.ResolvedByUserID).OnDelete(DeleteBehavior.Restrict);
                 b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
                 b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+            // ═════════════════════════════════════════════
+            // MODULE 3.3 : QUALITY CONTROL (Nayi Tables)
+            // ═════════════════════════════════════════════
+
+            // 1. QCParameter
+            modelBuilder.Entity<QCParameter>(b =>
+            {
+                b.ToTable("QCParameters");
+                b.HasKey(x => x.ParameterID);
+
+                b.Property(x => x.ParameterCode).HasMaxLength(20);
+                b.Property(x => x.ParameterName).HasMaxLength(100);
+                b.Property(x => x.ParameterType).HasMaxLength(20);
+
+                b.HasIndex(x => x.ParameterCode).IsUnique();
+                b.HasIndex(x => x.ParameterName).IsUnique();
+
+                b.HasOne<UnitOfMeasure>().WithMany().HasForeignKey(x => x.DefaultUOMID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 2. QualityDecision (Append-only Log)
+            modelBuilder.Entity<QualityDecision>(b =>
+            {
+                b.ToTable("QualityDecisions");
+                b.HasKey(x => x.DecisionID);
+
+                b.Property(x => x.Decision).HasMaxLength(20);
+                b.Property(x => x.Reason).HasMaxLength(500);
+                b.Property(x => x.DecidedAt).HasDefaultValueSql("SYSUTCDATETIME()");
+
+                // Index for latest decision per batch
+                b.HasIndex(x => new { x.BatchID, x.DecidedAt });
+
+                // Foreign Keys to existing Group 2 tables
+                b.HasOne<InventoryBatch>().WithMany().HasForeignKey(x => x.BatchID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<QCInspection>().WithMany().HasForeignKey(x => x.InspectionID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<NonConformanceReport>().WithMany().HasForeignKey(x => x.NCRID).OnDelete(DeleteBehavior.Restrict);
+
+                // Foreign Keys to User (Audit)
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.DecidedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ApprovedByUserID).OnDelete(DeleteBehavior.Restrict);
             });
         }
     }

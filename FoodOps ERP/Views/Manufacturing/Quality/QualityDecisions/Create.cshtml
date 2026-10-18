@@ -1,0 +1,9 @@
+﻿@model FoodOpsERP.Models.Manufacturing.Quality.ViewModels.QualityDecisionViewModel
+@{
+    ViewData["Title"] = "New Quality Decision";
+    ViewData["Subtitle"] = "Record a decision for an inventory batch";
+}
+<partial name="_PageHeader" />
+<div class="card">
+    <partial name="_DecisionForm" model="Model" />
+</div>

@@ -1371,6 +1371,125 @@ namespace FoodOps_ERP.Migrations
                     b.ToTable("ProductionWastages", (string)null);
                 });
 
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.QCParameter", b =>
+                {
+                    b.Property<int>("ParameterID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ParameterID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DefaultUOMID")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ParameterCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("ParameterName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ParameterType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("ParameterID");
+
+                    b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("DefaultUOMID");
+
+                    b.HasIndex("ModifiedByUserID");
+
+                    b.HasIndex("ParameterCode")
+                        .IsUnique();
+
+                    b.HasIndex("ParameterName")
+                        .IsUnique();
+
+                    b.ToTable("QCParameters", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.QualityDecision", b =>
+                {
+                    b.Property<int>("DecisionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DecisionID"));
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ApprovedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<long>("BatchID")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("DecidedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int>("DecidedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Decision")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int?>("InspectionID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NCRID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("DecisionID");
+
+                    b.HasIndex("ApprovedByUserID");
+
+                    b.HasIndex("DecidedByUserID");
+
+                    b.HasIndex("InspectionID");
+
+                    b.HasIndex("NCRID");
+
+                    b.HasIndex("BatchID", "DecidedAt");
+
+                    b.ToTable("QualityDecisions", (string)null);
+                });
+
             modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.Recipe", b =>
                 {
                     b.Property<int>("RecipeID")
@@ -2955,6 +3074,55 @@ namespace FoodOps_ERP.Migrations
                     b.HasOne("FoodOpsERP.Models.Entities.Manufacturing.WorkCenter", null)
                         .WithMany()
                         .HasForeignKey("WorkCenterID")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.QCParameter", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.UnitOfMeasure", null)
+                        .WithMany()
+                        .HasForeignKey("DefaultUOMID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ModifiedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.QualityDecision", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ApprovedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FoodOpsERP.Models.Entities.InventoryBatch", null)
+                        .WithMany()
+                        .HasForeignKey("BatchID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("DecidedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.QCInspection", null)
+                        .WithMany()
+                        .HasForeignKey("InspectionID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FoodOpsERP.Models.Entities.NonConformanceReport", null)
+                        .WithMany()
+                        .HasForeignKey("NCRID")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 

@@ -1,0 +1,42 @@
+﻿@model List<FoodOpsERP.Models.Manufacturing.Quality.ViewModels.QCParameterViewModel>
+@{
+    ViewData["Title"] = "Quality Records";
+    ViewData["Subtitle"] = "Master list of QC Parameters";
+}
+
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search parameters...", "params", Model.Count, null, null)
+
+    <div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="code">@item.ParameterCode</span></td>
+                            <td>@item.ParameterName</td>
+                            <td>@item.ParameterType</td>
+                            <td><partial name="_StatusPill" model='item.IsActive ? "Active" : "Inactive"' /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <partial name="_EmptyState" model='"No records found."' />
+        }
+    </div>
+</div>

@@ -3,6 +3,7 @@ using FoodOpsERP.Middlewares;
 using FoodOpsERP.Services.Inventory;
 using FoodOpsERP.Services.Manufacturing.Production;
 using FoodOpsERP.Services.Manufacturing.ProductsAndRecipes;
+using FoodOpsERP.Services.Manufacturing.Quality;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -88,6 +89,9 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IDemandService, DemandService>();
 builder.Services.AddScoped<IProductionPlanService, ProductionPlanService>();
 builder.Services.AddScoped<IProductionOrderService, ProductionOrderService>();
+// Module 3.3 - Quality Control
+builder.Services.AddScoped<IQCParameterService, QCParameterService>();
+builder.Services.AddScoped<IQualityDecisionService, QualityDecisionService>();
 
 
 // ═══════════════════════════════════════════════════════════
