@@ -1,0 +1,32 @@
+﻿@model FoodOpsERP.Models.Manufacturing.Costing.ViewModels.CostVarianceViewModel
+
+<form asp-action="ReviewVariance" method="post" data-spa-form data-reload-url="@Url.Action("VarianceControl")" data-refresh="#grid-card">
+    <div class="fo-modal__body">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <input type="hidden" asp-for="VarianceID" />
+        <input type="hidden" asp-for="ProductionOrderID" />
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-6"><span class="text-muted d-block fs-xs">Order #</span><b>@Model.OrderNumber</b></div>
+            <div class="col-md-6"><span class="text-muted d-block fs-xs">Total Variance</span><b>@Model.TotalVarianceAmount.ToString("N2")</b></div>
+        </div>
+
+        <div class="col-12 mb-3">
+            <label class="form-label">Review Status</label>
+            <select name="status" class="form-select" required>
+                <option value="Accepted">Accepted</option>
+                <option value="Investigate">Investigate</option>
+                <option value="Closed">Closed</option>
+            </select>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">Comments</label>
+            <textarea name="comments" class="form-control" rows="3" required placeholder="Reason for accepting/investigating..."></textarea>
+        </div>
+    </div>
+    <div class="fo-modal__footer">
+        <button type="button" class="btn btn-outline-secondary" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i><span>Submit Review</span></button>
+    </div>
+</form>

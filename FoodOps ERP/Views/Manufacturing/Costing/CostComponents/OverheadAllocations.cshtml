@@ -1,0 +1,65 @@
+﻿@model List<FoodOpsERP.Models.Manufacturing.Costing.ViewModels.OverheadAllocationViewModel>
+@{
+    ViewData["Title"] = "Overhead Allocations";
+    ViewData["Subtitle"] = "Monthly factory overheads (Electricity, Gas, etc.)";
+}
+
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search allocations...", "allocations", Model.Count, null, @<text>
+        <a href="@Url.Action("Index")" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Components</a>
+        <a href="@Url.Action("CreateOverhead")" class="btn btn-primary btn-sm" data-modal="true" data-modal-title="New Overhead Allocation" data-modal-size="lg"><i class="bi bi-plus-lg"></i> New Allocation</a>
+    </text>)
+
+<div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Plant</th>
+                        <th>Component</th>
+                        <th class="num">Amount</th>
+                        <th class="num">Basis Qty</th>
+                        <th class="num">Rate</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.PeriodMonth.ToString("MMM yyyy")</td>
+                            <td>@item.PlantName</td>
+                            <td><strong>@item.ComponentName</strong></td>
+                            <td class="num">@item.AllocatedAmount.ToString("N2")</td>
+                            <td class="num">@item.BasisQty.ToString("N2")</td>
+                            <td class="num">@item.RatePerBasis.ToString("N4")</td>
+                            <td><partial name="_StatusPill" model="item.Status" /></td>
+                            <td class="text-end">
+                                @if (item.Status == "Draft")
+                                {
+                                    <button type="button" class="btn btn-sm btn-outline-success"
+                                            data-action-url="@Url.Action("PostOverhead", new { id = item.AllocationID })"
+                                            data-name="@item.ComponentName"
+                                            data-confirm-title="Post this allocation?"
+                                            data-confirm-text="Post"
+                                            data-refresh="#grid-card">
+                                        <i class="bi bi-check2-circle"></i> Post
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <partial name="_EmptyState" model='"No overhead allocations found."' />
+        }
+    </div>
+</div>

@@ -1,0 +1,54 @@
+﻿@model List<FoodOpsERP.Models.Manufacturing.Costing.ViewModels.CostComponentViewModel>
+@{
+    ViewData["Title"] = "Cost Components";
+    ViewData["Subtitle"] = "Master list of cost buckets";
+}
+
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search components...", "components", Model.Count, "All|Active|Inactive", @<text>
+        <a href="@Url.Action("StandardCosts")" class="btn btn-outline-secondary btn-sm"><i class="bi bi-currency-dollar"></i> Standard Costs</a>
+        <a href="@Url.Action("Create")" class="btn btn-primary btn-sm" data-modal="true" data-modal-title="New Cost Component" data-modal-size="lg"><i class="bi bi-plus-lg"></i> New Component</a>
+    </text>)
+
+<div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Allocation Basis</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="code">@item.ComponentCode</span></td>
+                            <td>@item.ComponentName</td>
+                            <td>@item.ComponentType</td>
+                            <td>@item.AllocationBasis</td>
+                            <td><partial name="_StatusPill" model='item.IsActive ? "Active" : "Inactive"' /></td>
+                            <td class="text-end">
+                                <div class="row-actions">
+                                    <a href="@Url.Action("Edit", new { id = item.ComponentID })" class="btn btn-sm btn-outline-secondary" data-modal="true" data-modal-title="Edit Cost Component" data-modal-size="lg"><i class="bi bi-pencil"></i></a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Toggle Status" data-action-url="@Url.Action("ToggleActive", new { id = item.ComponentID })" data-name="@item.ComponentCode" data-confirm-title="Toggle Status?" data-confirm-text="Toggle" data-refresh="#grid-card"><i class="bi bi-power"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <partial name="_EmptyState" model='"No components found. Click New Component to create one."' />
+        }
+    </div>
+</div>

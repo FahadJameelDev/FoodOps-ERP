@@ -1,0 +1,35 @@
+﻿@model List<FoodOpsERP.Models.Manufacturing.Costing.ViewModels.BatchCostSummaryViewModel>
+@{
+    ViewData["Title"] = "Batch Costing"; ViewData["Subtitle"] = "Actual cost of production batches";
+}
+<partial name="_PageHeader" />
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search batches...", "batches", Model.Count, null, null)
+    <div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Order #</th><th class="num">Mat Cost</th><th class="num">Lab Cost</th><th class="num">Ovh Cost</th><th class="num">Total</th><th class="num">Unit Cost</th><th>Status</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@item.OrderNumber</strong></td>
+                            <td class="num">@item.ActualMaterialCost.ToString("N2")</td>
+                            <td class="num">@item.ActualLaborCost.ToString("N2")</td>
+                            <td class="num">@item.ActualOverheadCost.ToString("N2")</td>
+                            <td class="num"><strong>@item.TotalBatchCost.ToString("N2")</strong></td>
+                            <td class="num">@(item.UnitCost?.ToString("N4") ?? "—")</td>
+                            <td><partial name="_StatusPill" model="item.Status" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+
+            <partial name="_EmptyState" model='"No batch costs found."' />
+        }
+    </div>
+</div>

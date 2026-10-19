@@ -1,0 +1,45 @@
+﻿@model List<FoodOpsERP.Models.Manufacturing.Costing.ViewModels.BatchCostSummaryViewModel>
+@{
+    ViewData["Title"] = "Unit Cost"; ViewData["Subtitle"] = "Cost per unit of produced goods";
+}
+<partial name="_PageHeader" />
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search unit costs...", "costs", Model.Count, null, null)
+    <div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Order #</th><th class="num">Good Qty</th><th class="num">Total Cost</th><th class="num">Unit Cost</th><th class="num">Std. Unit Cost</th><th>Variance</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@item.OrderNumber</strong></td>
+                            <td class="num">@item.GoodQty.ToString("N2")</td>
+                            <td class="num">@item.TotalBatchCost.ToString("N2")</td>
+                            <td class="num"><strong>@(item.UnitCost?.ToString("N4") ?? "—")</strong></td>
+                            <td class="num">@(item.StandardUnitCostSnapshot?.ToString("N4") ?? "—")</td>
+                            <td>
+                                @if (item.UnitCost.HasValue && item.StandardUnitCostSnapshot.HasValue)
+                                {
+                                    var v = item.UnitCost.Value - item.StandardUnitCostSnapshot.Value;
+                                    <span class="pill @(v > 0 ? "pill--bad" : "pill--ok")">@v.ToString("N4")</span>
+                                }
+                                else
+                                {
+
+                                    <span class="na">—</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+
+            <partial name="_EmptyState" model='"No unit costs available."' />
+        }
+    </div>
+</div>

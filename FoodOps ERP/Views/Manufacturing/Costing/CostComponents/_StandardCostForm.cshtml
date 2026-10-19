@@ -1,0 +1,27 @@
+﻿@model FoodOpsERP.Models.Manufacturing.Costing.ViewModels.StandardCostViewModel
+@{
+    var products = ViewData["Products"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
+    var uoms = ViewData["UOMs"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
+}
+
+<form asp-action="CreateStandardCost" method="post" data-spa-form data-reload-url="@Url.Action("StandardCosts")" data-refresh="#grid-card" novalidate>
+    <div class="fo-modal__body">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <div class="row g-3">
+            <div class="col-md-6"><label asp-for="ProductID" class="form-label">Product <span class="text-danger">*</span></label><select asp-for="ProductID" asp-items="products" class="form-select"><option value="">Select Product...</option></select></div>
+            <div class="col-md-6"><label asp-for="CostUOMID" class="form-label">UOM <span class="text-danger">*</span></label><select asp-for="CostUOMID" asp-items="uoms" class="form-select"><option value="">Select UOM...</option></select></div>
+            
+            <div class="col-md-4"><label asp-for="StandardMaterialCost" class="form-label">Material Cost</label><input asp-for="StandardMaterialCost" type="number" step="0.0001" class="form-control num" /></div>
+            <div class="col-md-4"><label asp-for="StandardLaborCost" class="form-label">Labor Cost</label><input asp-for="StandardLaborCost" type="number" step="0.0001" class="form-control num" /></div>
+            <div class="col-md-4"><label asp-for="StandardOverheadCost" class="form-label">Overhead Cost</label><input asp-for="StandardOverheadCost" type="number" step="0.0001" class="form-control num" /></div>
+
+            <div class="col-md-6"><label asp-for="EffectiveFrom" class="form-label">Effective From</label><input asp-for="EffectiveFrom" type="date" class="form-control" /></div>
+            <div class="col-md-6"><label asp-for="EffectiveTo" class="form-label">Effective To</label><input asp-for="EffectiveTo" type="date" class="form-control" /></div>
+        </div>
+    </div>
+    <div class="fo-modal__footer">
+        <button type="button" class="btn btn-outline-secondary" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i><span>Save Cost</span></button>
+    </div>
+</form>

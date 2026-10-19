@@ -1,0 +1,35 @@
+﻿@model List<FoodOpsERP.Models.Manufacturing.Costing.ViewModels.CostVarianceViewModel>
+@{
+    ViewData["Title"] = "Variance Control"; ViewData["Subtitle"] = "Review and investigate variances";
+}
+<partial name="_PageHeader" />
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search pending reviews...", "reviews", Model.Count, null, null)
+    <div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Order #</th><th class="num">Variance Amount</th><th>Severity</th><th>Review Status</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@item.OrderNumber</strong></td>
+                            <td class="num">@item.TotalVarianceAmount.ToString("N2")</td>
+                            <td><partial name="_StatusPill" model="item.Severity" /></td>
+                            <td><partial name="_StatusPill" model="item.ReviewStatus" /></td>
+                            <td class="text-end">
+                                <a href="@Url.Action("ReviewVariance", new { id = item.VarianceID })" class="btn btn-sm btn-primary" data-modal="true" data-modal-title="Review Variance" data-modal-size="md">Review</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+
+            <partial name="_EmptyState" model='"No pending reviews found."' />
+        }
+    </div>
+</div>

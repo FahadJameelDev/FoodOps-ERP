@@ -1,6 +1,7 @@
 using FoodOpsERP.Data;
 using FoodOpsERP.Middlewares;
 using FoodOpsERP.Services.Inventory;
+using FoodOpsERP.Services.Manufacturing.Costing;
 using FoodOpsERP.Services.Manufacturing.Production;
 using FoodOpsERP.Services.Manufacturing.ProductsAndRecipes;
 using FoodOpsERP.Services.Manufacturing.Quality;
@@ -92,6 +93,10 @@ builder.Services.AddScoped<IProductionOrderService, ProductionOrderService>();
 // Module 3.3 - Quality Control
 builder.Services.AddScoped<IQCParameterService, QCParameterService>();
 builder.Services.AddScoped<IQualityDecisionService, QualityDecisionService>();
+// Module 3.4 - Costing & Variance
+builder.Services.AddScoped<ICostSetupService, CostSetupService>();
+builder.Services.AddScoped<IOverheadService, OverheadService>();
+builder.Services.AddScoped<IBatchCostingService, BatchCostingService>();
 
 
 // ═══════════════════════════════════════════════════════════

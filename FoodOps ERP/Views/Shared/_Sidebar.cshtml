@@ -203,8 +203,7 @@
         </ul>
     </div>
 </li>
-
-                        <!-- Module 3.4: Costing & Variance (Abhi Views nahi bane) -->
+                        <!-- ═══ Module 3.4: Costing & Variance ═══ -->
                         <li class="nav-item">
                             <button class="nav-module-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mod-costing" aria-expanded="false">
                                 <i class="bi bi-calculator" aria-hidden="true"></i>
@@ -213,12 +212,36 @@
                             </button>
                             <div class="collapse" id="mod-costing">
                                 <ul class="nav flex-column nav-features">
-                                    <li><a class="nav-link" href="#">Batch Costing</a></li>
-                                    <li><a class="nav-link" href="#">Cost Components</a></li>
-                                    <li><a class="nav-link" href="#">Unit Cost</a></li>
-                                    <li><a class="nav-link" href="#">Variance Analysis</a></li>
-                                    <li><a class="nav-link" href="#">Variance Control</a></li>
-                                    <li><a class="nav-link" href="#">Loss Analysis</a></li>
+                                    <li>
+                                        <a class="nav-link @activeClass("BatchCostings", "Index")"
+                                           asp-controller="BatchCostings" asp-action="Index"
+                                           data-short="Batch Costing">Batch Costing</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link @activeClass("CostComponents", "Index")"
+                                           asp-controller="CostComponents" asp-action="Index"
+                                           data-short="Cost Components">Cost Components</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link @activeClass("BatchCostings", "UnitCost")"
+                                           asp-controller="BatchCostings" asp-action="UnitCost"
+                                           data-short="Unit Cost">Unit Cost</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link @activeClass("BatchCostings", "Variance")"
+                                           asp-controller="BatchCostings" asp-action="Variance"
+                                           data-short="Variance Analysis">Variance Analysis</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link @activeClass("BatchCostings", "VarianceControl")"
+                                           asp-controller="BatchCostings" asp-action="VarianceControl"
+                                           data-short="Variance Control">Variance Control</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link @activeClass("BatchCostings", "LossAnalysis")"
+                                           asp-controller="BatchCostings" asp-action="LossAnalysis"
+                                           data-short="Loss Analysis">Loss Analysis</a>
+                                    </li>
                                 </ul>
                             </div>
                         </li>

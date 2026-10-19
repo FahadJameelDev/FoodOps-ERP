@@ -72,6 +72,16 @@ namespace FoodOpsERP.Data
         // ─────────────────────────────────────────────
         public DbSet<QCParameter> QCParameters { get; set; }
         public DbSet<QualityDecision> QualityDecisions { get; set; }
+        // ─────────────────────────────────────────────
+        // Module 3.4 : Costing & Variance (7 Tables)
+        // ─────────────────────────────────────────────
+        public DbSet<CostComponent> CostComponents { get; set; }
+        public DbSet<StandardItemCost> StandardItemCosts { get; set; }
+        public DbSet<OverheadAllocation> OverheadAllocations { get; set; }
+        public DbSet<BatchCostSummary> BatchCostSummaries { get; set; }
+        public DbSet<BatchCostLine> BatchCostLines { get; set; }
+        public DbSet<CostVariance> CostVariances { get; set; }
+        public DbSet<VarianceThreshold> VarianceThresholds { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -872,6 +882,153 @@ namespace FoodOpsERP.Data
                 // Foreign Keys to User (Audit)
                 b.HasOne<User>().WithMany().HasForeignKey(x => x.DecidedByUserID).OnDelete(DeleteBehavior.Restrict);
                 b.HasOne<User>().WithMany().HasForeignKey(x => x.ApprovedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+            // ═════════════════════════════════════════════
+            // MODULE 3.4 : COSTING & VARIANCE
+            // ═════════════════════════════════════════════
+
+            // 1. CostComponent
+            modelBuilder.Entity<CostComponent>(b =>
+            {
+                b.ToTable("CostComponents");
+                b.HasKey(x => x.ComponentID);
+                b.Property(x => x.ComponentCode).HasMaxLength(20);
+                b.Property(x => x.ComponentName).HasMaxLength(100);
+                b.Property(x => x.ComponentType).HasMaxLength(20);
+                b.Property(x => x.AllocationBasis).HasMaxLength(20);
+                b.HasIndex(x => x.ComponentCode).IsUnique();
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 2. StandardItemCost
+            modelBuilder.Entity<StandardItemCost>(b =>
+            {
+                b.ToTable("StandardItemCosts");
+                b.HasKey(x => x.CostID);
+                b.Property(x => x.StandardMaterialCost).HasPrecision(18, 4);
+                b.Property(x => x.StandardLaborCost).HasPrecision(18, 4);
+                b.Property(x => x.StandardOverheadCost).HasPrecision(18, 4);
+                b.Property(x => x.TotalStandardCost)
+                 .HasPrecision(18, 4)
+                 .HasComputedColumnSql("[StandardMaterialCost] + [StandardLaborCost] + [StandardOverheadCost]", stored: true);
+                b.Property(x => x.Status).HasMaxLength(20);
+                b.Property(x => x.Notes).HasMaxLength(500);
+                b.HasIndex(x => new { x.ProductID, x.EffectiveFrom }).IsUnique();
+                b.HasIndex(x => x.ProductID)
+                 .IsUnique()
+                 .HasFilter("[Status] = 'Approved' AND [EffectiveTo] IS NULL")
+                 .HasDatabaseName("UX_StandardItemCosts_OneApprovedPerProduct");
+                b.HasOne<Product>().WithMany().HasForeignKey(x => x.ProductID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<UnitOfMeasure>().WithMany().HasForeignKey(x => x.CostUOMID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ApprovedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 3. OverheadAllocation
+            modelBuilder.Entity<OverheadAllocation>(b =>
+            {
+                b.ToTable("OverheadAllocations");
+                b.HasKey(x => x.AllocationID);
+                b.Property(x => x.AllocatedAmount).HasPrecision(18, 2);
+                b.Property(x => x.BasisQty).HasPrecision(18, 4);
+                b.Property(x => x.RatePerBasis)
+                 .HasPrecision(18, 4)
+                 .HasComputedColumnSql("CASE WHEN [BasisQty] = 0 THEN 0 ELSE [AllocatedAmount] / [BasisQty] END", stored: true);
+                b.Property(x => x.Status).HasMaxLength(20);
+                b.HasIndex(x => new { x.PlantID, x.ComponentID, x.PeriodMonth }).IsUnique();
+                b.HasOne<Plant>().WithMany().HasForeignKey(x => x.PlantID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<CostComponent>().WithMany().HasForeignKey(x => x.ComponentID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.PostedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 4. BatchCostSummary
+            modelBuilder.Entity<BatchCostSummary>(b =>
+            {
+                b.ToTable("BatchCostSummaries");
+                b.HasKey(x => x.BatchCostID);
+                b.Property(x => x.ActualMaterialCost).HasPrecision(18, 2);
+                b.Property(x => x.ActualLaborCost).HasPrecision(18, 2);
+                b.Property(x => x.ActualOverheadCost).HasPrecision(18, 2);
+                b.Property(x => x.TotalBatchCost)
+                 .HasPrecision(18, 2)
+                 .HasComputedColumnSql("[ActualMaterialCost] + [ActualLaborCost] + [ActualOverheadCost]", stored: true);
+                b.Property(x => x.GoodQty).HasPrecision(18, 4);
+                b.Property(x => x.UnitCost)
+                 .HasPrecision(18, 4)
+                 .HasComputedColumnSql("CASE WHEN [GoodQty] = 0 THEN NULL ELSE ([ActualMaterialCost] + [ActualLaborCost] + [ActualOverheadCost]) / [GoodQty] END", stored: true);
+                b.Property(x => x.StandardUnitCostSnapshot).HasPrecision(18, 4);
+                b.Property(x => x.Status).HasMaxLength(20);
+                b.HasIndex(x => x.ProductionOrderID).IsUnique();
+                b.HasIndex(x => x.Status);
+                b.HasOne<ProductionOrder>().WithMany().HasForeignKey(x => x.ProductionOrderID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.FinalizedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 5. BatchCostLine
+            modelBuilder.Entity<BatchCostLine>(b =>
+            {
+                b.ToTable("BatchCostLines");
+                b.HasKey(x => x.CostLineID);
+                b.Property(x => x.SourceType).HasMaxLength(20);
+                b.Property(x => x.Quantity).HasPrecision(18, 4);
+                b.Property(x => x.Rate).HasPrecision(18, 4);
+                b.Property(x => x.Amount)
+                 .HasPrecision(18, 2)
+                 .HasComputedColumnSql("ROUND([Quantity] * [Rate], 2)", stored: true);
+                b.Property(x => x.Description).HasMaxLength(200);
+                b.HasIndex(x => new { x.BatchCostID, x.ComponentID });
+                b.HasOne(x => x.BatchCost)
+                 .WithMany(s => s.Lines)
+                 .HasForeignKey(x => x.BatchCostID)
+                 .OnDelete(DeleteBehavior.Cascade);
+                b.HasOne<CostComponent>().WithMany().HasForeignKey(x => x.ComponentID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<Product>().WithMany().HasForeignKey(x => x.ProductID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 6. CostVariance
+            modelBuilder.Entity<CostVariance>(b =>
+            {
+                b.ToTable("CostVariances");
+                b.HasKey(x => x.VarianceID);
+                b.Property(x => x.MaterialPriceVariance).HasPrecision(18, 2);
+                b.Property(x => x.MaterialUsageVariance).HasPrecision(18, 2);
+                b.Property(x => x.LaborVariance).HasPrecision(18, 2);
+                b.Property(x => x.OverheadVariance).HasPrecision(18, 2);
+                b.Property(x => x.YieldVariance).HasPrecision(18, 2);
+                b.Property(x => x.TotalVarianceAmount)
+                 .HasPrecision(18, 2)
+                 .HasComputedColumnSql("[MaterialPriceVariance] + [MaterialUsageVariance] + [LaborVariance] + [OverheadVariance] + [YieldVariance]", stored: true);
+                b.Property(x => x.TotalVariancePercent).HasPrecision(9, 4);
+                b.Property(x => x.Severity).HasMaxLength(20);
+                b.Property(x => x.ReviewStatus).HasMaxLength(20);
+                b.Property(x => x.ReviewComments).HasMaxLength(500);
+                b.HasIndex(x => x.ProductionOrderID).IsUnique();
+                b.HasIndex(x => new { x.ReviewStatus, x.Severity });
+                b.HasOne<ProductionOrder>().WithMany().HasForeignKey(x => x.ProductionOrderID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ReviewedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 7. VarianceThreshold
+            modelBuilder.Entity<VarianceThreshold>(b =>
+            {
+                b.ToTable("VarianceThresholds");
+                b.HasKey(x => x.ThresholdID);
+                b.Property(x => x.VarianceType).HasMaxLength(20);
+                b.Property(x => x.WarningPercent).HasPrecision(5, 2);
+                b.Property(x => x.CriticalPercent).HasPrecision(5, 2);
+                b.HasIndex(x => new { x.PlantID, x.ProductID, x.VarianceType }).IsUnique();
+                b.HasOne<Plant>().WithMany().HasForeignKey(x => x.PlantID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<Product>().WithMany().HasForeignKey(x => x.ProductID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
             });
         }
     }

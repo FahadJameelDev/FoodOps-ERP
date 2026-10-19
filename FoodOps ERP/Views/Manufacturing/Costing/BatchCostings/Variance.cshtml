@@ -1,0 +1,34 @@
+﻿@model List<FoodOpsERP.Models.Manufacturing.Costing.ViewModels.CostVarianceViewModel>
+@{
+    ViewData["Title"] = "Variance Analysis"; ViewData["Subtitle"] = "Compare standard vs actual costs";
+}
+<partial name="_PageHeader" />
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search variances...", "variances", Model.Count, null, null)
+    <div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Order #</th><th class="num">Mat. Price Var</th><th class="num">Mat. Usage Var</th><th class="num">Labor Var</th><th class="num">Total Variance</th><th>Severity</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@item.OrderNumber</strong></td>
+                            <td class="num">@item.MaterialPriceVariance.ToString("N2")</td>
+                            <td class="num">@item.MaterialUsageVariance.ToString("N2")</td>
+                            <td class="num">@item.LaborVariance.ToString("N2")</td>
+                            <td class="num"><strong>@item.TotalVarianceAmount.ToString("N2")</strong></td>
+                            <td><partial name="_StatusPill" model="item.Severity" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+
+            <partial name="_EmptyState" model='"No variances found."' />
+        }
+    </div>
+</div>

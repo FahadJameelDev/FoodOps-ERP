@@ -1,0 +1,66 @@
+﻿@model List<FoodOpsERP.Models.Manufacturing.Costing.ViewModels.StandardCostViewModel>
+@{
+    ViewData["Title"] = "Standard Costs";
+    ViewData["Subtitle"] = "Standard cost per product";
+}
+
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search costs...", "costs", Model.Count, null, @<text>
+        <a href="@Url.Action("Index")" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Components</a>
+        <a href="@Url.Action("CreateStandardCost")" class="btn btn-primary btn-sm" data-modal="true" data-modal-title="New Standard Cost" data-modal-size="lg"><i class="bi bi-plus-lg"></i> New Cost</a>
+    </text>)
+
+<div class="table-scroll">
+        @if (Model != null && Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Effective From</th>
+                        <th class="num">Mat. Cost</th>
+                        <th class="num">Lab. Cost</th>
+                        <th class="num">Ovh. Cost</th>
+                        <th class="num">Total</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@item.ProductName</strong></td>
+                            <td>@item.EffectiveFrom.ToString("dd MMM yyyy")</td>
+                            <td class="num">@item.StandardMaterialCost.ToString("N2")</td>
+                            <td class="num">@item.StandardLaborCost.ToString("N2")</td>
+                            <td class="num">@item.StandardOverheadCost.ToString("N2")</td>
+                            <!-- FIX: Yahan <b> ki jagah <strong> kar diya hai -->
+                            <td class="num"><strong>@item.TotalStandardCost.ToString("N2")</strong></td>
+                            <td><partial name="_StatusPill" model="item.Status" /></td>
+                            <td class="text-end">
+                                @if (item.Status == "Draft")
+                                {
+                                    <button type="button" class="btn btn-sm btn-outline-success"
+                                            data-action-url="@Url.Action("ApproveStandardCost", new { id = item.CostID })"
+                                            data-name="@item.ProductName"
+                                            data-confirm-title="Approve this cost?"
+                                            data-confirm-text="Approve"
+                                            data-refresh="#grid-card">
+                                        <i class="bi bi-check2-circle"></i> Approve
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <partial name="_EmptyState" model='"No standard costs found."' />
+        }
+    </div>
+</div>

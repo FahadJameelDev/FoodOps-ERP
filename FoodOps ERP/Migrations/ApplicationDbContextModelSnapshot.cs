@@ -276,6 +276,157 @@ namespace FoodOps_ERP.Migrations
                     b.ToTable("InventoryTransactions");
                 });
 
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.BatchCostLine", b =>
+                {
+                    b.Property<long>("CostLineID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("CostLineID"));
+
+                    b.Property<decimal>("Amount")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasComputedColumnSql("ROUND([Quantity] * [Rate], 2)", true);
+
+                    b.Property<int>("BatchCostID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ComponentID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("ProductID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("Rate")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<long?>("SourceID")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("SourceType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("CostLineID");
+
+                    b.HasIndex("ComponentID");
+
+                    b.HasIndex("ProductID");
+
+                    b.HasIndex("BatchCostID", "ComponentID");
+
+                    b.ToTable("BatchCostLines", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.BatchCostSummary", b =>
+                {
+                    b.Property<int>("BatchCostID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BatchCostID"));
+
+                    b.Property<decimal>("ActualLaborCost")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ActualMaterialCost")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ActualOverheadCost")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CalculatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("FinalizedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("FinalizedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("GoodQty")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductionOrderID")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<decimal?>("StandardUnitCostSnapshot")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("TotalBatchCost")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasComputedColumnSql("[ActualMaterialCost] + [ActualLaborCost] + [ActualOverheadCost]", true);
+
+                    b.Property<decimal?>("UnitCost")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)")
+                        .HasComputedColumnSql("CASE WHEN [GoodQty] = 0 THEN NULL ELSE ([ActualMaterialCost] + [ActualLaborCost] + [ActualOverheadCost]) / [GoodQty] END", true);
+
+                    b.HasKey("BatchCostID");
+
+                    b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("FinalizedByUserID");
+
+                    b.HasIndex("ModifiedByUserID");
+
+                    b.HasIndex("ProductionOrderID")
+                        .IsUnique();
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("BatchCostSummaries", (string)null);
+                });
+
             modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.BatchMaterialIssue", b =>
                 {
                     b.Property<int>("IssueID")
@@ -387,6 +538,165 @@ namespace FoodOps_ERP.Migrations
                     b.HasIndex("UOMID");
 
                     b.ToTable("BatchOutputLogs", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.CostComponent", b =>
+                {
+                    b.Property<int>("ComponentID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ComponentID"));
+
+                    b.Property<string>("AllocationBasis")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("ComponentCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("ComponentName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ComponentType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("ComponentID");
+
+                    b.HasIndex("ComponentCode")
+                        .IsUnique();
+
+                    b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("ModifiedByUserID");
+
+                    b.ToTable("CostComponents", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.CostVariance", b =>
+                {
+                    b.Property<int>("VarianceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VarianceID"));
+
+                    b.Property<DateTime>("CalculatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("LaborVariance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("MaterialPriceVariance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("MaterialUsageVariance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("OverheadVariance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProductionOrderID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReviewComments")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ReviewStatus")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ReviewedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("Severity")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("TotalVarianceAmount")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasComputedColumnSql("[MaterialPriceVariance] + [MaterialUsageVariance] + [LaborVariance] + [OverheadVariance] + [YieldVariance]", true);
+
+                    b.Property<decimal?>("TotalVariancePercent")
+                        .HasPrecision(9, 4)
+                        .HasColumnType("decimal(9,4)");
+
+                    b.Property<decimal>("YieldVariance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("VarianceID");
+
+                    b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("ModifiedByUserID");
+
+                    b.HasIndex("ProductionOrderID")
+                        .IsUnique();
+
+                    b.HasIndex("ReviewedByUserID");
+
+                    b.HasIndex("ReviewStatus", "Severity");
+
+                    b.ToTable("CostVariances", (string)null);
                 });
 
             modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.Demand", b =>
@@ -604,6 +914,82 @@ namespace FoodOps_ERP.Migrations
                         .IsUnique();
 
                     b.ToTable("DowntimeReasons", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.OverheadAllocation", b =>
+                {
+                    b.Property<int>("AllocationID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AllocationID"));
+
+                    b.Property<decimal>("AllocatedAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("BasisQty")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<int>("ComponentID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("PeriodMonth")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PlantID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("PostedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("PostedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("RatePerBasis")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)")
+                        .HasComputedColumnSql("CASE WHEN [BasisQty] = 0 THEN 0 ELSE [AllocatedAmount] / [BasisQty] END", true);
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("AllocationID");
+
+                    b.HasIndex("ComponentID");
+
+                    b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("ModifiedByUserID");
+
+                    b.HasIndex("PostedByUserID");
+
+                    b.HasIndex("PlantID", "ComponentID", "PeriodMonth")
+                        .IsUnique();
+
+                    b.ToTable("OverheadAllocations", (string)null);
                 });
 
             modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.PackagingConfig", b =>
@@ -1781,6 +2167,161 @@ namespace FoodOps_ERP.Migrations
                     b.ToTable("RecipeItems", (string)null);
                 });
 
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.StandardItemCost", b =>
+                {
+                    b.Property<int>("CostID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CostID"));
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ApprovedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CostUOMID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EffectiveFrom")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EffectiveTo")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("ProductID")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<decimal>("StandardLaborCost")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("StandardMaterialCost")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("StandardOverheadCost")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("TotalStandardCost")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)")
+                        .HasComputedColumnSql("[StandardMaterialCost] + [StandardLaborCost] + [StandardOverheadCost]", true);
+
+                    b.HasKey("CostID");
+
+                    b.HasIndex("ApprovedByUserID");
+
+                    b.HasIndex("CostUOMID");
+
+                    b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("ModifiedByUserID");
+
+                    b.HasIndex("ProductID")
+                        .IsUnique()
+                        .HasDatabaseName("UX_StandardItemCosts_OneApprovedPerProduct")
+                        .HasFilter("[Status] = 'Approved' AND [EffectiveTo] IS NULL");
+
+                    b.HasIndex("ProductID", "EffectiveFrom")
+                        .IsUnique();
+
+                    b.ToTable("StandardItemCosts", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.VarianceThreshold", b =>
+                {
+                    b.Property<int>("ThresholdID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ThresholdID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("CriticalPercent")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PlantID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProductID")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("VarianceType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("WarningPercent")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.HasKey("ThresholdID");
+
+                    b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("ModifiedByUserID");
+
+                    b.HasIndex("ProductID");
+
+                    b.HasIndex("PlantID", "ProductID", "VarianceType")
+                        .IsUnique()
+                        .HasFilter("[PlantID] IS NOT NULL AND [ProductID] IS NOT NULL");
+
+                    b.ToTable("VarianceThresholds", (string)null);
+                });
+
             modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.WorkCenter", b =>
                 {
                     b.Property<int>("WorkCenterID")
@@ -2619,6 +3160,53 @@ namespace FoodOps_ERP.Migrations
                     b.Navigation("Plant");
                 });
 
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.BatchCostLine", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.Manufacturing.BatchCostSummary", "BatchCost")
+                        .WithMany("Lines")
+                        .HasForeignKey("BatchCostID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.Manufacturing.CostComponent", null)
+                        .WithMany()
+                        .HasForeignKey("ComponentID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("BatchCost");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.BatchCostSummary", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("FinalizedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ModifiedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FoodOpsERP.Models.Entities.Manufacturing.ProductionOrder", null)
+                        .WithMany()
+                        .HasForeignKey("ProductionOrderID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.BatchMaterialIssue", b =>
                 {
                     b.HasOne("FoodOpsERP.Models.Entities.InventoryBatch", null)
@@ -2686,6 +3274,45 @@ namespace FoodOps_ERP.Migrations
                         .HasForeignKey("UOMID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.CostComponent", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ModifiedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.CostVariance", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ModifiedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FoodOpsERP.Models.Entities.Manufacturing.ProductionOrder", null)
+                        .WithMany()
+                        .HasForeignKey("ProductionOrderID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ReviewedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.Demand", b =>
@@ -2762,6 +3389,37 @@ namespace FoodOps_ERP.Migrations
                     b.HasOne("FoodOpsERP.Models.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("ModifiedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.OverheadAllocation", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.Manufacturing.CostComponent", null)
+                        .WithMany()
+                        .HasForeignKey("ComponentID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ModifiedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FoodOpsERP.Models.Entities.Plant", null)
+                        .WithMany()
+                        .HasForeignKey("PlantID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("PostedByUserID")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
@@ -3237,6 +3895,61 @@ namespace FoodOps_ERP.Migrations
                     b.Navigation("Recipe");
                 });
 
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.StandardItemCost", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ApprovedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FoodOpsERP.Models.Entities.UnitOfMeasure", null)
+                        .WithMany()
+                        .HasForeignKey("CostUOMID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ModifiedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FoodOpsERP.Models.Entities.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.VarianceThreshold", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ModifiedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FoodOpsERP.Models.Entities.Plant", null)
+                        .WithMany()
+                        .HasForeignKey("PlantID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FoodOpsERP.Models.Entities.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductID")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
             modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.WorkCenter", b =>
                 {
                     b.HasOne("FoodOpsERP.Models.Entities.UnitOfMeasure", null)
@@ -3461,6 +4174,11 @@ namespace FoodOps_ERP.Migrations
                     b.Navigation("QCInspections");
 
                     b.Navigation("StockAdjustments");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.BatchCostSummary", b =>
+                {
+                    b.Navigation("Lines");
                 });
 
             modelBuilder.Entity("FoodOpsERP.Models.Entities.Manufacturing.ProductionPlan", b =>
