@@ -250,6 +250,7 @@
             </li>
 
             <!-- ═══ GROUP 4: WORKFORCE & HUMAN CAPITAL ═══ -->
+            <!-- ═══ GROUP 4: WORKFORCE & HUMAN CAPITAL ═══ -->
             <li class="nav-group">
                 <button class="nav-group-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#group4" aria-expanded="false">
                     <i class="bi bi-people" aria-hidden="true"></i>
@@ -266,23 +267,29 @@
                             </button>
                             <div class="collapse" id="mod-hr">
                                 <ul class="nav flex-column nav-features">
-                                    <li><a class="nav-link" href="#">Employee Management</a></li>
-                                    <li><a class="nav-link" href="#">Workforce Setup</a></li>
-                                    <li><a class="nav-link" href="#">Compensation Setup</a></li>
-                                    <li><a class="nav-link" href="#">Leave Management</a></li>
-                                    <li><a class="nav-link" href="#">Attendance</a></li>
-                                    <li><a class="nav-link" href="#">Attendance Control</a></li>
-                                    <li><a class="nav-link" href="#">Overtime</a></li>
-                                    <li><a class="nav-link" href="#">Payroll Processing</a></li>
-                                    <li><a class="nav-link" href="#">Payroll Review</a></li>
-                                    <li><a class="nav-link" href="#">Payroll Finalization</a></li>
+                                    <li><a class="nav-link @activeClass("Employees", "Index")" asp-controller="Employees" asp-action="Index" data-short="Employees">Employee Management</a></li>
+                        
+                                    <li><a class="nav-link @activeClass("WorkforceSetup", "Index")" asp-controller="WorkforceSetup" asp-action="Index" data-short="Setup">Workforce Setup</a></li>
+                        
+                                    <li><a class="nav-link @activeClass("Compensation", "Index")" asp-controller="Compensation" asp-action="Index" data-short="Compensation">Compensation Setup</a></li>
+                        
+                                    <li><a class="nav-link @activeClass("Leave", "Index")" asp-controller="Leave" asp-action="Index" data-short="Leave">Leave Management</a></li>
+                        
+                                    <li><a class="nav-link @activeClass("Attendance", "Index")" asp-controller="Attendance" asp-action="Index" data-short="Attendance">Attendance</a></li>
+                                    <li><a class="nav-link @activeClass("Attendance", "Corrections")" asp-controller="Attendance" asp-action="Corrections" data-short="Corrections">Attendance Control</a></li>
+                        
+                                    <li><a class="nav-link @activeClass("Overtime", "Index")" asp-controller="Overtime" asp-action="Index" data-short="Overtime">Overtime</a></li>
+                        
+                                    <!-- FIX: Payroll ke 3 features ke links alag alag kiye hain -->
+                                    <li><a class="nav-link @activeClass("Payroll", "Index")" asp-controller="Payroll" asp-action="Index" data-short="Processing">Payroll Processing</a></li>
+                                    <li><a class="nav-link @activeClass("Payroll", "Review")" asp-controller="Payroll" asp-action="Review" data-short="Review">Payroll Review</a></li>
+                                    <li><a class="nav-link @activeClass("Payroll", "Finalize")" asp-controller="Payroll" asp-action="Finalize" data-short="Finalization">Payroll Finalization</a></li>
                                 </ul>
                             </div>
                         </li>
                     </ul>
                 </div>
             </li>
-
             <!-- ═══ GROUP 5: AI ENGINE & INTELLIGENCE ═══ -->
             <li class="nav-group">
                 <button class="nav-group-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#group5" aria-expanded="false">

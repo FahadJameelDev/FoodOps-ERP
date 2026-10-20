@@ -1,0 +1,50 @@
+﻿@model List<FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.LeaveRequestViewModel>
+@{
+    ViewData["Title"] = "Leave Requests";
+    ViewData["Subtitle"] = "Leave Management";
+}
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search requests...", "requests", Model.Count, "All|Pending|Approved|Rejected", @<text>
+        <a href="@Url.Action("LeaveTypes")" class="btn btn-outline-secondary btn-sm"><i class="bi bi-list-check"></i> Leave Types</a>
+        <a href="@Url.Action("Create")" class="btn btn-primary btn-sm" data-modal="true" data-modal-title="New Leave Request" data-modal-size="lg"><i class="bi bi-plus-lg"></i> New Request</a>
+    </text>)
+
+<div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Req #</th><th>Employee</th><th>Type</th><th>From</th><th>To</th><th class="num">Days</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="code">@item.RequestNo</span></td>
+                            <td>@item.EmployeeName</td>
+                            <td>@item.LeaveTypeName</td>
+                            <td>@item.FromDate.ToString("dd MMM yyyy")</td>
+                            <td>@item.ToDate.ToString("dd MMM yyyy")</td>
+                            <td class="num">@item.TotalDays</td>
+                            <td><partial name="_StatusPill" model="item.Status" /></td>
+                            <td class="text-end">
+                                @if (item.Status == "Pending")
+                                {
+                                    <div class="row-actions">
+                                        <button type="button" class="btn btn-sm btn-outline-success" data-action-url="@Url.Action("Approve", new { id = item.LeaveRequestID })" data-confirm-title="Approve Leave?" data-confirm-text="Approve" data-refresh="#grid-card"><i class="bi bi-check"></i></button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" data-action-url="@Url.Action("Reject", new { id = item.LeaveRequestID })" data-confirm-title="Reject Leave?" data-confirm-text="Reject" data-refresh="#grid-card"><i class="bi bi-x"></i></button>
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+
+            <partial name="_EmptyState" model='"No leave requests found."' />
+        }
+    </div>
+</div>

@@ -1,0 +1,25 @@
+﻿@model FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.EmployeeSalaryViewModel
+@{
+    var emps = ViewData["Employees"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
+    var structs = ViewData["Structures"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
+}
+<form asp-action="CreateEmployeeSalary" method="post" data-spa-form data-reload-url="@Url.Action("EmployeeSalaries")" data-refresh="#grid-card" novalidate>
+    <div class="fo-modal__body">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        
+        <div class="row g-3">
+            <div class="col-md-12"><label asp-for="EmployeeID" class="form-label">Employee</label><select asp-for="EmployeeID" asp-items="emps" class="form-select"><option value="">Select Employee...</option></select></div>
+            <div class="col-md-12"><label asp-for="StructureID" class="form-label">Salary Structure (Optional)</label><select asp-for="StructureID" asp-items="structs" class="form-select"><option value="">Manual Entry...</option></select></div>
+            <div class="col-md-6"><label asp-for="EffectiveFrom" class="form-label">Effective From</label><input asp-for="EffectiveFrom" type="date" class="form-control" /></div>
+            
+            <div class="col-md-6"><label asp-for="BasicSalary" class="form-label">Basic Salary</label><input asp-for="BasicSalary" type="number" step="0.01" class="form-control num" /></div>
+            <div class="col-md-4"><label asp-for="HousingAllowance" class="form-label">Housing</label><input asp-for="HousingAllowance" type="number" step="0.01" class="form-control num" /></div>
+            <div class="col-md-4"><label asp-for="TransportAllowance" class="form-label">Transport</label><input asp-for="TransportAllowance" type="number" step="0.01" class="form-control num" /></div>
+            <div class="col-md-4"><label asp-for="OtherAllowance" class="form-label">Other</label><input asp-for="OtherAllowance" type="number" step="0.01" class="form-control num" /></div>
+        </div>
+    </div>
+    <div class="fo-modal__footer">
+        <button type="button" class="btn btn-outline-secondary" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i><span>Set Salary</span></button>
+    </div>
+</form>

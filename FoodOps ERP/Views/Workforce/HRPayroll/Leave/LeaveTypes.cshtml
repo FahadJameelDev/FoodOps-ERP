@@ -1,0 +1,45 @@
+﻿@model List<FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.LeaveTypeViewModel>
+@{
+    ViewData["Title"] = "Leave Types";
+    ViewData["Subtitle"] = "Leave Management";
+}
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search leave types...", "types", Model.Count, "All|Active|Inactive", @<text>
+        <a href="@Url.Action("Index")" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Requests</a>
+        <a href="@Url.Action("CreateType")" class="btn btn-primary btn-sm" data-modal="true" data-modal-title="New Leave Type" data-modal-size="lg"><i class="bi bi-plus-lg"></i> New Type</a>
+    </text>)
+
+<div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Code</th><th>Name</th><th>Paid?</th><th class="num">Max Days</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="code">@item.LeaveTypeCode</span></td>
+                            <td>@item.LeaveTypeName</td>
+                            <td>@(item.IsPaid ? "Yes" : "No")</td>
+                            <td class="num">@(item.MaxDaysPerYear?.ToString() ?? "—")</td>
+                            <td><partial name="_StatusPill" model='item.IsActive ? "Active" : "Inactive"' /></td>
+                            <td class="text-end">
+                                <div class="row-actions">
+                                    <a href="@Url.Action("EditType", new { id = item.LeaveTypeID })" class="btn btn-sm btn-outline-secondary" data-modal="true" data-modal-title="Edit Leave Type" data-modal-size="lg"><i class="bi bi-pencil"></i></a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-action-url="@Url.Action("ToggleType", new { id = item.LeaveTypeID })" data-name="@item.LeaveTypeCode" data-confirm-title="Toggle Status?" data-refresh="#grid-card"><i class="bi bi-power"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+
+            <partial name="_EmptyState" model='"No leave types found."' />
+        }
+    </div>
+</div>

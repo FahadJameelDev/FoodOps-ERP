@@ -1,0 +1,124 @@
+﻿@model FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.EmployeeViewModel
+@{
+    ViewData["Title"] = "Employee Details";
+    ViewData["Subtitle"] = $"{Model.FirstName} {Model.LastName} ({Model.EmployeeCode})";
+}
+
+<partial name="_PageHeader" />
+
+<div class="row g-3">
+    <!-- Left Column: Profile & Info -->
+    <div class="col-lg-8">
+        
+        <!-- Personal Info Card -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="card-title"><i class="bi bi-person-badge"></i>Personal Information</h5>
+                <div class="grid-tools">
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i>Back</a>
+                    <a asp-action="Edit" asp-route-id="@Model.EmployeeID" class="btn btn-primary btn-sm" data-modal="true" data-modal-title="Edit Employee" data-modal-size="xl">
+                        <i class="bi bi-pencil"></i>Edit
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4"><span class="text-muted d-block fs-xs">First Name</span><b>@Model.FirstName</b></div>
+                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Last Name</span><b>@Model.LastName</b></div>
+                    <div class="col-md-4"><span class="text-muted d-block fs-xs">CNIC</span><b>@(Model.CNIC ?? "—")</b></div>
+                    
+                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Phone</span><b>@(Model.Phone ?? "—")</b></div>
+                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Email</span><b>@(Model.Email ?? "—")</b></div>
+                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Employment Status</span><partial name="_StatusPill" model="Model.CurrentEmploymentStatus" /></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Job Info Card -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="card-title"><i class="bi bi-briefcase"></i>Job Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Employee Code</span><b>@Model.EmployeeCode</b></div>
+                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Plant</span><b>@Model.PlantName</b></div>
+                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Department</span><b>@Model.DepartmentName</b></div>
+                    
+                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Designation</span><b>@(Model.Designation ?? "—")</b></div>
+                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Shift</span><b>@(Model.ShiftName ?? "—")</b></div>
+                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Joining Date</span><b>@Model.JoiningDate.ToString("dd MMM yyyy")</b></div>
+                    
+                    @if (Model.LeavingDate.HasValue)
+                    {
+                        <div class="col-md-4"><span class="text-muted d-block fs-xs">Leaving Date</span><b>@Model.LeavingDate.Value.ToString("dd MMM yyyy")</b></div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Documents Card -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title"><i class="bi bi-folder"></i>Documents</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>Type</th><th>Name</th><th>Expiry</th><th>Uploaded</th></tr></thead>
+                    <tbody>
+                        @if (Model.Documents != null && Model.Documents.Any())
+                        {
+                            foreach (var doc in Model.Documents)
+                            {
+                                <tr>
+                                    <td><strong>@doc.DocumentType</strong></td>
+                                    <td>@doc.DocumentName</td>
+                                    <td>@(doc.ExpiryDate?.ToString("dd MMM yyyy") ?? "—")</td>
+                                    <td>@doc.UploadedAt.ToString("dd MMM yyyy")</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="4" class="text-center text-muted py-3">No documents uploaded.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Bank & Status -->
+    <div class="col-lg-4">
+        <div class="card mb-3">
+            <div class="card-header"><h5 class="card-title"><i class="bi bi-bank"></i>Bank Details</h5></div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="text-muted d-block fs-xs">Bank Name</span>
+                    <b>@(Model.BankName ?? "—")</b>
+                </div>
+                <div>
+                    <span class="text-muted d-block fs-xs">Account Number</span>
+                    <b>@(Model.BankAccountNo ?? "—")</b>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h5 class="card-title"><i class="bi bi-shield-check"></i>Account Status</h5></div>
+            <div class="card-body text-center">
+                <partial name="_StatusPill" model='Model.IsActive ? "Active" : "Inactive"' />
+                <div class="mt-3">
+                    <button type="button" class="btn btn-sm btn-outline-danger w-100"
+                            data-action-url="@Url.Action("ToggleActive", new { id = Model.EmployeeID })"
+                            data-name="@Model.EmployeeCode"
+                            data-confirm-title="Toggle Status?"
+                            data-confirm-text="Toggle"
+                            data-reload-url="@Url.Action("Details", new { id = Model.EmployeeID })">
+                        <i class="bi bi-power"></i> Toggle Active Status
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

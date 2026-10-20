@@ -1,0 +1,45 @@
+﻿@model List<FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.DepartmentViewModel>
+@{
+    ViewData["Title"] = "Departments";
+    ViewData["Subtitle"] = "Workforce Setup — Departments";
+}
+
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search departments...", "departments", Model.Count, "All|Active|Inactive", @<text>
+        <a href="@Url.Action("Shifts")" class="btn btn-outline-secondary btn-sm"><i class="bi bi-clock"></i> Shifts</a>
+        <a href="@Url.Action("CreateDepartment")" class="btn btn-primary btn-sm" data-modal="true" data-modal-title="New Department" data-modal-size="lg"><i class="bi bi-plus-lg"></i> New Department</a>
+    </text>)
+
+<div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Code</th><th>Name</th><th>Plant</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="code">@item.DepartmentCode</span></td>
+                            <td>@item.DepartmentName</td>
+                            <td>@item.PlantName</td>
+                            <td><partial name="_StatusPill" model='item.IsActive ? "Active" : "Inactive"' /></td>
+                            <td class="text-end">
+                                <div class="row-actions">
+                                    <a href="@Url.Action("EditDepartment", new { id = item.DepartmentID })" class="btn btn-sm btn-outline-secondary" data-modal="true" data-modal-title="Edit Department" data-modal-size="lg"><i class="bi bi-pencil"></i></a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-action-url="@Url.Action("ToggleDepartment", new { id = item.DepartmentID })" data-name="@item.DepartmentCode" data-confirm-title="Toggle Status?" data-confirm-text="Toggle" data-refresh="#grid-card"><i class="bi bi-power"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+
+            <partial name="_EmptyState" model='"No departments found. Click New Department to create one."' />
+        }
+    </div>
+</div>

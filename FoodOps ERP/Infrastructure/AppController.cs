@@ -44,4 +44,12 @@ public abstract class AppController : Controller
         catch (InvalidOperationException ex) { return ex.Message; }
         catch (DbUpdateConcurrencyException) { return "This record was changed by someone else. Please reload and try again."; }
     }
+    // FIX: Identity se asal UserID nikalne ke liye
+    protected int GetCurrentUserId()
+    {
+        var claim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+        if (claim != null && int.TryParse(claim.Value, out var id))
+            return id;
+        return 0; // Not logged in
+    }
 }

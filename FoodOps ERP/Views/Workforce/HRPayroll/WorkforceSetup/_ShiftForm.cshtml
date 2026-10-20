@@ -1,0 +1,29 @@
+﻿@model FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.ShiftViewModel
+@{
+    var isEdit = Model.ShiftID != 0;
+    var plants = ViewData["Plants"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
+}
+
+<form asp-action="@(isEdit ? "EditShift" : "CreateShift")" asp-route-id="@(isEdit ? Model.ShiftID.ToString() : null)"
+      method="post" data-spa-form data-reload-url="@Url.Action("Shifts")" data-refresh="#grid-card" novalidate>
+    <div class="fo-modal__body">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        @if (isEdit)
+        {
+            <input type="hidden" asp-for="ShiftID" />
+        }
+
+        <div class="row g-3">
+            <div class="col-md-12"><label asp-for="PlantID" class="form-label">Plant <span class="text-danger">*</span></label><select asp-for="PlantID" asp-items="plants" class="form-select"><option value="">Select Plant...</option></select></div>
+            <div class="col-md-6"><label asp-for="ShiftCode" class="form-label">Code <span class="text-danger">*</span></label><input asp-for="ShiftCode" class="form-control" readonly="@isEdit" /></div>
+            <div class="col-md-6"><label asp-for="ShiftName" class="form-label">Name <span class="text-danger">*</span></label><input asp-for="ShiftName" class="form-control" /></div>
+            <div class="col-md-6"><label asp-for="StartTime" class="form-label">Start Time</label><input asp-for="StartTime" type="time" class="form-control" /></div>
+            <div class="col-md-6"><label asp-for="EndTime" class="form-label">End Time</label><input asp-for="EndTime" type="time" class="form-control" /></div>
+            <div class="col-md-6"><div class="form-check mt-3"><input asp-for="IsActive" class="form-check-input" /><label asp-for="IsActive" class="form-check-label">Is Active</label></div></div>
+        </div>
+    </div>
+    <div class="fo-modal__footer">
+        <button type="button" class="btn btn-outline-secondary" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i><span>@(isEdit ? "Update" : "Save")</span></button>
+    </div>
+</form>

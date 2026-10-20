@@ -1,7 +1,8 @@
 ﻿using FoodOpsERP.Models.Entities;
 using FoodOpsERP.Models.Entities.Manufacturing;
+using FoodOpsERP.Models.Entities.Security;
 using Microsoft.EntityFrameworkCore;
-
+using FoodOpsERP.Models.Workforce.HRPayroll.Entities;
 namespace FoodOpsERP.Data
 {
     public class ApplicationDbContext : DbContext
@@ -82,6 +83,31 @@ namespace FoodOpsERP.Data
         public DbSet<BatchCostLine> BatchCostLines { get; set; }
         public DbSet<CostVariance> CostVariances { get; set; }
         public DbSet<VarianceThreshold> VarianceThresholds { get; set; }
+        // ═════════════════════════════════════════════
+        // SECURITY / AUTH DBSETS
+        // ═════════════════════════════════════════════
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<Permission> Permissions { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
+        public DbSet<RolePermission> RolePermissions { get; set; }
+        // ─────────────────────────────────────────────
+// Group 4 : Workforce & HR/Payroll (15 Tables)
+// ─────────────────────────────────────────────
+public DbSet<Department> Departments { get; set; }
+public DbSet<Shift> Shifts { get; set; }
+public DbSet<Employee> Employees { get; set; }
+public DbSet<EmployeeDocument> EmployeeDocuments { get; set; }
+public DbSet<LeaveType> LeaveTypes { get; set; }
+public DbSet<LeaveBalance> LeaveBalances { get; set; }
+public DbSet<LeaveRequest> LeaveRequests { get; set; }
+public DbSet<AttendanceLog> AttendanceLogs { get; set; }
+public DbSet<AttendanceCorrection> AttendanceCorrections { get; set; }
+public DbSet<OvertimeRecord> OvertimeRecords { get; set; }
+public DbSet<SalaryStructure> SalaryStructures { get; set; }
+public DbSet<EmployeeSalary> EmployeeSalaries { get; set; }
+public DbSet<PayrollRun> PayrollRuns { get; set; }
+public DbSet<PayrollLine> PayrollLines { get; set; }
+public DbSet<PayrollApproval> PayrollApprovals { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -1029,6 +1055,319 @@ namespace FoodOpsERP.Data
                 b.HasOne<Product>().WithMany().HasForeignKey(x => x.ProductID).OnDelete(DeleteBehavior.Restrict);
                 b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
                 b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+            // ═════════════════════════════════════════════
+            // SECURITY / AUTH CONFIGURATION
+            // ═════════════════════════════════════════════
+
+            // 1. Role
+            modelBuilder.Entity<Role>(b =>
+            {
+                b.ToTable("Roles");
+                b.HasKey(x => x.RoleID);
+                b.Property(x => x.RoleCode).HasMaxLength(30);
+                b.Property(x => x.RoleName).HasMaxLength(100);
+                b.Property(x => x.Description).HasMaxLength(300);
+
+                b.HasIndex(x => x.RoleCode).IsUnique();
+
+                // FIX: Audit FKs ke sath WithMany() specify kiya
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 2. Permission
+            modelBuilder.Entity<Permission>(b =>
+            {
+                b.ToTable("Permissions");
+                b.HasKey(x => x.PermissionID);
+                b.Property(x => x.PermissionCode).HasMaxLength(50);
+                b.Property(x => x.PermissionName).HasMaxLength(100);
+                b.Property(x => x.ModuleKey).HasMaxLength(50);
+                b.Property(x => x.Description).HasMaxLength(300);
+
+                b.HasIndex(x => x.PermissionCode).IsUnique();
+                b.HasIndex(x => x.ModuleKey);
+
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 3. UserRole
+            modelBuilder.Entity<UserRole>(b =>
+            {
+                b.ToTable("UserRoles");
+                b.HasKey(x => x.UserRoleID);
+                b.HasIndex(x => new { x.UserID, x.RoleID }).IsUnique();
+                b.Property(x => x.AssignedAt).HasDefaultValueSql("SYSUTCDATETIME()");
+
+                // FIX: User navigation specify ki
+                b.HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne(x => x.Role).WithMany(r => r.UserRoles).HasForeignKey(x => x.RoleID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.AssignedBy).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 4. RolePermission
+            modelBuilder.Entity<RolePermission>(b =>
+            {
+                b.ToTable("RolePermissions");
+                b.HasKey(x => x.RolePermissionID);
+                b.HasIndex(x => new { x.RoleID, x.PermissionID }).IsUnique();
+                b.Property(x => x.GrantedAt).HasDefaultValueSql("SYSUTCDATETIME()");
+
+                b.HasOne(x => x.Role).WithMany(r => r.RolePermissions).HasForeignKey(x => x.RoleID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne(x => x.Permission).WithMany(p => p.RolePermissions).HasForeignKey(x => x.PermissionID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.GrantedBy).OnDelete(DeleteBehavior.Restrict);
+            });
+            // ═════════════════════════════════════════════
+            // GROUP 4 : WORKFORCE & HR/PAYROLL
+            // ═════════════════════════════════════════════
+
+            // 1. Department
+            modelBuilder.Entity<Department>(b =>
+            {
+                b.ToTable("Departments");
+                b.HasKey(x => x.DepartmentID);
+                b.Property(x => x.DepartmentCode).HasMaxLength(20);
+                b.Property(x => x.DepartmentName).HasMaxLength(100);
+                b.HasIndex(x => new { x.PlantID, x.DepartmentCode }).IsUnique();
+                b.HasOne(x => x.Plant).WithMany().HasForeignKey(x => x.PlantID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 2. Shift
+            modelBuilder.Entity<Shift>(b =>
+            {
+                b.ToTable("Shifts");
+                b.HasKey(x => x.ShiftID);
+                b.Property(x => x.ShiftCode).HasMaxLength(20);
+                b.Property(x => x.ShiftName).HasMaxLength(50);
+                b.HasIndex(x => new { x.PlantID, x.ShiftCode }).IsUnique();
+                b.HasOne(x => x.Plant).WithMany().HasForeignKey(x => x.PlantID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 3. Employee
+            modelBuilder.Entity<Employee>(b =>
+            {
+                b.ToTable("Employees");
+                b.HasKey(x => x.EmployeeID);
+                b.Property(x => x.EmployeeCode).HasMaxLength(30);
+                b.Property(x => x.FirstName).HasMaxLength(50);
+                b.Property(x => x.LastName).HasMaxLength(50);
+                b.Property(x => x.CNIC).HasMaxLength(15);
+                b.Property(x => x.Phone).HasMaxLength(20);
+                b.Property(x => x.Email).HasMaxLength(100);
+                b.Property(x => x.Designation).HasMaxLength(100);
+                b.Property(x => x.EmploymentStatus).HasMaxLength(20);
+                b.Property(x => x.BankAccountNo).HasMaxLength(30);
+                b.Property(x => x.BankName).HasMaxLength(100);
+                b.HasIndex(x => x.EmployeeCode).IsUnique();
+                b.HasIndex(x => x.CNIC).IsUnique().HasFilter("[CNIC] IS NOT NULL");
+                b.HasIndex(x => new { x.PlantID, x.DepartmentID });
+                b.HasIndex(x => x.EmploymentStatus);
+                b.HasOne(x => x.Plant).WithMany().HasForeignKey(x => x.PlantID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne(x => x.Department).WithMany(d => d.Employees).HasForeignKey(x => x.DepartmentID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne(x => x.Shift).WithMany(s => s.Employees).HasForeignKey(x => x.ShiftID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 4. EmployeeDocument
+            modelBuilder.Entity<EmployeeDocument>(b =>
+            {
+                b.ToTable("EmployeeDocuments");
+                b.HasKey(x => x.DocumentID);
+                b.Property(x => x.DocumentType).HasMaxLength(30);
+                b.Property(x => x.DocumentName).HasMaxLength(100);
+                b.Property(x => x.FilePath).HasMaxLength(500);
+                b.HasIndex(x => x.EmployeeID);
+                b.HasOne(x => x.Employee).WithMany(e => e.Documents).HasForeignKey(x => x.EmployeeID).OnDelete(DeleteBehavior.Cascade);
+                b.HasOne(x => x.UploadedByUser).WithMany().HasForeignKey(x => x.UploadedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 5. LeaveType
+            modelBuilder.Entity<LeaveType>(b =>
+            {
+                b.ToTable("LeaveTypes");
+                b.HasKey(x => x.LeaveTypeID);
+                b.Property(x => x.LeaveTypeCode).HasMaxLength(20);
+                b.Property(x => x.LeaveTypeName).HasMaxLength(50);
+                b.HasIndex(x => x.LeaveTypeCode).IsUnique();
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 6. LeaveBalance
+            modelBuilder.Entity<LeaveBalance>(b =>
+            {
+                b.ToTable("LeaveBalances");
+                b.HasKey(x => x.BalanceID);
+                b.Property(x => x.EntitledDays).HasPrecision(5, 1);
+                b.Property(x => x.UsedDays).HasPrecision(5, 1);
+                b.Property(x => x.RemainingDays).HasPrecision(5, 1);
+                b.HasIndex(x => new { x.EmployeeID, x.LeaveTypeID, x.Year }).IsUnique();
+                b.HasOne(x => x.Employee).WithMany(e => e.LeaveBalances).HasForeignKey(x => x.EmployeeID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne(x => x.LeaveType).WithMany(t => t.LeaveBalances).HasForeignKey(x => x.LeaveTypeID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 7. LeaveRequest
+            modelBuilder.Entity<LeaveRequest>(b =>
+            {
+                b.ToTable("LeaveRequests");
+                b.HasKey(x => x.LeaveRequestID);
+                b.Property(x => x.RequestNo).HasMaxLength(30);
+                b.Property(x => x.TotalDays).HasPrecision(5, 1);
+                b.Property(x => x.Reason).HasMaxLength(500);
+                b.Property(x => x.Status).HasMaxLength(20);
+                b.Property(x => x.RejectionReason).HasMaxLength(300);
+                b.HasIndex(x => x.RequestNo).IsUnique();
+                b.HasIndex(x => new { x.EmployeeID, x.Status });
+                b.HasIndex(x => x.Status);
+                b.HasOne(x => x.Employee).WithMany(e => e.LeaveRequests).HasForeignKey(x => x.EmployeeID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne(x => x.LeaveType).WithMany(t => t.LeaveRequests).HasForeignKey(x => x.LeaveTypeID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne(x => x.ApprovedByUser).WithMany().HasForeignKey(x => x.ApprovedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 8. AttendanceLog
+            modelBuilder.Entity<AttendanceLog>(b =>
+            {
+                b.ToTable("AttendanceLogs");
+                b.HasKey(x => x.AttendanceID);
+                b.Property(x => x.Status).HasMaxLength(20);
+                b.Property(x => x.Remarks).HasMaxLength(200);
+                b.HasIndex(x => new { x.EmployeeID, x.LogDate }).IsUnique();
+                b.HasIndex(x => new { x.LogDate, x.Status });
+                b.HasOne(x => x.Employee).WithMany(e => e.AttendanceLogs).HasForeignKey(x => x.EmployeeID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne(x => x.Shift).WithMany(s => s.AttendanceLogs).HasForeignKey(x => x.ShiftID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 9. AttendanceCorrection
+            modelBuilder.Entity<AttendanceCorrection>(b =>
+            {
+                b.ToTable("AttendanceCorrections");
+                b.HasKey(x => x.CorrectionID);
+                b.Property(x => x.Reason).HasMaxLength(300);
+                b.Property(x => x.Status).HasMaxLength(20);
+                b.HasIndex(x => x.Status);
+                b.HasOne(x => x.AttendanceLog).WithMany(a => a.Corrections).HasForeignKey(x => x.AttendanceID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne(x => x.RequestedByUser).WithMany().HasForeignKey(x => x.RequestedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne(x => x.ApprovedByUser).WithMany().HasForeignKey(x => x.ApprovedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 10. OvertimeRecord
+            modelBuilder.Entity<OvertimeRecord>(b =>
+            {
+                b.ToTable("OvertimeRecords");
+                b.HasKey(x => x.OvertimeID);
+                b.Property(x => x.OTHours).HasPrecision(5, 2);
+                b.Property(x => x.OTRateMultiplier).HasPrecision(3, 2);
+                b.Property(x => x.Reason).HasMaxLength(300);
+                b.Property(x => x.Status).HasMaxLength(20);
+                b.HasIndex(x => new { x.EmployeeID, x.OTDate });
+                b.HasIndex(x => x.Status);
+                b.HasOne(x => x.Employee).WithMany(e => e.OvertimeRecords).HasForeignKey(x => x.EmployeeID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne(x => x.ApprovedByUser).WithMany().HasForeignKey(x => x.ApprovedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 11. SalaryStructure
+            modelBuilder.Entity<SalaryStructure>(b =>
+            {
+                b.ToTable("SalaryStructures");
+                b.HasKey(x => x.StructureID);
+                b.Property(x => x.StructureCode).HasMaxLength(30);
+                b.Property(x => x.StructureName).HasMaxLength(100);
+                b.Property(x => x.BasicSalary).HasPrecision(18, 2);
+                b.Property(x => x.HousingAllowance).HasPrecision(18, 2);
+                b.Property(x => x.TransportAllowance).HasPrecision(18, 2);
+                b.Property(x => x.OtherAllowance).HasPrecision(18, 2);
+                b.HasIndex(x => x.StructureCode).IsUnique();
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 12. EmployeeSalary
+            modelBuilder.Entity<EmployeeSalary>(b =>
+            {
+                b.ToTable("EmployeeSalaries");
+                b.HasKey(x => x.EmployeeSalaryID);
+                b.Property(x => x.BasicSalary).HasPrecision(18, 2);
+                b.Property(x => x.HousingAllowance).HasPrecision(18, 2);
+                b.Property(x => x.TransportAllowance).HasPrecision(18, 2);
+                b.Property(x => x.OtherAllowance).HasPrecision(18, 2);
+                b.Property(x => x.GrossSalary).HasPrecision(18, 2);
+                b.Property(x => x.Status).HasMaxLength(20);
+                b.HasIndex(x => new { x.EmployeeID, x.EffectiveFrom }).IsUnique();
+                b.HasIndex(x => x.EmployeeID)
+                 .IsUnique()
+                 .HasFilter("[Status] = 'Active' AND [EffectiveTo] IS NULL")
+                 .HasDatabaseName("UX_EmployeeSalaries_OneActivePerEmployee");
+                b.HasOne(x => x.Employee).WithMany(e => e.Salaries).HasForeignKey(x => x.EmployeeID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne(x => x.Structure).WithMany(s => s.EmployeeSalaries).HasForeignKey(x => x.StructureID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 13. PayrollRun
+            modelBuilder.Entity<PayrollRun>(b =>
+            {
+                b.ToTable("PayrollRuns");
+                b.HasKey(x => x.PayrollRunID);
+                b.Property(x => x.RunNo).HasMaxLength(30);
+                b.Property(x => x.Status).HasMaxLength(20);
+                b.Property(x => x.TotalBasicPay).HasPrecision(18, 2);
+                b.Property(x => x.TotalAllowances).HasPrecision(18, 2);
+                b.Property(x => x.TotalOvertimePay).HasPrecision(18, 2);
+                b.Property(x => x.TotalDeductions).HasPrecision(18, 2);
+                b.Property(x => x.NetPayable).HasPrecision(18, 2);
+                b.HasIndex(x => x.RunNo).IsUnique();
+                b.HasIndex(x => new { x.PlantID, x.PeriodMonth, x.PeriodYear }).IsUnique();
+                b.HasIndex(x => x.Status);
+                b.HasOne(x => x.Plant).WithMany().HasForeignKey(x => x.PlantID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<User>().WithMany().HasForeignKey(x => x.ModifiedByUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 14. PayrollLine
+            modelBuilder.Entity<PayrollLine>(b =>
+            {
+                b.ToTable("PayrollLines");
+                b.HasKey(x => x.PayrollLineID);
+                b.Property(x => x.BasicPay).HasPrecision(18, 2);
+                b.Property(x => x.HousingAllowance).HasPrecision(18, 2);
+                b.Property(x => x.TransportAllowance).HasPrecision(18, 2);
+                b.Property(x => x.OtherAllowance).HasPrecision(18, 2);
+                b.Property(x => x.OvertimePay).HasPrecision(18, 2);
+                b.Property(x => x.LeaveDeduction).HasPrecision(18, 2);
+                b.Property(x => x.OtherDeduction).HasPrecision(18, 2);
+                b.Property(x => x.GrossPay).HasPrecision(18, 2);
+                b.Property(x => x.TotalDeductions).HasPrecision(18, 2);
+                b.Property(x => x.NetPay).HasPrecision(18, 2);
+                b.Property(x => x.OTHours).HasPrecision(5, 2);
+                b.Property(x => x.Remarks).HasMaxLength(200);
+                b.HasIndex(x => new { x.PayrollRunID, x.EmployeeID }).IsUnique();
+                b.HasOne(x => x.PayrollRun).WithMany(r => r.Lines).HasForeignKey(x => x.PayrollRunID).OnDelete(DeleteBehavior.Cascade);
+                b.HasOne(x => x.Employee).WithMany(e => e.PayrollLines).HasForeignKey(x => x.EmployeeID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 15. PayrollApproval
+            modelBuilder.Entity<PayrollApproval>(b =>
+            {
+                b.ToTable("PayrollApprovals");
+                b.HasKey(x => x.ApprovalID);
+                b.Property(x => x.Decision).HasMaxLength(20);
+                b.Property(x => x.Comments).HasMaxLength(500);
+                b.HasIndex(x => new { x.PayrollRunID, x.StepNo, x.ApproverUserID }).IsUnique();
+                b.HasIndex(x => x.PayrollRunID);
+                b.HasOne(x => x.PayrollRun).WithMany(r => r.Approvals).HasForeignKey(x => x.PayrollRunID).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne(x => x.ApproverUser).WithMany().HasForeignKey(x => x.ApproverUserID).OnDelete(DeleteBehavior.Restrict);
             });
         }
     }

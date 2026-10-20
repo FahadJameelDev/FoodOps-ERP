@@ -1,0 +1,9 @@
+﻿@model FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.EmployeeViewModel
+@{
+    ViewData["Title"] = "Edit Employee";
+    ViewData["Subtitle"] = $"Update details for {Model.FirstName} {Model.LastName}";
+}
+<partial name="_PageHeader" />
+<div class="card">
+    <partial name="_EmployeeForm" model="Model" />
+</div>

@@ -1,0 +1,20 @@
+﻿@model FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.AttendanceCorrectionViewModel
+@{
+    var logs = ViewData["AttendanceLogs"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
+}
+<form asp-action="CreateCorrection" method="post" data-spa-form data-reload-url="@Url.Action("Corrections")" data-refresh="#grid-card" novalidate>
+    <div class="fo-modal__body">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+        <div class="row g-3">
+            <div class="col-md-12"><label asp-for="AttendanceID" class="form-label">Select Attendance Record</label><select asp-for="AttendanceID" asp-items="logs" class="form-select"><option value="">Select...</option></select></div>
+            <div class="col-md-6"><label asp-for="NewCheckIn" class="form-label">New Check In</label><input asp-for="NewCheckIn" type="datetime-local" class="form-control" /></div>
+            <div class="col-md-6"><label asp-for="NewCheckOut" class="form-label">New Check Out</label><input asp-for="NewCheckOut" type="datetime-local" class="form-control" /></div>
+            <div class="col-12"><label asp-for="Reason" class="form-label">Reason for Correction</label><textarea asp-for="Reason" class="form-control" rows="2"></textarea></div>
+        </div>
+    </div>
+    <div class="fo-modal__footer">
+        <button type="button" class="btn btn-outline-secondary" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i><span>Request</span></button>
+    </div>
+</form>

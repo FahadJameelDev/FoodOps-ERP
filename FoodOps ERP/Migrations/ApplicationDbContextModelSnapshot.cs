@@ -2782,6 +2782,194 @@ namespace FoodOps_ERP.Migrations
                     b.ToTable("QCSpecifications");
                 });
 
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Security.Permission", b =>
+                {
+                    b.Property<int>("PermissionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PermissionID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ModuleKey")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("PermissionCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("PermissionName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("PermissionID");
+
+                    b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("ModifiedByUserID");
+
+                    b.HasIndex("ModuleKey");
+
+                    b.HasIndex("PermissionCode")
+                        .IsUnique();
+
+                    b.ToTable("Permissions", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Security.Role", b =>
+                {
+                    b.Property<int>("RoleID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoleID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSystem")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RoleCode")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("RoleID");
+
+                    b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("ModifiedByUserID");
+
+                    b.HasIndex("RoleCode")
+                        .IsUnique();
+
+                    b.ToTable("Roles", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Security.RolePermission", b =>
+                {
+                    b.Property<int>("RolePermissionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RolePermissionID"));
+
+                    b.Property<DateTime>("GrantedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int>("GrantedBy")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PermissionID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoleID")
+                        .HasColumnType("int");
+
+                    b.HasKey("RolePermissionID");
+
+                    b.HasIndex("GrantedBy");
+
+                    b.HasIndex("PermissionID");
+
+                    b.HasIndex("RoleID", "PermissionID")
+                        .IsUnique();
+
+                    b.ToTable("RolePermissions", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Security.UserRole", b =>
+                {
+                    b.Property<int>("UserRoleID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserRoleID"));
+
+                    b.Property<DateTime>("AssignedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int>("AssignedBy")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoleID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserID")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserRoleID");
+
+                    b.HasIndex("AssignedBy");
+
+                    b.HasIndex("RoleID");
+
+                    b.HasIndex("UserID", "RoleID")
+                        .IsUnique();
+
+                    b.ToTable("UserRoles", (string)null);
+                });
+
             modelBuilder.Entity("FoodOpsERP.Models.Entities.StockAdjustment", b =>
                 {
                     b.Property<int>("AdjustmentID")
@@ -3069,6 +3257,1033 @@ namespace FoodOps_ERP.Migrations
                         .IsUnique();
 
                     b.ToTable("WarehouseBins");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.AttendanceCorrection", b =>
+                {
+                    b.Property<int>("CorrectionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CorrectionID"));
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ApprovedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<long>("AttendanceID")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("NewCheckIn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("NewCheckOut")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("OldCheckIn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("OldCheckOut")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<int>("RequestedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("CorrectionID");
+
+                    b.HasIndex("ApprovedByUserID");
+
+                    b.HasIndex("AttendanceID");
+
+                    b.HasIndex("RequestedByUserID");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("AttendanceCorrections", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.AttendanceLog", b =>
+                {
+                    b.Property<long>("AttendanceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("AttendanceID"));
+
+                    b.Property<DateTime?>("CheckInTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("CheckOutTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EmployeeID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LogDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Remarks")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<int?>("ShiftID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int?>("WorkedMinutes")
+                        .HasColumnType("int");
+
+                    b.HasKey("AttendanceID");
+
+                    b.HasIndex("ShiftID");
+
+                    b.HasIndex("EmployeeID", "LogDate")
+                        .IsUnique();
+
+                    b.HasIndex("LogDate", "Status");
+
+                    b.ToTable("AttendanceLogs", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.Department", b =>
+                {
+                    b.Property<int>("DepartmentID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DepartmentID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("DepartmentCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("DepartmentName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlantID")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("DepartmentID");
+
+                    b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("ModifiedByUserID");
+
+                    b.HasIndex("PlantID", "DepartmentCode")
+                        .IsUnique();
+
+                    b.ToTable("Departments", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.Employee", b =>
+                {
+                    b.Property<int>("EmployeeID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeID"));
+
+                    b.Property<string>("BankAccountNo")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("BankName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("CNIC")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DepartmentID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Designation")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("EmployeeCode")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("EmploymentStatus")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("JoiningDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("LeavingDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("PlantID")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<int?>("ShiftID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserID")
+                        .HasColumnType("int");
+
+                    b.HasKey("EmployeeID");
+
+                    b.HasIndex("CNIC")
+                        .IsUnique()
+                        .HasFilter("[CNIC] IS NOT NULL");
+
+                    b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("DepartmentID");
+
+                    b.HasIndex("EmployeeCode")
+                        .IsUnique();
+
+                    b.HasIndex("EmploymentStatus");
+
+                    b.HasIndex("ModifiedByUserID");
+
+                    b.HasIndex("ShiftID");
+
+                    b.HasIndex("UserID");
+
+                    b.HasIndex("PlantID", "DepartmentID");
+
+                    b.ToTable("Employees", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.EmployeeDocument", b =>
+                {
+                    b.Property<int>("DocumentID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DocumentID"));
+
+                    b.Property<string>("DocumentName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("DocumentType")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<int>("EmployeeID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ExpiryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UploadedByUserID")
+                        .HasColumnType("int");
+
+                    b.HasKey("DocumentID");
+
+                    b.HasIndex("EmployeeID");
+
+                    b.HasIndex("UploadedByUserID");
+
+                    b.ToTable("EmployeeDocuments", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.EmployeeSalary", b =>
+                {
+                    b.Property<int>("EmployeeSalaryID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeSalaryID"));
+
+                    b.Property<decimal>("BasicSalary")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EffectiveFrom")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EffectiveTo")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EmployeeID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("GrossSalary")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("HousingAllowance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("OtherAllowance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int?>("StructureID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TransportAllowance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("EmployeeSalaryID");
+
+                    b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("EmployeeID")
+                        .IsUnique()
+                        .HasDatabaseName("UX_EmployeeSalaries_OneActivePerEmployee")
+                        .HasFilter("[Status] = 'Active' AND [EffectiveTo] IS NULL");
+
+                    b.HasIndex("ModifiedByUserID");
+
+                    b.HasIndex("StructureID");
+
+                    b.HasIndex("EmployeeID", "EffectiveFrom")
+                        .IsUnique();
+
+                    b.ToTable("EmployeeSalaries", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.LeaveBalance", b =>
+                {
+                    b.Property<int>("BalanceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BalanceID"));
+
+                    b.Property<int>("EmployeeID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("EntitledDays")
+                        .HasPrecision(5, 1)
+                        .HasColumnType("decimal(5,1)");
+
+                    b.Property<int>("LeaveTypeID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("RemainingDays")
+                        .HasPrecision(5, 1)
+                        .HasColumnType("decimal(5,1)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<decimal>("UsedDays")
+                        .HasPrecision(5, 1)
+                        .HasColumnType("decimal(5,1)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("BalanceID");
+
+                    b.HasIndex("LeaveTypeID");
+
+                    b.HasIndex("EmployeeID", "LeaveTypeID", "Year")
+                        .IsUnique();
+
+                    b.ToTable("LeaveBalances", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.LeaveRequest", b =>
+                {
+                    b.Property<int>("LeaveRequestID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LeaveRequestID"));
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ApprovedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EmployeeID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("FromDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("LeaveTypeID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("RequestNo")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("ToDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("TotalDays")
+                        .HasPrecision(5, 1)
+                        .HasColumnType("decimal(5,1)");
+
+                    b.HasKey("LeaveRequestID");
+
+                    b.HasIndex("ApprovedByUserID");
+
+                    b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("LeaveTypeID");
+
+                    b.HasIndex("ModifiedByUserID");
+
+                    b.HasIndex("RequestNo")
+                        .IsUnique();
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("EmployeeID", "Status");
+
+                    b.ToTable("LeaveRequests", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.LeaveType", b =>
+                {
+                    b.Property<int>("LeaveTypeID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LeaveTypeID"));
+
+                    b.Property<bool>("CarryForward")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LeaveTypeCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("LeaveTypeName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int?>("MaxDaysPerYear")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("LeaveTypeID");
+
+                    b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("LeaveTypeCode")
+                        .IsUnique();
+
+                    b.HasIndex("ModifiedByUserID");
+
+                    b.ToTable("LeaveTypes", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.OvertimeRecord", b =>
+                {
+                    b.Property<int>("OvertimeID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OvertimeID"));
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ApprovedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EmployeeID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("OTDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("OTHours")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<decimal>("OTRateMultiplier")
+                        .HasPrecision(3, 2)
+                        .HasColumnType("decimal(3,2)");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("OvertimeID");
+
+                    b.HasIndex("ApprovedByUserID");
+
+                    b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("ModifiedByUserID");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("EmployeeID", "OTDate");
+
+                    b.ToTable("OvertimeRecords", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.PayrollApproval", b =>
+                {
+                    b.Property<int>("ApprovalID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ApprovalID"));
+
+                    b.Property<int>("ApproverUserID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Comments")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("DecidedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Decision")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("PayrollRunID")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<int>("StepNo")
+                        .HasColumnType("int");
+
+                    b.HasKey("ApprovalID");
+
+                    b.HasIndex("ApproverUserID");
+
+                    b.HasIndex("PayrollRunID");
+
+                    b.HasIndex("PayrollRunID", "StepNo", "ApproverUserID")
+                        .IsUnique();
+
+                    b.ToTable("PayrollApprovals", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.PayrollLine", b =>
+                {
+                    b.Property<long>("PayrollLineID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("PayrollLineID"));
+
+                    b.Property<decimal>("BasicPay")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("EmployeeID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("GrossPay")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("HousingAllowance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("LeaveDeduction")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("NetPay")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("OTHours")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<decimal>("OtherAllowance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("OtherDeduction")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("OvertimePay")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("PayrollRunID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PresentDays")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Remarks")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<decimal>("TotalDeductions")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TransportAllowance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("WorkingDays")
+                        .HasColumnType("int");
+
+                    b.HasKey("PayrollLineID");
+
+                    b.HasIndex("EmployeeID");
+
+                    b.HasIndex("PayrollRunID", "EmployeeID")
+                        .IsUnique();
+
+                    b.ToTable("PayrollLines", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.PayrollRun", b =>
+                {
+                    b.Property<int>("PayrollRunID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PayrollRunID"));
+
+                    b.Property<DateTime?>("CalculatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("NetPayable")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("PeriodMonth")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PeriodYear")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlantID")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("RunNo")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("TotalAllowances")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalBasicPay")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalDeductions")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("TotalEmployees")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalOvertimePay")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("PayrollRunID");
+
+                    b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("ModifiedByUserID");
+
+                    b.HasIndex("RunNo")
+                        .IsUnique();
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("PlantID", "PeriodMonth", "PeriodYear")
+                        .IsUnique();
+
+                    b.ToTable("PayrollRuns", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.SalaryStructure", b =>
+                {
+                    b.Property<int>("StructureID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StructureID"));
+
+                    b.Property<decimal>("BasicSalary")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("HousingAllowance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("OtherAllowance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("StructureCode")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("StructureName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("TransportAllowance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("StructureID");
+
+                    b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("ModifiedByUserID");
+
+                    b.HasIndex("StructureCode")
+                        .IsUnique();
+
+                    b.ToTable("SalaryStructures", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.Shift", b =>
+                {
+                    b.Property<int>("ShiftID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ShiftID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedByUserID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlantID")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("ShiftCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("ShiftName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("time");
+
+                    b.HasKey("ShiftID");
+
+                    b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("ModifiedByUserID");
+
+                    b.HasIndex("PlantID", "ShiftCode")
+                        .IsUnique();
+
+                    b.ToTable("Shifts", (string)null);
                 });
 
             modelBuilder.Entity("FoodOpsERP.Models.Entities.CertificateOfAnalysis", b =>
@@ -4107,6 +5322,84 @@ namespace FoodOps_ERP.Migrations
                     b.Navigation("UOM");
                 });
 
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Security.Permission", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ModifiedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Security.Role", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ModifiedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Security.RolePermission", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("GrantedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.Security.Permission", "Permission")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("PermissionID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.Security.Role", "Role")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("RoleID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Security.UserRole", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("AssignedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.Security.Role", "Role")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("RoleID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("FoodOpsERP.Models.Entities.StockAdjustment", b =>
                 {
                     b.HasOne("FoodOpsERP.Models.Entities.User", "AdjustedBy")
@@ -4156,6 +5449,359 @@ namespace FoodOps_ERP.Migrations
                         .IsRequired();
 
                     b.Navigation("Warehouse");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.AttendanceCorrection", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", "ApprovedByUser")
+                        .WithMany()
+                        .HasForeignKey("ApprovedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FoodOpsERP.Models.Workforce.HRPayroll.Entities.AttendanceLog", "AttendanceLog")
+                        .WithMany("Corrections")
+                        .HasForeignKey("AttendanceID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", "RequestedByUser")
+                        .WithMany()
+                        .HasForeignKey("RequestedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ApprovedByUser");
+
+                    b.Navigation("AttendanceLog");
+
+                    b.Navigation("RequestedByUser");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.AttendanceLog", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Workforce.HRPayroll.Entities.Employee", "Employee")
+                        .WithMany("AttendanceLogs")
+                        .HasForeignKey("EmployeeID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Workforce.HRPayroll.Entities.Shift", "Shift")
+                        .WithMany("AttendanceLogs")
+                        .HasForeignKey("ShiftID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Shift");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.Department", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ModifiedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FoodOpsERP.Models.Entities.Plant", "Plant")
+                        .WithMany()
+                        .HasForeignKey("PlantID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Plant");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.Employee", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Workforce.HRPayroll.Entities.Department", "Department")
+                        .WithMany("Employees")
+                        .HasForeignKey("DepartmentID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ModifiedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FoodOpsERP.Models.Entities.Plant", "Plant")
+                        .WithMany()
+                        .HasForeignKey("PlantID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Workforce.HRPayroll.Entities.Shift", "Shift")
+                        .WithMany("Employees")
+                        .HasForeignKey("ShiftID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Department");
+
+                    b.Navigation("Plant");
+
+                    b.Navigation("Shift");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.EmployeeDocument", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Workforce.HRPayroll.Entities.Employee", "Employee")
+                        .WithMany("Documents")
+                        .HasForeignKey("EmployeeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", "UploadedByUser")
+                        .WithMany()
+                        .HasForeignKey("UploadedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("UploadedByUser");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.EmployeeSalary", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Workforce.HRPayroll.Entities.Employee", "Employee")
+                        .WithMany("Salaries")
+                        .HasForeignKey("EmployeeID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ModifiedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FoodOpsERP.Models.Workforce.HRPayroll.Entities.SalaryStructure", "Structure")
+                        .WithMany("EmployeeSalaries")
+                        .HasForeignKey("StructureID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Structure");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.LeaveBalance", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Workforce.HRPayroll.Entities.Employee", "Employee")
+                        .WithMany("LeaveBalances")
+                        .HasForeignKey("EmployeeID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Workforce.HRPayroll.Entities.LeaveType", "LeaveType")
+                        .WithMany("LeaveBalances")
+                        .HasForeignKey("LeaveTypeID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("LeaveType");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.LeaveRequest", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", "ApprovedByUser")
+                        .WithMany()
+                        .HasForeignKey("ApprovedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Workforce.HRPayroll.Entities.Employee", "Employee")
+                        .WithMany("LeaveRequests")
+                        .HasForeignKey("EmployeeID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Workforce.HRPayroll.Entities.LeaveType", "LeaveType")
+                        .WithMany("LeaveRequests")
+                        .HasForeignKey("LeaveTypeID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ModifiedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ApprovedByUser");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("LeaveType");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.LeaveType", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ModifiedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.OvertimeRecord", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", "ApprovedByUser")
+                        .WithMany()
+                        .HasForeignKey("ApprovedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Workforce.HRPayroll.Entities.Employee", "Employee")
+                        .WithMany("OvertimeRecords")
+                        .HasForeignKey("EmployeeID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ModifiedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ApprovedByUser");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.PayrollApproval", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", "ApproverUser")
+                        .WithMany()
+                        .HasForeignKey("ApproverUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Workforce.HRPayroll.Entities.PayrollRun", "PayrollRun")
+                        .WithMany("Approvals")
+                        .HasForeignKey("PayrollRunID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ApproverUser");
+
+                    b.Navigation("PayrollRun");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.PayrollLine", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Workforce.HRPayroll.Entities.Employee", "Employee")
+                        .WithMany("PayrollLines")
+                        .HasForeignKey("EmployeeID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Workforce.HRPayroll.Entities.PayrollRun", "PayrollRun")
+                        .WithMany("Lines")
+                        .HasForeignKey("PayrollRunID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("PayrollRun");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.PayrollRun", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ModifiedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FoodOpsERP.Models.Entities.Plant", "Plant")
+                        .WithMany()
+                        .HasForeignKey("PlantID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Plant");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.SalaryStructure", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ModifiedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.Shift", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FoodOpsERP.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ModifiedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("FoodOpsERP.Models.Entities.Plant", "Plant")
+                        .WithMany()
+                        .HasForeignKey("PlantID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Plant");
                 });
 
             modelBuilder.Entity("FoodOpsERP.Models.Entities.Category", b =>
@@ -4217,6 +5863,18 @@ namespace FoodOps_ERP.Migrations
                     b.Navigation("QCInspectionResults");
                 });
 
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Security.Permission", b =>
+                {
+                    b.Navigation("RolePermissions");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Entities.Security.Role", b =>
+                {
+                    b.Navigation("RolePermissions");
+
+                    b.Navigation("UserRoles");
+                });
+
             modelBuilder.Entity("FoodOpsERP.Models.Entities.Supplier", b =>
                 {
                     b.Navigation("InventoryBatches");
@@ -4232,6 +5890,59 @@ namespace FoodOps_ERP.Migrations
             modelBuilder.Entity("FoodOpsERP.Models.Entities.WarehouseBin", b =>
                 {
                     b.Navigation("InventoryBatches");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.AttendanceLog", b =>
+                {
+                    b.Navigation("Corrections");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.Department", b =>
+                {
+                    b.Navigation("Employees");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.Employee", b =>
+                {
+                    b.Navigation("AttendanceLogs");
+
+                    b.Navigation("Documents");
+
+                    b.Navigation("LeaveBalances");
+
+                    b.Navigation("LeaveRequests");
+
+                    b.Navigation("OvertimeRecords");
+
+                    b.Navigation("PayrollLines");
+
+                    b.Navigation("Salaries");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.LeaveType", b =>
+                {
+                    b.Navigation("LeaveBalances");
+
+                    b.Navigation("LeaveRequests");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.PayrollRun", b =>
+                {
+                    b.Navigation("Approvals");
+
+                    b.Navigation("Lines");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.SalaryStructure", b =>
+                {
+                    b.Navigation("EmployeeSalaries");
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.Workforce.HRPayroll.Entities.Shift", b =>
+                {
+                    b.Navigation("AttendanceLogs");
+
+                    b.Navigation("Employees");
                 });
 #pragma warning restore 612, 618
         }

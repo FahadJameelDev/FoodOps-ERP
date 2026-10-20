@@ -1,0 +1,39 @@
+﻿@model List<FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.EmployeeSalaryViewModel>
+@{
+    ViewData["Title"] = "Employee Salaries";
+    ViewData["Subtitle"] = "Compensation Setup";
+}
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search salaries...", "salaries", Model.Count, null, @<text>
+        <a href="@Url.Action("Index")" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Structures</a>
+        <a href="@Url.Action("CreateEmployeeSalary")" class="btn btn-primary btn-sm" data-modal="true" data-modal-title="Set Employee Salary" data-modal-size="lg"><i class="bi bi-plus-lg"></i> Set Salary</a>
+    </text>)
+
+<div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Employee</th><th>Structure</th><th>Effective From</th><th class="num">Gross Salary</th><th>Status</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@item.EmployeeName</strong></td>
+                            <td>@(item.StructureName ?? "Manual")</td>
+                            <td>@item.EffectiveFrom.ToString("dd MMM yyyy")</td>
+                            <td class="num">@item.GrossSalary.ToString("N2")</td>
+                            <td><partial name="_StatusPill" model="item.Status" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+
+            <partial name="_EmptyState" model='"No salaries found."' />
+        }
+    </div>
+</div>

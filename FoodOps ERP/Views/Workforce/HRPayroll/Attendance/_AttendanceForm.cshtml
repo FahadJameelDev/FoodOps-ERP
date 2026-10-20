@@ -1,0 +1,37 @@
+﻿@model FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.AttendanceViewModel
+@{
+    var isEdit = Model.AttendanceID != 0;
+    var emps = ViewData["Employees"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
+    var shifts = ViewData["Shifts"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
+}
+<form asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@(isEdit ? Model.AttendanceID.ToString() : null)" method="post" data-spa-form data-reload-url="@Url.Action("Index")" data-refresh="#grid-card" novalidate>
+    <div class="fo-modal__body">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        @if (isEdit)
+        {
+            <input type="hidden" asp-for="AttendanceID" />
+        }
+
+        <div class="row g-3">
+            <div class="col-md-6"><label asp-for="EmployeeID" class="form-label">Employee</label><select asp-for="EmployeeID" asp-items="emps" class="form-select" disabled="@isEdit"><option value="">Select...</option></select></div>
+            <div class="col-md-6"><label asp-for="LogDate" class="form-label">Date</label><input asp-for="LogDate" type="date" class="form-control" readonly="@isEdit" /></div>
+            <div class="col-md-6"><label asp-for="CheckInTime" class="form-label">Check In</label><input asp-for="CheckInTime" type="datetime-local" class="form-control" /></div>
+            <div class="col-md-6"><label asp-for="CheckOutTime" class="form-label">Check Out</label><input asp-for="CheckOutTime" type="datetime-local" class="form-control" /></div>
+            <div class="col-md-6">
+                <label asp-for="Status" class="form-label">Status</label>
+                <select asp-for="Status" class="form-select">
+                    <option value="Present">Present</option>
+                    <option value="Absent">Absent</option>
+                    <option value="Late">Late</option>
+                    <option value="HalfDay">Half Day</option>
+                    <option value="Leave">Leave</option>
+                </select>
+            </div>
+            <div class="col-md-6"><label asp-for="ShiftID" class="form-label">Shift</label><select asp-for="ShiftID" asp-items="shifts" class="form-select"><option value="">Select...</option></select></div>
+        </div>
+    </div>
+    <div class="fo-modal__footer">
+        <button type="button" class="btn btn-outline-secondary" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i><span>@(isEdit ? "Update" : "Save")</span></button>
+    </div>
+</form>

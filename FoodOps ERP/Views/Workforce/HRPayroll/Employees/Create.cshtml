@@ -1,0 +1,9 @@
+﻿@model FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.EmployeeViewModel
+@{
+    ViewData["Title"] = "New Employee";
+    ViewData["Subtitle"] = "Create a new employee record";
+}
+<partial name="_PageHeader" />
+<div class="card">
+    <partial name="_EmployeeForm" model="Model" />
+</div>

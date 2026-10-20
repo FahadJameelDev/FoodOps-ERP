@@ -1,0 +1,35 @@
+﻿@model FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.PayrollLineViewModel
+@{
+    var isEdit = Model.PayrollLineID != 0;
+}
+
+<form method="post" data-spa-form="true" data-reload-url="/Payroll/Details/@Model.PayrollRunID">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="PayrollLineID" />
+    <input type="hidden" asp-for="PayrollRunID" />
+    <input type="hidden" asp-for="EmployeeID" />
+
+    <div class="row g-3">
+        <div class="col-md-12">
+            <label class="form-label">Employee</label>
+            <input class="form-control" value="@Model.EmployeeName" readonly />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="BasicPay" class="form-label">Basic Pay</label>
+            <input asp-for="BasicPay" type="number" step="0.01" class="form-control num" readonly />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="OvertimePay" class="form-label">Overtime Pay</label>
+            <input asp-for="OvertimePay" type="number" step="0.01" class="form-control num" readonly />
+        </div>
+        <div class="col-md-12">
+            <div class="alert alert-info py-2">
+                Payroll lines are auto-calculated by the system. Manual adjustments should be made through Payroll Adjustments.
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer mt-4">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    </div>
+</form>

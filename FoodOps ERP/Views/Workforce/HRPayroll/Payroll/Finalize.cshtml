@@ -1,0 +1,40 @@
+﻿@model List<FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.PayrollViewModel>
+@{
+    ViewData["Title"] = "Payroll Finalization";
+    ViewData["Subtitle"] = "Finalize approved payrolls";
+}
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search payrolls...", "payrolls", Model.Count, null, null)
+
+    <div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Run #</th><th>Month/Year</th><th>Plant</th><th class="num">Employees</th><th class="num">Net Payable</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr data-href="@Url.Action("Details", new { id = item.PayrollRunID })">
+                            <td><span class="code">@item.RunNo</span></td>
+                            <td>@item.PeriodMonth / @item.PeriodYear</td>
+                            <td>@item.PlantName</td>
+                            <td class="num">@item.TotalEmployees</td>
+                            <td class="num">@item.NetPayable.ToString("N2")</td>
+                            <td><partial name="_StatusPill" model="item.Status" /></td>
+                            <td class="text-end">
+                                <a href="@Url.Action("Details", new { id = item.PayrollRunID })" class="btn btn-sm btn-outline-secondary"><i class="bi bi-eye"></i></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+
+            <partial name="_EmptyState" model='"No payrolls pending finalization."' />
+        }
+    </div>
+</div>

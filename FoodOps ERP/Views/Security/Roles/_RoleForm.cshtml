@@ -1,0 +1,26 @@
+﻿@model FoodOpsERP.Models.Security.ViewModels.RoleViewModel
+@{
+    var isEdit = Model.RoleID != 0;
+}
+
+<form asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@(isEdit ? Model.RoleID.ToString() : null)"
+      method="post" data-spa-form data-reload-url="@Url.Action("Index")" data-refresh="#grid-card" novalidate>
+    <div class="fo-modal__body">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        @if (isEdit)
+        {
+            <input type="hidden" asp-for="RoleID" />
+        }
+
+        <div class="row g-3">
+            <div class="col-md-6"><label asp-for="RoleCode" class="form-label">Code <span class="text-danger">*</span></label><input asp-for="RoleCode" class="form-control" readonly="@isEdit" /><span asp-validation-for="RoleCode" class="text-danger"></span></div>
+            <div class="col-md-6"><label asp-for="RoleName" class="form-label">Name <span class="text-danger">*</span></label><input asp-for="RoleName" class="form-control" /><span asp-validation-for="RoleName" class="text-danger"></span></div>
+            <div class="col-12"><label asp-for="Description" class="form-label">Description</label><textarea asp-for="Description" class="form-control" rows="2"></textarea></div>
+            <div class="col-md-6"><div class="form-check mt-3"><input asp-for="IsActive" class="form-check-input" /><label asp-for="IsActive" class="form-check-label">Is Active</label></div></div>
+        </div>
+    </div>
+    <div class="fo-modal__footer">
+        <button type="button" class="btn btn-outline-secondary" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i><span>@(isEdit ? "Update Role" : "Save Role")</span></button>
+    </div>
+</form>

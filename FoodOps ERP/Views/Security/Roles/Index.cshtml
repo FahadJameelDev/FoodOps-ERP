@@ -1,0 +1,56 @@
+﻿@model List<FoodOpsERP.Models.Security.ViewModels.RoleViewModel>
+@{
+    ViewData["Title"] = "Roles";
+    ViewData["Subtitle"] = "Manage user roles";
+}
+
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search roles...", "roles", Model.Count, null, @<text>
+        <a href="@Url.Action("Create")" class="btn btn-primary btn-sm" data-modal="true" data-modal-title="New Role" data-modal-size="lg">
+            <i class="bi bi-plus-lg"></i> New Role
+        </a>
+    </text>)
+
+<div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>System</th>
+                        <th>Active</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="code">@item.RoleCode</span></td>
+                            <td>@item.RoleName</td>
+                            <td>@(item.IsSystem ? "Yes" : "No")</td>
+                            <td>@(item.IsActive ? "Yes" : "No")</td>
+                            <td class="text-end">
+                                <div class="row-actions">
+                                    @if (!item.IsSystem)
+                                    {
+                                        <a href="@Url.Action("Edit", new { id = item.RoleID })" class="btn btn-sm btn-outline-secondary" data-modal="true" data-modal-title="Edit Role" data-modal-size="lg"><i class="bi bi-pencil"></i></a>
+                                    }
+                                    <a href="@Url.Action("Permissions", new { id = item.RoleID })" class="btn btn-sm btn-outline-primary">Permissions</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <partial name="_EmptyState" model='"No roles found. Click New Role to create one."' />
+        }
+    </div>
+</div>

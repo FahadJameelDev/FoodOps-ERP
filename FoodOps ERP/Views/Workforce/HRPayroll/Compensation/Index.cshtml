@@ -1,0 +1,45 @@
+﻿@model List<FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.SalaryStructureViewModel>
+@{
+    ViewData["Title"] = "Salary Structures";
+    ViewData["Subtitle"] = "Compensation Setup";
+}
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search structures...", "structures", Model.Count, "All|Active|Inactive", @<text>
+        <a href="@Url.Action("EmployeeSalaries")" class="btn btn-outline-secondary btn-sm"><i class="bi bi-cash"></i> Employee Salaries</a>
+        <a href="@Url.Action("CreateStructure")" class="btn btn-primary btn-sm" data-modal="true" data-modal-title="New Structure" data-modal-size="lg"><i class="bi bi-plus-lg"></i> New Structure</a>
+    </text>)
+
+<div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Code</th><th>Name</th><th class="num">Basic</th><th class="num">Allowances</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="code">@item.StructureCode</span></td>
+                            <td>@item.StructureName</td>
+                            <td class="num">@item.BasicSalary.ToString("N2")</td>
+                            <td class="num">@((item.HousingAllowance + item.TransportAllowance + item.OtherAllowance).ToString("N2"))</td>
+                            <td><partial name="_StatusPill" model='item.IsActive ? "Active" : "Inactive"' /></td>
+                            <td class="text-end">
+                                <div class="row-actions">
+                                    <a href="@Url.Action("EditStructure", new { id = item.StructureID })" class="btn btn-sm btn-outline-secondary" data-modal="true" data-modal-title="Edit Structure" data-modal-size="lg"><i class="bi bi-pencil"></i></a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-action-url="@Url.Action("ToggleStructure", new { id = item.StructureID })" data-name="@item.StructureCode" data-confirm-title="Toggle Status?" data-refresh="#grid-card"><i class="bi bi-power"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+
+            <partial name="_EmptyState" model='"No structures found."' />
+        }
+    </div>
+</div>

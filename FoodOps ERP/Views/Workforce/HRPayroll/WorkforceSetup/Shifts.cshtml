@@ -1,0 +1,46 @@
+﻿@model List<FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.ShiftViewModel>
+@{
+    ViewData["Title"] = "Shifts";
+    ViewData["Subtitle"] = "Workforce Setup — Shifts";
+}
+
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search shifts...", "shifts", Model.Count, "All|Active|Inactive", @<text>
+        <a href="@Url.Action("Index")" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Departments</a>
+        <a href="@Url.Action("CreateShift")" class="btn btn-primary btn-sm" data-modal="true" data-modal-title="New Shift" data-modal-size="lg"><i class="bi bi-plus-lg"></i> New Shift</a>
+    </text>)
+
+<div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Code</th><th>Name</th><th>Start Time</th><th>End Time</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="code">@item.ShiftCode</span></td>
+                            <td>@item.ShiftName</td>
+                            <td>@item.StartTime.ToString(@"hh\:mm")</td>
+                            <td>@item.EndTime.ToString(@"hh\:mm")</td>
+                            <td><partial name="_StatusPill" model='item.IsActive ? "Active" : "Inactive"' /></td>
+                            <td class="text-end">
+                                <div class="row-actions">
+                                    <a href="@Url.Action("EditShift", new { id = item.ShiftID })" class="btn btn-sm btn-outline-secondary" data-modal="true" data-modal-title="Edit Shift" data-modal-size="lg"><i class="bi bi-pencil"></i></a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-action-url="@Url.Action("ToggleShift", new { id = item.ShiftID })" data-name="@item.ShiftCode" data-confirm-title="Toggle Status?" data-confirm-text="Toggle" data-refresh="#grid-card"><i class="bi bi-power"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+
+            <partial name="_EmptyState" model='"No shifts found. Click New Shift to create one."' />
+        }
+    </div>
+</div>

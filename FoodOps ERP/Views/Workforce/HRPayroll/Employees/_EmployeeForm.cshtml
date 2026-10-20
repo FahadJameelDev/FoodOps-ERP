@@ -1,0 +1,53 @@
+﻿@model FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.EmployeeViewModel
+@{
+    var isEdit = Model.EmployeeID != 0;
+    var plants = ViewData["Plants"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
+    var depts = ViewData["Departments"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
+    var shifts = ViewData["Shifts"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
+}
+
+<form asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@(isEdit ? Model.EmployeeID.ToString() : null)"
+      method="post" data-spa-form data-reload-url="@Url.Action("Index")" data-refresh="#grid-card" novalidate>
+    <div class="fo-modal__body">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        @if (isEdit)
+        {
+            <input type="hidden" asp-for="EmployeeID" />
+        }
+
+        <div class="row g-3">
+            <div class="col-md-6"><label asp-for="PlantID" class="form-label">Plant <span class="text-danger">*</span></label><select asp-for="PlantID" asp-items="plants" class="form-select"><option value="">Select Plant...</option></select></div>
+            <div class="col-md-6"><label asp-for="DepartmentID" class="form-label">Department <span class="text-danger">*</span></label><select asp-for="DepartmentID" asp-items="depts" class="form-select"><option value="">Select Department...</option></select></div>
+            <div class="col-md-6"><label asp-for="ShiftID" class="form-label">Shift</label><select asp-for="ShiftID" asp-items="shifts" class="form-select"><option value="">Select Shift...</option></select></div>
+            <div class="col-md-6"><label asp-for="Designation" class="form-label">Designation</label><input asp-for="Designation" class="form-control" /></div>
+            
+            <div class="col-md-6"><label asp-for="EmployeeCode" class="form-label">Employee Code <span class="text-danger">*</span></label><input asp-for="EmployeeCode" class="form-control" readonly="@isEdit" /></div>
+            <div class="col-md-3"><label asp-for="FirstName" class="form-label">First Name <span class="text-danger">*</span></label><input asp-for="FirstName" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="LastName" class="form-label">Last Name <span class="text-danger">*</span></label><input asp-for="LastName" class="form-control" /></div>
+            
+            <div class="col-md-4"><label asp-for="CNIC" class="form-label">CNIC</label><input asp-for="CNIC" class="form-control" /></div>
+            <div class="col-md-4"><label asp-for="Phone" class="form-label">Phone</label><input asp-for="Phone" class="form-control" /></div>
+            <div class="col-md-4"><label asp-for="Email" class="form-label">Email</label><input asp-for="Email" class="form-control" /></div>
+
+            <div class="col-md-4"><label asp-for="JoiningDate" class="form-label">Joining Date</label><input asp-for="JoiningDate" type="date" class="form-control" /></div>
+            <div class="col-md-4"><label asp-for="LeavingDate" class="form-label">Leaving Date</label><input asp-for="LeavingDate" type="date" class="form-control" /></div>
+            <div class="col-md-4">
+                <label asp-for="CurrentEmploymentStatus" class="form-label">Employment Status</label>
+                <select asp-for="CurrentEmploymentStatus" class="form-select">
+                    <option value="Active">Active</option>
+                    <option value="Resigned">Resigned</option>
+                    <option value="Terminated">Terminated</option>
+                </select>
+            </div>
+
+            <div class="col-md-6"><label asp-for="BankAccountNo" class="form-label">Bank Account No</label><input asp-for="BankAccountNo" class="form-control" /></div>
+            <div class="col-md-6"><label asp-for="BankName" class="form-label">Bank Name</label><input asp-for="BankName" class="form-control" /></div>
+
+            <div class="col-md-6"><div class="form-check mt-3"><input asp-for="IsActive" class="form-check-input" /><label asp-for="IsActive" class="form-check-label">Is Active</label></div></div>
+        </div>
+    </div>
+    <div class="fo-modal__footer">
+        <button type="button" class="btn btn-outline-secondary" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i><span>@(isEdit ? "Update Employee" : "Save Employee")</span></button>
+    </div>
+</form>

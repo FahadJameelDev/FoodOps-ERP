@@ -1,0 +1,48 @@
+﻿@model FoodOpsERP.Models.Security.ViewModels.RolePermissionViewModel
+@{
+    var modules = Model.Permissions.GroupBy(p => p.ModuleKey);
+}
+
+<form method="post" asp-action="Permissions" asp-route-roleId="@Model.RoleID" data-spa-form data-reload-url="@Url.Action("Permissions", new { id = Model.RoleID })">
+    
+    <div class="fo-modal__body">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <input type="hidden" asp-for="RoleID" />
+        
+        <div class="mb-3">
+            <h6 class="text-muted">Select Permissions for <strong>@Model.RoleName</strong></h6>
+        </div>
+
+        @foreach (var mod in modules)
+        {
+            <div class="card mb-3">
+                <div class="card-header py-2">
+                    <strong class="text-heading">@mod.Key</strong>
+                </div>
+                <div class="card-body py-2">
+                    <div class="row g-2">
+                        @foreach (var p in mod)
+                        {
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           name="permissionIds" value="@p.PermissionID"
+                                           id="perm_@p.PermissionID"
+                                    @(p.IsGranted ? "checked" : "") />
+                                    <label class="form-check-label" for="perm_@p.PermissionID">
+                                        @p.PermissionName <small class="text-muted">(@p.PermissionCode)</small>
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="fo-modal__footer">
+        <button type="button" class="btn btn-outline-secondary" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i><span>Save Permissions</span></button>
+    </div>
+</form>

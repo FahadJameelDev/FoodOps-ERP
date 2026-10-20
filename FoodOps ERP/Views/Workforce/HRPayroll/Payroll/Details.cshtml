@@ -1,0 +1,77 @@
+﻿@model FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.PayrollViewModel
+@{
+    ViewData["Title"] = $"Payroll {Model.RunNo}";
+    ViewData["Subtitle"] = $"{Model.PeriodMonth}/{Model.PeriodYear} - {Model.PlantName}";
+}
+<partial name="_PageHeader" />
+
+<div class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title"><i class="bi bi-info-circle"></i>Summary <partial name="_StatusPill" model="Model.Status" /></h5>
+        <div class="grid-tools">
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i>Back</a>
+            
+            @if (Model.Status == "Draft")
+            {
+                <form method="post" asp-action="Calculate" asp-route-id="@Model.PayrollRunID" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-calculator"></i> Calculate</button>
+                </form>
+            }
+            @if (Model.Status == "Calculated")
+            {
+                <form method="post" asp-action="Approve" asp-route-id="@Model.PayrollRunID" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="comments" value="Approved from details page" />
+                    <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-check-circle"></i> Approve</button>
+                </form>
+            }
+            @if (Model.Status == "Approved")
+            {
+                <form method="post" asp-action="Finalize" asp-route-id="@Model.PayrollRunID" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-secondary btn-sm"><i class="bi bi-lock"></i> Finalize</button>
+                </form>
+            }
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3"><span class="text-muted d-block fs-xs">Total Employees</span><b>@Model.TotalEmployees</b></div>
+            <div class="col-md-3"><span class="text-muted d-block fs-xs">Total Basic Pay</span><b>@Model.TotalBasicPay.ToString("N2")</b></div>
+            <div class="col-md-3"><span class="text-muted d-block fs-xs">Total Allowances</span><b>@Model.TotalAllowances.ToString("N2")</b></div>
+            <div class="col-md-3"><span class="text-muted d-block fs-xs">Total OT Pay</span><b>@Model.TotalOvertimePay.ToString("N2")</b></div>
+            <div class="col-md-3"><span class="text-muted d-block fs-xs">Total Deductions</span><b class="text-danger">@Model.TotalDeductions.ToString("N2")</b></div>
+            <div class="col-md-3"><span class="text-muted d-block fs-xs">Net Payable</span><b class="text-success fs-5">@Model.NetPayable.ToString("N2")</b></div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h5 class="card-title"><i class="bi bi-list-check"></i>Employee Payroll Lines</h5></div>
+    <div class="table-responsive">
+        <table class="table table-sm mb-0">
+            <thead><tr><th>Employee</th><th class="num">Basic</th><th class="num">Allowances</th><th class="num">OT Pay</th><th class="num">Deductions</th><th class="num">Net Pay</th></tr></thead>
+            <tbody>
+                @if (Model.Lines != null && Model.Lines.Any())
+                {
+                    foreach (var line in Model.Lines)
+                    {
+                        <tr>
+                            <td><strong>@line.EmployeeName</strong></td>
+                            <td class="num">@line.BasicPay.ToString("N2")</td>
+                            <td class="num">@((line.HousingAllowance + line.TransportAllowance + line.OtherAllowance).ToString("N2"))</td>
+                            <td class="num">@line.OvertimePay.ToString("N2")</td>
+                            <td class="num text-danger">@line.TotalDeductions.ToString("N2")</td>
+                            <td class="num text-success"><strong>@line.NetPay.ToString("N2")</strong></td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="6" class="text-center text-muted py-3">No lines generated. Click Calculate to generate.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

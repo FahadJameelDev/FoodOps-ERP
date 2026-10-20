@@ -1,0 +1,24 @@
+﻿@model FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.LeaveTypeViewModel
+@{
+    var isEdit = Model.LeaveTypeID != 0;
+}
+<form asp-action="@(isEdit ? "EditType" : "CreateType")" asp-route-id="@(isEdit ? Model.LeaveTypeID.ToString() : null)" method="post" data-spa-form data-reload-url="@Url.Action("LeaveTypes")" data-refresh="#grid-card" novalidate>
+    <div class="fo-modal__body">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        @if (isEdit)
+        {
+            <input type="hidden" asp-for="LeaveTypeID" />
+        }
+        <div class="row g-3">
+            <div class="col-md-6"><label asp-for="LeaveTypeCode" class="form-label">Code</label><input asp-for="LeaveTypeCode" class="form-control" readonly="@isEdit" /></div>
+            <div class="col-md-6"><label asp-for="LeaveTypeName" class="form-label">Name</label><input asp-for="LeaveTypeName" class="form-control" /></div>
+            <div class="col-md-6"><label asp-for="MaxDaysPerYear" class="form-label">Max Days / Year</label><input asp-for="MaxDaysPerYear" type="number" class="form-control num" /></div>
+            <div class="col-md-6"><div class="form-check mt-3"><input asp-for="IsPaid" class="form-check-input" /><label asp-for="IsPaid" class="form-check-label">Is Paid</label></div></div>
+            <div class="col-md-6"><div class="form-check mt-3"><input asp-for="IsActive" class="form-check-input" /><label asp-for="IsActive" class="form-check-label">Is Active</label></div></div>
+        </div>
+    </div>
+    <div class="fo-modal__footer">
+        <button type="button" class="btn btn-outline-secondary" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i><span>@(isEdit ? "Update" : "Save")</span></button>
+    </div>
+</form>

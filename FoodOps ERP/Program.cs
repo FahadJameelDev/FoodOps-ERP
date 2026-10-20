@@ -5,6 +5,9 @@ using FoodOpsERP.Services.Manufacturing.Costing;
 using FoodOpsERP.Services.Manufacturing.Production;
 using FoodOpsERP.Services.Manufacturing.ProductsAndRecipes;
 using FoodOpsERP.Services.Manufacturing.Quality;
+using FoodOpsERP.Services.Security;
+using FoodOpsERP.Services.Workforce.HRPayroll;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -97,6 +100,38 @@ builder.Services.AddScoped<IQualityDecisionService, QualityDecisionService>();
 builder.Services.AddScoped<ICostSetupService, CostSetupService>();
 builder.Services.AddScoped<IOverheadService, OverheadService>();
 builder.Services.AddScoped<IBatchCostingService, BatchCostingService>();
+// ═══════════════════════════════════════════════════════════
+// 4.3 WORKFORCE / HR & PAYROLL SERVICES
+// ═══════════════════════════════════════════════════════════
+builder.Services.AddScoped<IWorkforceSetupService, WorkforceSetupService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<ICompensationService, CompensationService>();
+builder.Services.AddScoped<ILeaveService, LeaveService>();
+builder.Services.AddScoped<IAttendanceService, AttendanceService>();
+builder.Services.AddScoped<IOvertimeService, OvertimeService>();
+builder.Services.AddScoped<IPayrollService, PayrollService>();
+
+
+
+// ═══════════════════════════════════════════════════════════
+// 4.1 SECURITY / AUTH SERVICES
+// ═══════════════════════════════════════════════════════════
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+// ═══════════════════════════════════════════════════════════
+// 4.2 COOKIE AUTHENTICATION
+// ═══════════════════════════════════════════════════════════
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
+        options.AccessDeniedPath = "/Account/Login";
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.SlidingExpiration = true;
+    });
+
+builder.Services.AddAuthorization();
 
 
 // ═══════════════════════════════════════════════════════════
