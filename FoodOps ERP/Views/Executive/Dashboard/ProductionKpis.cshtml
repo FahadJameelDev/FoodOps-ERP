@@ -1,0 +1,16 @@
+﻿@model FoodOpsERP.Models.Executive.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Production KPIs";
+    ViewData["Subtitle"] = "Detailed Production Metrics";
+}
+<partial name="_PageHeader" />
+<div class="card">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4"><span class="text-muted d-block fs-xs">Active Orders</span><b>@Model.ActiveProductionOrders</b></div>
+            <div class="col-md-4"><span class="text-muted d-block fs-xs">Today's Produced Qty</span><b>@Model.TodayProducedQty.ToString("N2")</b></div>
+            <div class="col-md-4"><span class="text-muted d-block fs-xs">Today's Rejected Qty</span><b>@Model.TodayRejectedQty.ToString("N2")</b></div>
+            <div class="col-md-4"><span class="text-muted d-block fs-xs">Production Efficiency</span><b>@Model.ProductionEfficiency.ToString("N1")%</b></div>
+        </div>
+    </div>
+</div>

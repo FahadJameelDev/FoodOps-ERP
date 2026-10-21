@@ -38,7 +38,6 @@
                     <span>Dashboard</span>
                 </a>
             </li>
-
             <!-- ═══ GROUP 1: EXECUTIVE & GOVERNANCE ═══ -->
             <li class="nav-group">
                 <button class="nav-group-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#group1" aria-expanded="false">
@@ -56,16 +55,16 @@
                             </button>
                             <div class="collapse" id="mod-exec">
                                 <ul class="nav flex-column nav-features">
-
-                                    <li><a class="nav-link" href="#">Production KPIs</a></li>
-                                    <li><a class="nav-link" href="#">Inventory KPIs</a></li>
-                                    <li><a class="nav-link" href="#">Quality KPIs</a></li>
-                                    <li><a class="nav-link" href="#">Cost &amp; Variance KPIs</a></li>
-                                    <li><a class="nav-link" href="#">Workforce KPIs</a></li>
-                                    <li><a class="nav-link" href="#">Critical Alerts</a></li>
-                                    <li><a class="nav-link" href="#">Action Queue</a></li>
-                                    <li><a class="nav-link" href="#">Trends</a></li>
-                                    <li><a class="nav-link" href="#">AI Summary</a></li>
+                                    <li><a class="nav-link @activeClass("Dashboard", "Index")" asp-controller="Dashboard" asp-action="Index" data-short="Overview">Factory Overview</a></li>
+                                    <li><a class="nav-link @activeClass("Dashboard", "ProductionKpis")" asp-controller="Dashboard" asp-action="ProductionKpis" data-short="Production">Production KPIs</a></li>
+                                    <li><a class="nav-link @activeClass("Dashboard", "InventoryKpis")" asp-controller="Dashboard" asp-action="InventoryKpis" data-short="Inventory">Inventory KPIs</a></li>
+                                    <li><a class="nav-link @activeClass("Dashboard", "QualityKpis")" asp-controller="Dashboard" asp-action="QualityKpis" data-short="Quality">Quality KPIs</a></li>
+                                    <li><a class="nav-link @activeClass("Dashboard", "CostKpis")" asp-controller="Dashboard" asp-action="CostKpis" data-short="Cost">Cost &amp; Variance KPIs</a></li>
+                                    <li><a class="nav-link @activeClass("Dashboard", "WorkforceKpis")" asp-controller="Dashboard" asp-action="WorkforceKpis" data-short="Workforce">Workforce KPIs</a></li>
+                                    <li><a class="nav-link @activeClass("Dashboard", "Alerts")" asp-controller="Dashboard" asp-action="Alerts" data-short="Alerts">Critical Alerts</a></li>
+                                    <li><a class="nav-link @activeClass("Dashboard", "ActionQueue")" asp-controller="Dashboard" asp-action="ActionQueue" data-short="Actions">Action Queue</a></li>
+                                    <li><a class="nav-link @activeClass("Dashboard", "Trends")" asp-controller="Dashboard" asp-action="Trends" data-short="Trends">Trends</a></li>
+                                    <li><a class="nav-link" href="#" data-short="AI Summary">AI Summary</a></li>
                                 </ul>
                             </div>
                         </li>
@@ -77,12 +76,13 @@
                             </button>
                             <div class="collapse" id="mod-reports">
                                 <ul class="nav flex-column nav-features">
-                                    <li><a class="nav-link" href="#">Production Reports</a></li>
-                                    <li><a class="nav-link" href="#">Inventory Reports</a></li>
-                                    <li><a class="nav-link" href="#">Quality Reports</a></li>
-                                    <li><a class="nav-link" href="#">Cost Reports</a></li>
-                                    <li><a class="nav-link" href="#">Workforce Reports</a></li>
-                                    <li><a class="nav-link" href="#">Executive Reports</a></li>
+                                    <li><a class="nav-link" asp-controller="Reports" asp-action="Index" data-short="All Reports">Reports Home</a></li>
+                                    <li><a class="nav-link @activeClass("Reports", "Production")" asp-controller="Reports" asp-action="Production" data-short="Production">Production Reports</a></li>
+                                    <li><a class="nav-link @activeClass("Reports", "Inventory")" asp-controller="Reports" asp-action="Inventory" data-short="Inventory">Inventory Reports</a></li>
+                                    <li><a class="nav-link @activeClass("Reports", "Quality")" asp-controller="Reports" asp-action="Quality" data-short="Quality">Quality Reports</a></li>
+                                    <li><a class="nav-link @activeClass("Reports", "Cost")" asp-controller="Reports" asp-action="Cost" data-short="Cost">Cost Reports</a></li>
+                                    <li><a class="nav-link @activeClass("Reports", "Workforce")" asp-controller="Reports" asp-action="Workforce" data-short="Workforce">Workforce Reports</a></li>
+                                    <li><a class="nav-link @activeClass("Reports", "Executive")" asp-controller="Reports" asp-action="Executive" data-short="Executive">Executive Reports</a></li>
                                 </ul>
                             </div>
                         </li>

@@ -1,0 +1,16 @@
+﻿@model FoodOpsERP.Models.Executive.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Workforce KPIs";
+    ViewData["Subtitle"] = "Detailed HR Metrics";
+}
+<partial name="_PageHeader" />
+<div class="card">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4"><span class="text-muted d-block fs-xs">Present Today</span><b class="text-success">@Model.TodayPresentEmployees</b></div>
+            <div class="col-md-4"><span class="text-muted d-block fs-xs">Absent Today</span><b class="text-danger">@Model.TodayAbsentEmployees</b></div>
+            <div class="col-md-4"><span class="text-muted d-block fs-xs">Attendance Rate</span><b>@Model.AttendancePercentage.ToString("N1")%</b></div>
+            <div class="col-md-4"><span class="text-muted d-block fs-xs">Pending Leaves</span><b>@Model.PendingLeaveRequests</b></div>
+        </div>
+    </div>
+</div>

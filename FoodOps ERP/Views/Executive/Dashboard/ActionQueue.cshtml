@@ -1,0 +1,29 @@
+﻿@model FoodOpsERP.Models.Executive.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Action Queue";
+    ViewData["Subtitle"] = "Pending actions for you";
+}
+<partial name="_PageHeader" />
+<div class="card">
+    <div class="card-body">
+        @if (Model.ActionQueue.Any())
+        {
+            foreach (var action in Model.ActionQueue)
+            {
+                <div class="alert-item alert-item-info mb-2">
+                    <div class="alert-item-icon"><i class="bi bi-clock"></i></div>
+                    <div class="alert-item-content">
+                        <div class="alert-item-title">@action.Task</div>
+                        <div class="alert-item-desc">Module: @action.Module</div>
+                    </div>
+                    <a href="@action.Link" class="alert-item-action">Go</a>
+                </div>
+            }
+        }
+        else
+        {
+
+            <p class="text-muted">No pending actions.</p>
+        }
+    </div>
+</div>

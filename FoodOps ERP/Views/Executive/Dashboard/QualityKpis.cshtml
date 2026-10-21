@@ -1,0 +1,15 @@
+﻿@model FoodOpsERP.Models.Executive.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Quality KPIs";
+    ViewData["Subtitle"] = "Detailed Quality Metrics";
+}
+<partial name="_PageHeader" />
+<div class="card">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4"><span class="text-muted d-block fs-xs">Pending Inspections</span><b>@Model.PendingQCInspections</b></div>
+            <div class="col-md-4"><span class="text-muted d-block fs-xs">Batches on Hold</span><b class="text-danger">@Model.QCOnHoldBatches</b></div>
+            <div class="col-md-4"><span class="text-muted d-block fs-xs">Quality Pass Rate</span><b class="text-success">@Model.QualityPassRate.ToString("N1")%</b></div>
+        </div>
+    </div>
+</div>

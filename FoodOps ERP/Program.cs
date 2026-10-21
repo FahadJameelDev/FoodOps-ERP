@@ -1,5 +1,6 @@
 using FoodOpsERP.Data;
 using FoodOpsERP.Middlewares;
+using FoodOpsERP.Services.Executive;
 using FoodOpsERP.Services.Inventory;
 using FoodOpsERP.Services.Manufacturing.Costing;
 using FoodOpsERP.Services.Manufacturing.Production;
@@ -110,6 +111,11 @@ builder.Services.AddScoped<ILeaveService, LeaveService>();
 builder.Services.AddScoped<IAttendanceService, AttendanceService>();
 builder.Services.AddScoped<IOvertimeService, OvertimeService>();
 builder.Services.AddScoped<IPayrollService, PayrollService>();
+// ═══════════════════════════════════════════════════════════
+// 4.4 EXECUTIVE / DASHBOARD SERVICES
+// ═══════════════════════════════════════════════════════════
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
 
 
