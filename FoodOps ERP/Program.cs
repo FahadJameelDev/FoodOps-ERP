@@ -1,5 +1,6 @@
 using FoodOpsERP.Data;
 using FoodOpsERP.Middlewares;
+using FoodOpsERP.Services.AI;
 using FoodOpsERP.Services.Executive;
 using FoodOpsERP.Services.Inventory;
 using FoodOpsERP.Services.Manufacturing.Costing;
@@ -124,6 +125,12 @@ builder.Services.AddScoped<IReportService, ReportService>();
 // ═══════════════════════════════════════════════════════════
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
+// ═══════════════════════════════════════════════════════════
+// 4.5 AI ENGINE SERVICES
+// ═══════════════════════════════════════════════════════════
+builder.Services.AddScoped<IAIAssistantService, AIAssistantService>();
+builder.Services.AddScoped<IAIAuditService, AIAuditService>();
+builder.Services.AddScoped<IAIInsightService, AIInsightService>();
 // ═══════════════════════════════════════════════════════════
 // 4.2 COOKIE AUTHENTICATION
 // ═══════════════════════════════════════════════════════════

@@ -1,0 +1,40 @@
+﻿@model List<FoodOpsERP.Models.AI.ViewModels.AIAssistantLogViewModel>
+@{
+    ViewData["Title"] = "AI Audit Logs";
+    ViewData["Subtitle"] = "History of all AI Assistant interactions";
+}
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search logs...", "logs", Model.Count, "All|Inventory|Production|Quality|Cost|Payroll|Management", @<text>
+        <a href="@Url.Action("Evidence")" class="btn btn-outline-secondary btn-sm"><i class="bi bi-file-earmark-text"></i> Evidence</a>
+        <a href="@Url.Action("Safety")" class="btn btn-outline-secondary btn-sm"><i class="bi bi-shield-check"></i> Safety Rules</a>
+    </text>)
+
+<div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Date</th><th>User</th><th>Domain</th><th>Question</th><th>Success</th><th>Time (ms)</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.CreatedAt.ToString("dd MMM yyyy HH:mm")</td>
+                            <td>@item.UserName</td>
+                            <td><partial name="_StatusPill" model="item.DomainContext" /></td>
+                            <td class="text-truncate" style="max-width: 300px;" title="@item.QuestionSummary">@item.QuestionSummary</td>
+                            <td>@(item.IsSuccess ? "Yes" : "No")</td>
+                            <td class="num">@item.ExecutionTimeMs</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+
+            <partial name="_EmptyState" model='"No AI audit logs found."' />
+        }
+    </div>
+</div>

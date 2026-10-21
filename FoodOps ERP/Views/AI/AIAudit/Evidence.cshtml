@@ -1,0 +1,37 @@
+﻿@model List<FoodOpsERP.Models.AI.ViewModels.AIAssistantLogViewModel>
+@{
+    ViewData["Title"] = "AI Evidence";
+    ViewData["Subtitle"] = "Detailed proof of AI interactions";
+}
+<partial name="_PageHeader" />
+
+<div class="card" id="grid-card">
+    @Html.GridToolbar("Search evidence...", "evidence", Model.Count, null, @<text>
+        <a href="@Url.Action("Index")" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Audit Logs</a>
+    </text>)
+
+<div class="table-scroll">
+        @if (Model.Any())
+        {
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Date</th><th>Domain</th><th>Question</th><th>Answer</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.CreatedAt.ToString("dd MMM yyyy HH:mm")</td>
+                            <td>@item.DomainContext</td>
+                            <td>@item.QuestionSummary</td>
+                            <td class="text-truncate" style="max-width: 300px;" title="@item.AnswerSummary">@item.AnswerSummary</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+
+            <partial name="_EmptyState" model='"No evidence found."' />
+        }
+    </div>
+</div>

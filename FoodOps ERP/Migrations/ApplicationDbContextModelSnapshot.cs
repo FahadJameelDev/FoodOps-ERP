@@ -22,6 +22,104 @@ namespace FoodOps_ERP.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("FoodOpsERP.Models.AI.Entities.AIAssistantLog", b =>
+                {
+                    b.Property<long>("AILogID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("AILogID"));
+
+                    b.Property<string>("AnswerSummary")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<string>("DomainContext")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("ExecutionTimeMs")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsSuccess")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ModelName")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("QuestionSummary")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("TokensUsed")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserID")
+                        .HasColumnType("int");
+
+                    b.HasKey("AILogID");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("DomainContext", "CreatedAt");
+
+                    b.HasIndex("UserID", "CreatedAt");
+
+                    b.ToTable("AIAssistantLogs", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.AI.Entities.AIInsightCache", b =>
+                {
+                    b.Property<int>("CacheID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CacheID"));
+
+                    b.Property<string>("CacheKey")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("GeneratedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<string>("ModuleContext")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("PayloadJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CacheID");
+
+                    b.HasIndex("ExpiresAt");
+
+                    b.HasIndex("ModuleContext", "CacheKey")
+                        .IsUnique();
+
+                    b.ToTable("AIInsightCaches", (string)null);
+                });
+
             modelBuilder.Entity("FoodOpsERP.Models.Entities.Category", b =>
                 {
                     b.Property<int>("CategoryID")
@@ -4284,6 +4382,17 @@ namespace FoodOps_ERP.Migrations
                         .IsUnique();
 
                     b.ToTable("Shifts", (string)null);
+                });
+
+            modelBuilder.Entity("FoodOpsERP.Models.AI.Entities.AIAssistantLog", b =>
+                {
+                    b.HasOne("FoodOpsERP.Models.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FoodOpsERP.Models.Entities.CertificateOfAnalysis", b =>

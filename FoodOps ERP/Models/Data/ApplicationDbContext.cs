@@ -1,8 +1,9 @@
-﻿using FoodOpsERP.Models.Entities;
+﻿using FoodOpsERP.Models.AI.Entities;
+using FoodOpsERP.Models.Entities;
 using FoodOpsERP.Models.Entities.Manufacturing;
 using FoodOpsERP.Models.Entities.Security;
-using Microsoft.EntityFrameworkCore;
 using FoodOpsERP.Models.Workforce.HRPayroll.Entities;
+using Microsoft.EntityFrameworkCore;
 namespace FoodOpsERP.Data
 {
     public class ApplicationDbContext : DbContext
@@ -108,6 +109,12 @@ public DbSet<EmployeeSalary> EmployeeSalaries { get; set; }
 public DbSet<PayrollRun> PayrollRuns { get; set; }
 public DbSet<PayrollLine> PayrollLines { get; set; }
 public DbSet<PayrollApproval> PayrollApprovals { get; set; }
+
+        // ─────────────────────────────────────────────
+        // Group 5 : AI Engine (2 Tables)
+        // ─────────────────────────────────────────────
+        public DbSet<AIAssistantLog> AIAssistantLogs { get; set; }
+        public DbSet<AIInsightCache> AIInsightCaches { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -1368,6 +1375,47 @@ public DbSet<PayrollApproval> PayrollApprovals { get; set; }
                 b.HasIndex(x => x.PayrollRunID);
                 b.HasOne(x => x.PayrollRun).WithMany(r => r.Approvals).HasForeignKey(x => x.PayrollRunID).OnDelete(DeleteBehavior.Restrict);
                 b.HasOne(x => x.ApproverUser).WithMany().HasForeignKey(x => x.ApproverUserID).OnDelete(DeleteBehavior.Restrict);
+            });
+            // ═════════════════════════════════════════════
+            // GROUP 5 : AI ENGINE
+            // ═════════════════════════════════════════════
+
+            // 1. AIAssistantLog
+            modelBuilder.Entity<AIAssistantLog>(b =>
+            {
+                b.ToTable("AIAssistantLogs");
+                b.HasKey(x => x.AILogID);
+
+                b.Property(x => x.DomainContext).HasMaxLength(30);
+                b.Property(x => x.QuestionSummary).HasMaxLength(500);
+                b.Property(x => x.AnswerSummary).HasMaxLength(1000);
+                b.Property(x => x.ModelName).HasMaxLength(50);
+                b.Property(x => x.ErrorMessage).HasMaxLength(500);
+                b.Property(x => x.CreatedAt).HasDefaultValueSql("SYSUTCDATETIME()");
+
+                b.HasIndex(x => new { x.UserID, x.CreatedAt });
+                b.HasIndex(x => new { x.DomainContext, x.CreatedAt });
+                b.HasIndex(x => x.CreatedAt);
+
+                b.HasOne(x => x.User)
+                 .WithMany()
+                 .HasForeignKey(x => x.UserID)
+                 .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 2. AIInsightCache
+            modelBuilder.Entity<AIInsightCache>(b =>
+            {
+                b.ToTable("AIInsightCaches");
+                b.HasKey(x => x.CacheID);
+
+                b.Property(x => x.ModuleContext).HasMaxLength(50);
+                b.Property(x => x.CacheKey).HasMaxLength(100);
+                b.Property(x => x.PayloadJson).HasColumnType("nvarchar(max)");
+                b.Property(x => x.GeneratedAt).HasDefaultValueSql("SYSUTCDATETIME()");
+
+                b.HasIndex(x => new { x.ModuleContext, x.CacheKey }).IsUnique();
+                b.HasIndex(x => x.ExpiresAt);
             });
         }
     }

@@ -1,0 +1,56 @@
+﻿@{
+    ViewData["Title"] = "AI Assistant Hub";
+    ViewData["Subtitle"] = "Intelligent insights across your factory";
+}
+<partial name="_PageHeader" />
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <a asp-action="Inventory" class="card tile p-3 h-100 text-decoration-none">
+            <div class="d-flex align-items-center gap-3">
+                <div class="tile-icon tile-icon--ok"><i class="bi bi-boxes"></i></div>
+                <div><h6 class="mb-0 text-heading">Inventory Assistant</h6><small class="text-muted">Check stock, expiry alerts</small></div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-action="Production" class="card tile p-3 h-100 text-decoration-none">
+            <div class="d-flex align-items-center gap-3">
+                <div class="tile-icon tile-icon--info"><i class="bi bi-gear"></i></div>
+                <div><h6 class="mb-0 text-heading">Production Assistant</h6><small class="text-muted">Batch status, efficiency</small></div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-action="Quality" class="card tile p-3 h-100 text-decoration-none">
+            <div class="d-flex align-items-center gap-3">
+                <div class="tile-icon tile-icon--ok"><i class="bi bi-patch-check"></i></div>
+                <div><h6 class="mb-0 text-heading">Quality Assistant</h6><small class="text-muted">QC results, hold alerts</small></div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-action="Cost" class="card tile p-3 h-100 text-decoration-none">
+            <div class="d-flex align-items-center gap-3">
+                <div class="tile-icon tile-icon--warn"><i class="bi bi-calculator"></i></div>
+                <div><h6 class="mb-0 text-heading">Cost Assistant</h6><small class="text-muted">Variance analysis</small></div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-action="Payroll" class="card tile p-3 h-100 text-decoration-none">
+            <div class="d-flex align-items-center gap-3">
+                <div class="tile-icon tile-icon--bad"><i class="bi bi-people"></i></div>
+                <div><h6 class="mb-0 text-heading">Payroll Assistant</h6><small class="text-muted">Salary queries, attendance</small></div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-action="Management" class="card tile p-3 h-100 text-decoration-none">
+            <div class="d-flex align-items-center gap-3">
+                <div class="tile-icon tile-icon--info"><i class="bi bi-briefcase"></i></div>
+                <div><h6 class="mb-0 text-heading">Management Assistant</h6><small class="text-muted">Overall factory overview</small></div>
+            </div>
+        </a>
+    </div>
+</div>

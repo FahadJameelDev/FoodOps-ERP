@@ -1,0 +1,70 @@
+﻿@model FoodOpsERP.Models.AI.ViewModels.AIChatViewModel
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title"><i class="bi bi-robot"></i>@Model.DomainContext Assistant</h5>
+        <a asp-action="Index" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i>Back</a>
+    </div>
+    <div class="card-body">
+        <div id="chat-history" class="mb-3" style="max-height: 400px; overflow-y: auto;">
+            <!-- Chat history will appear here -->
+            <div class="alert alert-info">
+                Hello! I am your @Model.DomainContext Assistant. How can I help you today?
+            </div>
+        </div>
+
+        <form id="chat-form" data-domain="@Model.DomainContext">
+            @Html.AntiForgeryToken()
+            <div class="input-group">
+                <input type="text" id="chat-input" class="form-control" placeholder="Ask a question..." autocomplete="off" required />
+                <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i> Send</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById('chat-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const input = document.getElementById('chat-input');
+        const question = input.value.trim();
+        if (!question) return;
+
+        const history = document.getElementById('chat-history');
+        const domain = this.dataset.domain;
+
+        // User message
+        history.innerHTML += `<div class="alert alert-secondary text-end">${question}</div>`;
+        input.value = '';
+
+        // AI loading
+        const loadingId = 'loading-' + Date.now();
+        history.innerHTML += `<div id="${loadingId}" class="alert alert-light text-muted">Thinking...</div>`;
+        history.scrollTop = history.scrollHeight;
+
+        try {
+            const formData = new FormData();
+            formData.append('domainContext', domain);
+            formData.append('question', question);
+
+            const response = await fetch('/AIAssistant/Ask', {
+                method: 'POST',
+                body: formData,
+                headers: { 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value }
+            });
+            const data = await response.json();
+
+            document.getElementById(loadingId).remove();
+            
+            if (data.success) {
+                history.innerHTML += `<div class="alert alert-success">${data.answer}</div>`;
+            } else {
+                history.innerHTML += `<div class="alert alert-danger">${data.message}</div>`;
+            }
+        } catch (err) {
+            document.getElementById(loadingId).remove();
+            history.innerHTML += `<div class="alert alert-danger">Network error. Please try again.</div>`;
+        }
+        history.scrollTop = history.scrollHeight;
+    });
+</script>

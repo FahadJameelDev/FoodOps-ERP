@@ -291,6 +291,7 @@
                 </div>
             </li>
             <!-- ═══ GROUP 5: AI ENGINE & INTELLIGENCE ═══ -->
+            <!-- ═══ GROUP 5: AI ENGINE & INTELLIGENCE ═══ -->
             <li class="nav-group">
                 <button class="nav-group-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#group5" aria-expanded="false">
                     <i class="bi bi-robot" aria-hidden="true"></i>
@@ -307,15 +308,18 @@
                             </button>
                             <div class="collapse" id="mod-ai">
                                 <ul class="nav flex-column nav-features">
-                                    <li><a class="nav-link" href="#">Inventory Assistant</a></li>
-                                    <li><a class="nav-link" href="#">Production Assistant</a></li>
-                                    <li><a class="nav-link" href="#">Quality Assistant</a></li>
-                                    <li><a class="nav-link" href="#">Cost Assistant</a></li>
-                                    <li><a class="nav-link" href="#">Payroll Assistant</a></li>
-                                    <li><a class="nav-link" href="#">Management Assistant</a></li>
-                                    <li><a class="nav-link" href="#">AI Safety</a></li>
-                                    <li><a class="nav-link" href="#">AI Evidence</a></li>
-                                    <li><a class="nav-link" href="#">AI Audit</a></li>
+                                    <li><a class="nav-link @activeClass("AIAssistant", "Index")" asp-controller="AIAssistant" asp-action="Index" data-short="AI Hub">AI Assistant Hub</a></li>
+                                    
+                                    <li><a class="nav-link @activeClass("AIAssistant", "Inventory")" asp-controller="AIAssistant" asp-action="Inventory" data-short="Inventory">Inventory Assistant</a></li>
+                                    <li><a class="nav-link @activeClass("AIAssistant", "Production")" asp-controller="AIAssistant" asp-action="Production" data-short="Production">Production Assistant</a></li>
+                                    <li><a class="nav-link @activeClass("AIAssistant", "Quality")" asp-controller="AIAssistant" asp-action="Quality" data-short="Quality">Quality Assistant</a></li>
+                                    <li><a class="nav-link @activeClass("AIAssistant", "Cost")" asp-controller="AIAssistant" asp-action="Cost" data-short="Cost">Cost Assistant</a></li>
+                                    <li><a class="nav-link @activeClass("AIAssistant", "Payroll")" asp-controller="AIAssistant" asp-action="Payroll" data-short="Payroll">Payroll Assistant</a></li>
+                                    <li><a class="nav-link @activeClass("AIAssistant", "Management")" asp-controller="AIAssistant" asp-action="Management" data-short="Management">Management Assistant</a></li>
+                                    
+                                    <li><a class="nav-link @activeClass("AIAudit", "Safety")" asp-controller="AIAudit" asp-action="Safety" data-short="Safety">AI Safety</a></li>
+                                    <li><a class="nav-link @activeClass("AIAudit", "Evidence")" asp-controller="AIAudit" asp-action="Evidence" data-short="Evidence">AI Evidence</a></li>
+                                    <li><a class="nav-link @activeClass("AIAudit", "Index")" asp-controller="AIAudit" asp-action="Index" data-short="Audit">AI Audit</a></li>
                                 </ul>
                             </div>
                         </li>
