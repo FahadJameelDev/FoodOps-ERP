@@ -11,5 +11,9 @@
         public string QCStatus { get; set; } = string.Empty;
         public string? BinCode { get; set; }
         public int DaysToExpiry { get; set; }
+
+        // ✅ YEH LINE ADD KAREIN
+        // LotViewModel.cs
+        public DateTime? ReceivedDate { get; set; } // ✅ '?' laga dein
     }
 }

@@ -6,7 +6,9 @@
     <div class="fo-modal__body">
         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
         <input type="hidden" asp-for="POID" />
-        <input type="hidden" asp-for="POCode" /><input type="hidden" asp-for="SupplierName" />
+        <input type="hidden" asp-for="POCode" />
+        <input type="hidden" asp-for="SupplierName" />
+        <input type="hidden" asp-for="SupplierID" /> <!-- SupplierID zaroori hai -->
 
         <div class="info-strip">
             <div><span>Purchase order</span><b>@Model.POCode</b></div>
@@ -25,20 +27,37 @@
 
         <div class="table-responsive">
             <table class="table mb-0">
-                <thead><tr><th>Product</th><th class="num">Ordered</th><th class="num">Received</th><th style="width:120px">Receive now</th><th style="width:150px">Batch #</th><th style="width:140px">Mfg date</th><th style="width:140px">Expiry</th><th style="width:170px">Bin</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th class="num">Ordered</th>
+                        <th class="num">Received</th>
+                        <th style="width:120px">Receive now</th>
+                        <th style="width:150px">Batch #</th>
+                        <th style="width:140px">Mfg date</th>
+                        <th style="width:140px">Expiry</th>
+                        <th style="width:170px">Bin</th>
+                    </tr>
+                </thead>
                 <tbody>
                     @for (var i = 0; i < Model.Items.Count; i++)
                     {
                         <tr>
                             <td>
-                                <input type="hidden" asp-for="Items[i].POItemID" /><input type="hidden" asp-for="Items[i].ProductID" />
-                                <input type="hidden" asp-for="Items[i].ProductName" /><input type="hidden" asp-for="Items[i].UOMCode" />
-                                <input type="hidden" asp-for="Items[i].OrderedQty" /><input type="hidden" asp-for="Items[i].ReceivedQty" />
-                                <strong>@Model.Items[i].ProductName</strong> <span class="text-muted">(@Model.Items[i].UOMCode)</span>
+                                <input type="hidden" asp-for="Items[i].POItemID" />
+                                <input type="hidden" asp-for="Items[i].ProductID" />
+                                <input type="hidden" asp-for="Items[i].ProductName" />
+                                <input type="hidden" asp-for="Items[i].UOMCode" />
+                                <input type="hidden" asp-for="Items[i].OrderedQty" />
+                                <input type="hidden" asp-for="Items[i].ReceivedQty" />
+                                <strong>@Model.Items[i].ProductName</strong>
                             </td>
                             <td class="num">@Fmt.Qty(Model.Items[i].OrderedQty)</td>
                             <td class="num">@Fmt.Qty(Model.Items[i].ReceivedQty)</td>
-                            <td><input asp-for="Items[i].ReceiveQty" type="number" step="0.0001" min="0" max="@Math.Max(Model.Items[i].OrderedQty - Model.Items[i].ReceivedQty, 0)" class="form-control num" /><span asp-validation-for="Items[i].ReceiveQty"></span></td>
+                            
+                            <!-- ✅ FIX: Name changed to ReceivingQty -->
+                            <td><input asp-for="Items[i].ReceivingQty" type="number" step="0.0001" min="0" max="@Math.Max(Model.Items[i].OrderedQty - Model.Items[i].ReceivedQty, 0)" class="form-control num" /><span asp-validation-for="Items[i].ReceivingQty"></span></td>
+                            
                             <td><input asp-for="Items[i].BatchNumber" class="form-control" placeholder="Batch no." /><span asp-validation-for="Items[i].BatchNumber"></span></td>
                             <td><input asp-for="Items[i].ManufacturingDate" type="date" class="form-control" /></td>
                             <td><input asp-for="Items[i].ExpiryDate" type="date" class="form-control" /><span asp-validation-for="Items[i].ExpiryDate"></span></td>
@@ -48,7 +67,6 @@
                 </tbody>
             </table>
         </div>
-        <p class="form-hint">Leave “Receive now” at 0 for items that did not arrive. Expiry date is important for food-safety traceability.</p>
     </div>
     <div class="fo-modal__footer">
         <button type="button" class="btn btn-outline-secondary" data-modal-close>Cancel</button>

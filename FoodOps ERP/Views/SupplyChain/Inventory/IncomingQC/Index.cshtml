@@ -23,7 +23,8 @@
                         <th class="num">Quantity</th>
                         <th>Received</th>
                         <th>QC status</th>
-                        <th class="text-end">Actions</th>
+                        <!-- ✅ Width barha di taake button na kate -->
+                        <th class="text-end" style="width: 140px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -36,30 +37,34 @@
                             <td><span class="code">@b.BatchNumber</span></td>
                             <td>@b.ProductName</td>
                             <td class="num">@Fmt.Qty(b.CurrentQuantity)</td>
-                            <td>@Fmt.Date(b.ReceivedDate)</td>
+                            
+                            <!-- ✅ Null check lagaya hai taake 01 Jan 0001 na aaye -->
+                            <td>@(b.ReceivedDate != null ? Fmt.Date(b.ReceivedDate) : "—")</td>
+                            
                             <td><partial name="_StatusPill" model="b.QCStatus" /></td>
                             <td class="text-end">
                                 <div class="row-actions">
                                     @if (held)
                                     {
-                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                        <button type="button" class="btn btn-sm btn-outline-secondary px-3"
                                                 data-action-url="@Url.Action("Release", new { id = b.BatchID })"
                                                 data-name="@b.BatchNumber"
                                                 data-confirm-title="Release batch?"
                                                 data-confirm-message="The batch will leave hold and become available."
                                                 data-confirm-text="Release"
                                                 data-refresh="#grid-card">
-                                            <i class="bi bi-unlock"></i>Release
+                                            Release
                                         </button>
                                     }
                                     else
                                     {
-                                        <a asp-action="Inspect" asp-route-id="@b.BatchID" class="btn btn-primary btn-sm"
+                                        <!-- ✅ Icon hata diya aur px-3 lagaya taake button poora fit ho -->
+                                        <a asp-action="Inspect" asp-route-id="@b.BatchID" class="btn btn-primary btn-sm px-3"
                                                data-modal="true"
                                                data-modal-title="Inspect batch @b.BatchNumber"
                                                data-modal-size="md"
                                                data-modal-icon="bi-patch-check">
-                                            <i class="bi bi-search"></i>Inspect
+                                            Inspect
                                         </a>
                                     }
                                 </div>

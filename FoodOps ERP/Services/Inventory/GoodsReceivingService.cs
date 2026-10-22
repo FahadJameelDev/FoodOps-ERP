@@ -66,101 +66,113 @@ namespace FoodOpsERP.Services.Inventory
 
         public async Task<bool> CreateGRNAsync(GRNViewModel model, int userId)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            var strategy = _context.Database.CreateExecutionStrategy();
 
-            try
+            return await strategy.ExecuteAsync(async () =>
             {
-                var po = await _context.PurchaseOrders
-                    .Include(x => x.PurchaseOrderItems)
-                    .FirstOrDefaultAsync(x => x.POID == model.POID);
+                using var transaction = await _context.Database.BeginTransactionAsync();
 
-                if (po == null)
-                    throw new InvalidOperationException($"PO ID {model.POID} not found.");
-
-                // ✅ FIX: Sirf Approved/PartiallyReceived se GRN
-                if (po.Status != "Approved" && po.Status != "PartiallyReceived")
-                    throw new InvalidOperationException($"Cannot create GRN for PO in '{po.Status}' status.");
-
-                // ✅ FIX: Kam se kam ek item receiving
-                var receivingItems = model.Items.Where(x => x.ReceivingQty > 0).ToList();
-                if (!receivingItems.Any())
-                    throw new InvalidOperationException("At least one item must have receiving quantity > 0.");
-
-                var batches = new List<InventoryBatch>();
-
-                foreach (var item in receivingItems)
+                try
                 {
-                    var poItem = po.PurchaseOrderItems
-                        .FirstOrDefault(x => x.POItemID == item.POItemID)
-                        ?? throw new InvalidOperationException($"PO Item {item.POItemID} not found.");
+                    var po = await _context.PurchaseOrders
+                        .Include(x => x.PurchaseOrderItems)
+                        .FirstOrDefaultAsync(x => x.POID == model.POID);
 
-                    // ✅ FIX: Over-receipt check
-                    if (poItem.ReceivedQty + item.ReceivingQty > poItem.OrderedQty)
-                        throw new InvalidOperationException(
-                            $"Over-receipt for '{item.ProductName}'. Ordered: {poItem.OrderedQty}, Already received: {poItem.ReceivedQty}, Trying to receive: {item.ReceivingQty}");
+                    if (po == null)
+                        throw new InvalidOperationException($"PO ID {model.POID} not found.");
 
-                    // ✅ FIX: Expiry date validation
-                    if (item.ExpiryDate.HasValue && item.ExpiryDate.Value.Date <= DateTime.Today)
-                        throw new InvalidOperationException(
-                            $"Expiry date for '{item.ProductName}' must be in the future.");
+                    if (po.Status != "Approved" && po.Status != "PartiallyReceived")
+                        throw new InvalidOperationException($"Cannot create GRN for PO in '{po.Status}' status.");
 
-                    poItem.ReceivedQty += item.ReceivingQty;
+                    // ✅ FIX: View se ReceivingQty aa rahi hai
+                    var receivingItems = model.Items.Where(x => x.ReceivingQty > 0).ToList();
+                    if (!receivingItems.Any())
+                        throw new InvalidOperationException("At least one item must have receiving quantity > 0.");
 
-                    var batch = new InventoryBatch
+                    // ✅ FIX: Fallback Bins aur Suppliers
+                    var defaultBinId = await _context.WarehouseBins.Select(x => (int?)x.BinID).FirstOrDefaultAsync() ?? 1;
+                    int validSupplierId = model.SupplierID > 0 ? model.SupplierID : (await _context.Suppliers.Select(s => s.SupplierID).FirstOrDefaultAsync());
+
+                    var batches = new List<InventoryBatch>();
+
+                    foreach (var item in receivingItems)
                     {
-                        // ✅ FIX: Unique batch number with milliseconds
-                        BatchNumber = string.IsNullOrWhiteSpace(item.BatchNumber)
-                            ? $"BAT-{DateTime.UtcNow:yyyyMMddHHmmssfff}"
-                            : item.BatchNumber,
-                        ProductID = item.ProductID,
-                        SupplierID = model.SupplierID,
-                        PlantID = po.PlantID,
-                        ManufacturingDate = item.ManufacturingDate,
-                        ExpiryDate = item.ExpiryDate,
-                        CurrentQuantity = item.ReceivingQty,
-                        QCStatus = "Pending",
-                        ReceivedDate = model.ReceivedDate,
+                        var poItem = po.PurchaseOrderItems
+                            .FirstOrDefault(x => x.POItemID == item.POItemID)
+                            ?? throw new InvalidOperationException($"PO Item {item.POItemID} not found.");
+
+                        if (poItem.ReceivedQty + item.ReceivingQty > poItem.OrderedQty)
+                            throw new InvalidOperationException(
+                                $"Over-receipt for '{item.ProductName}'. Ordered: {poItem.OrderedQty}, Already received: {poItem.ReceivedQty}, Trying to receive: {item.ReceivingQty}");
+
+                        // Agar expiry date nahi di, toh default 1 saal aage laga do
+                        DateTime? expDate = item.ExpiryDate ?? DateTime.Today.AddYears(1);
+                        if (expDate.Value.Date <= DateTime.Today)
+                            throw new InvalidOperationException($"Expiry date for '{item.ProductName}' must be in the future.");
+
+                        poItem.ReceivedQty += item.ReceivingQty;
+
+                        int targetBinId = (item.BinID.HasValue && item.BinID > 0) ? item.BinID.Value : defaultBinId;
+
+                        var batch = new InventoryBatch
+                        {
+                            BatchNumber = string.IsNullOrWhiteSpace(item.BatchNumber)
+                                ? $"BAT-{DateTime.UtcNow:yyyyMMddHHmmssfff}"
+                                : item.BatchNumber,
+                            ProductID = item.ProductID,
+                            SupplierID = validSupplierId, // ✅ Safe SupplierID
+                            PlantID = po.PlantID,
+                            BinID = targetBinId, // ✅ Safe BinID
+                            ManufacturingDate = item.ManufacturingDate ?? DateTime.Today,
+                            ExpiryDate = expDate,
+                            CurrentQuantity = item.ReceivingQty,
+                            QCStatus = "Pending",
+                            ReceivedDate = model.ReceivedDate,
+                            CreatedByUserID = userId,
+                            CreatedAt = DateTime.UtcNow
+                        };
+
+                        batches.Add(batch);
+                    }
+
+                    _context.InventoryBatches.AddRange(batches);
+                    await _context.SaveChangesAsync();
+
+                    var transactions = batches.Select(batch => new InventoryTransaction
+                    {
+                        BatchID = batch.BatchID,
+                        PlantID = batch.PlantID,
+                        TransactionType = "GRN",
+                        Quantity = batch.CurrentQuantity,
+                        ReferenceType = "PO",
+                        ReferenceID = po.POID,
+                        Remarks = $"GRN for PO {po.POCode}",
                         CreatedByUserID = userId,
-                        CreatedAt = DateTime.UtcNow
-                    };
+                        Timestamp = DateTime.UtcNow
+                    }).ToList();
 
-                    batches.Add(batch);
+                    _context.InventoryTransactions.AddRange(transactions);
+
+                    bool allReceived = po.PurchaseOrderItems.All(x => x.ReceivedQty >= x.OrderedQty);
+                    po.Status = allReceived ? "Received" : "PartiallyReceived";
+                    po.ModifiedAt = DateTime.UtcNow;
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return true;
                 }
-
-                // ✅ FIX: Batch save — loop ke bahar, ek dafa
-                _context.InventoryBatches.AddRange(batches);
-                await _context.SaveChangesAsync();
-
-                // ✅ FIX: Transactions ek saath
-                var transactions = batches.Select(batch => new InventoryTransaction
+                catch (DbUpdateException ex)
                 {
-                    BatchID = batch.BatchID,
-                    PlantID = batch.PlantID,
-                    TransactionType = "GRN",
-                    Quantity = batch.CurrentQuantity,
-                    ReferenceType = "PO",
-                    ReferenceID = po.POID,
-                    Remarks = $"GRN for PO {po.POCode}",
-                    CreatedByUserID = userId,
-                    Timestamp = DateTime.UtcNow
-                }).ToList();
-
-                _context.InventoryTransactions.AddRange(transactions);
-
-                // Update PO Status
-                bool allReceived = po.PurchaseOrderItems.All(x => x.ReceivedQty >= x.OrderedQty);
-                po.Status = allReceived ? "Received" : "PartiallyReceived";
-                po.ModifiedAt = DateTime.UtcNow;
-
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
-                return true;
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+                    await transaction.RollbackAsync();
+                    // Asal database error nikal kar controller ko bhejein
+                    throw new InvalidOperationException($"Database error: {ex.InnerException?.Message ?? ex.Message}");
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            });
         }
     }
 }
