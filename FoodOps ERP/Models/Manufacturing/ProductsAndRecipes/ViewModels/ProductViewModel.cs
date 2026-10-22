@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace FoodOpsERP.Models.Manufacturing.ProductsAndRecipes.ViewModels;
 
@@ -22,11 +23,15 @@ public class ProductViewModel
 
     [Required]
     [StringLength(30)]
-    public string ProductType { get; set; } = "Finished"; // Finished, RawMaterial, etc.
+    public string ProductType { get; set; } = "Finished";
 
     public bool IsActive { get; set; } = true;
 
     // Display only
     public string? CategoryName { get; set; }
     public string? UOMName { get; set; }
+
+    // ✅ Dropdowns ke liye nayi properties
+    public IEnumerable<SelectListItem>? CategoryList { get; set; }
+    public IEnumerable<SelectListItem>? UOMList { get; set; }
 }

@@ -22,15 +22,15 @@ public class ProductsController : AppController
     public async Task<IActionResult> Index()
     {
         var list = await _service.GetAllAsync();
-        // FIX: Lamba path hata diya
         return View(list);
     }
 
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        await LoadLookupsAsync();
-        return FormView("_ProductForm", "Create", new ProductViewModel());
+        var model = new ProductViewModel();
+        await PopulateDropdowns(model);
+        return FormView("_ProductForm", "Create", model);
     }
 
     [HttpPost]
@@ -38,7 +38,7 @@ public class ProductsController : AppController
     {
         if (!ModelState.IsValid)
         {
-            await LoadLookupsAsync();
+            await PopulateDropdowns(model);
             return Invalid("_ProductForm", "Create", model);
         }
 
@@ -46,7 +46,7 @@ public class ProductsController : AppController
         if (!result.Success)
         {
             ModelState.AddModelError("", result.Message);
-            await LoadLookupsAsync();
+            await PopulateDropdowns(model);
             return Invalid("_ProductForm", "Create", model);
         }
 
@@ -59,7 +59,7 @@ public class ProductsController : AppController
         var model = await _service.GetByIdAsync(id);
         if (model == null) return NotFound();
 
-        await LoadLookupsAsync();
+        await PopulateDropdowns(model);
         return FormView("_ProductForm", "Edit", model);
     }
 
@@ -68,7 +68,7 @@ public class ProductsController : AppController
     {
         if (!ModelState.IsValid)
         {
-            await LoadLookupsAsync();
+            await PopulateDropdowns(model);
             return Invalid("_ProductForm", "Edit", model);
         }
 
@@ -76,7 +76,7 @@ public class ProductsController : AppController
         if (!result.Success)
         {
             ModelState.AddModelError("", result.Message);
-            await LoadLookupsAsync();
+            await PopulateDropdowns(model);
             return Invalid("_ProductForm", "Edit", model);
         }
 
@@ -90,9 +90,17 @@ public class ProductsController : AppController
         return result.Success ? Saved(result.Message) : Failed(result.Message);
     }
 
-    private async Task LoadLookupsAsync()
+    // ✅ ViewData ki jagah ab Model mein data ja raha hai
+    private async Task PopulateDropdowns(ProductViewModel model)
     {
-        ViewBag.Categories = new SelectList(await _db.Categories.AsNoTracking().OrderBy(x => x.CategoryName).ToListAsync(), "CategoryID", "CategoryName");
-        ViewBag.UOMs = new SelectList(await _db.UnitsOfMeasure.AsNoTracking().OrderBy(x => x.UOMName).ToListAsync(), "UOMID", "UOMName");
+        model.CategoryList = await _db.Categories.AsNoTracking()
+            .OrderBy(x => x.CategoryName)
+            .Select(x => new SelectListItem { Value = x.CategoryID.ToString(), Text = x.CategoryName })
+            .ToListAsync();
+
+        model.UOMList = await _db.UnitsOfMeasure.AsNoTracking()
+            .OrderBy(x => x.UOMName)
+            .Select(x => new SelectListItem { Value = x.UOMID.ToString(), Text = x.UOMName })
+            .ToListAsync();
     }
 }

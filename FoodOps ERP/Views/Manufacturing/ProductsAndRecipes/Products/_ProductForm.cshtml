@@ -1,8 +1,6 @@
 ﻿@model FoodOpsERP.Models.Manufacturing.ProductsAndRecipes.ViewModels.ProductViewModel
 @{
     var isEdit = Model.ProductID != 0;
-    var categories = ViewData["Categories"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
-    var uoms = ViewData["UOMs"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
 }
 
 <form asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@(isEdit ? Model.ProductID.ToString() : null)"
@@ -30,7 +28,7 @@
 
             <div class="col-md-6">
                 <label asp-for="CategoryID" class="form-label">Category <span class="text-danger">*</span></label>
-                <select asp-for="CategoryID" asp-items="categories" class="form-select" required>
+                <select asp-for="CategoryID" asp-items="Model.CategoryList" class="form-select" required>
                     <option value="">Select Category...</option>
                 </select>
                 <span asp-validation-for="CategoryID" class="text-danger"></span>
@@ -38,7 +36,7 @@
 
             <div class="col-md-6">
                 <label asp-for="BaseUOMID" class="form-label">Base UOM <span class="text-danger">*</span></label>
-                <select asp-for="BaseUOMID" asp-items="uoms" class="form-select" required>
+                <select asp-for="BaseUOMID" asp-items="Model.UOMList" class="form-select" required>
                     <option value="">Select UOM...</option>
                 </select>
                 <span asp-validation-for="BaseUOMID" class="text-danger"></span>
