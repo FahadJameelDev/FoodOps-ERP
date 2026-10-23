@@ -40,6 +40,7 @@
                             <td><span class="code">@s.ProductCode</span></td>
                             <td>@s.ProductName</td>
                             <td class="num">@Fmt.Qty(s.TotalQuantity)</td>
+                            <!-- ✅ Yahan UOMCode use ho raha hai jo ab ViewModel mein hai -->
                             <td>@s.UOMCode</td>
                             <td class="num">@Fmt.Qty(s.MinStockLevel)</td>
                             <td><partial name="_StatusPill" model="s.StockStatus" /></td>

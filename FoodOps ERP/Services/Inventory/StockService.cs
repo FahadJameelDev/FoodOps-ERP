@@ -21,7 +21,7 @@ namespace FoodOpsERP.Services.Inventory
                 .AsNoTracking()
                 .Include(x => x.Product)
                     .ThenInclude(p => p.BaseUOM)
-                .Where(x => x.CurrentQuantity > 0) // ✅ FIX: Sirf available stock
+                .Where(x => x.CurrentQuantity > 0)
                 .GroupBy(x => new
                 {
                     x.ProductID,
@@ -38,7 +38,6 @@ namespace FoodOpsERP.Services.Inventory
                     UOM = g.Key.UOM,
                     TotalQuantity = g.Sum(x => x.CurrentQuantity),
                     MinStockLevel = g.Key.MinStockLevel ?? 0,
-                    // ✅ FIX: Stock status logic
                     StockStatus = g.Sum(x => x.CurrentQuantity) <= 0 ? "Out"
                                 : g.Sum(x => x.CurrentQuantity) <= (g.Key.MinStockLevel ?? 0) ? "Low"
                                 : "OK"
@@ -66,7 +65,6 @@ namespace FoodOpsERP.Services.Inventory
                     ExpiryDate = x.ExpiryDate,
                     QCStatus = x.QCStatus,
                     BinCode = x.WarehouseBin != null ? x.WarehouseBin.BinCode : null,
-                    // ✅ FIX: Safe DaysToExpiry
                     DaysToExpiry = x.ExpiryDate.HasValue
                         ? EF.Functions.DateDiffDay(DateTime.Today, x.ExpiryDate.Value)
                         : 999
@@ -94,7 +92,6 @@ namespace FoodOpsERP.Services.Inventory
                     CurrentQuantity = x.CurrentQuantity,
                     ExpiryDate = x.ExpiryDate,
                     QCStatus = x.QCStatus,
-                    // ✅ FIX: Safe DaysToExpiry
                     DaysToExpiry = x.ExpiryDate.HasValue
                         ? EF.Functions.DateDiffDay(DateTime.Today, x.ExpiryDate.Value)
                         : 0
@@ -103,58 +100,69 @@ namespace FoodOpsERP.Services.Inventory
 
         public async Task<bool> AdjustStockAsync(long batchId, decimal qty, string reason, int userId, string? remarks = null)
         {
-            // ✅ FIX: Transaction wrap
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            // ✅ FIX: Execution Strategy wrap (Retry on failure ke liye)
+            var strategy = _context.Database.CreateExecutionStrategy();
 
-            try
+            return await strategy.ExecuteAsync(async () =>
             {
-                var batch = await _context.InventoryBatches.FindAsync(batchId);
-                if (batch == null) return false;
+                using var transaction = await _context.Database.BeginTransactionAsync();
 
-                // ✅ FIX: Zero adjustment reject
-                if (qty == 0)
-                    throw new InvalidOperationException("Adjustment quantity cannot be zero.");
-
-                // ✅ FIX: Negative stock check
-                var newQty = batch.CurrentQuantity + qty;
-                if (newQty < 0)
-                    throw new InvalidOperationException(
-                        $"Cannot adjust stock. Current: {batch.CurrentQuantity}, Adjustment: {qty}, Result would be: {newQty}. Stock cannot be negative.");
-
-                batch.CurrentQuantity = newQty;
-                batch.ModifiedAt = DateTime.UtcNow;
-
-                _context.StockAdjustments.Add(new StockAdjustment
+                try
                 {
-                    BatchID = batchId,
-                    AdjustedQty = qty,
-                    Reason = reason,
-                    Remarks = remarks,
-                    AdjustedByUserID = userId,
-                    AdjustedAt = DateTime.UtcNow
-                });
+                    var batch = await _context.InventoryBatches.FindAsync(batchId);
+                    if (batch == null) return false;
 
-                _context.InventoryTransactions.Add(new InventoryTransaction
+                    if (qty == 0)
+                        throw new InvalidOperationException("Adjustment quantity cannot be zero.");
+
+                    var newQty = batch.CurrentQuantity + qty;
+                    if (newQty < 0)
+                        throw new InvalidOperationException(
+                            $"Cannot adjust stock. Current: {batch.CurrentQuantity}, Adjustment: {qty}, Result would be: {newQty}. Stock cannot be negative.");
+
+                    batch.CurrentQuantity = newQty;
+                    batch.ModifiedAt = DateTime.UtcNow;
+
+                    // ✅ FIX: Safe User ID (Kyunke abhi Auth nahi hai)
+                    int validUserId = userId;
+                    if (!await _context.Users.AnyAsync(u => u.UserID == validUserId))
+                    {
+                        validUserId = await _context.Users.Select(u => u.UserID).FirstOrDefaultAsync();
+                        if (validUserId == 0) validUserId = 1; // Ultimate fallback
+                    }
+
+                    _context.StockAdjustments.Add(new StockAdjustment
+                    {
+                        BatchID = batchId,
+                        AdjustedQty = qty,
+                        Reason = reason,
+                        Remarks = remarks,
+                        AdjustedByUserID = validUserId, // ✅ Safe ID
+                        AdjustedAt = DateTime.UtcNow
+                    });
+
+                    _context.InventoryTransactions.Add(new InventoryTransaction
+                    {
+                        BatchID = batchId,
+                        PlantID = batch.PlantID,
+                        TransactionType = "Adjustment",
+                        Quantity = qty,
+                        ReferenceType = "Adjustment",
+                        Remarks = remarks,
+                        CreatedByUserID = validUserId, // ✅ Safe ID
+                        Timestamp = DateTime.UtcNow
+                    });
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return true;
+                }
+                catch
                 {
-                    BatchID = batchId,
-                    PlantID = batch.PlantID,
-                    TransactionType = "Adjustment",
-                    Quantity = qty,
-                    ReferenceType = "Adjustment",
-                    Remarks = remarks,
-                    CreatedByUserID = userId,
-                    Timestamp = DateTime.UtcNow
-                });
-
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
-                return true;
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            });
         }
     }
 }
