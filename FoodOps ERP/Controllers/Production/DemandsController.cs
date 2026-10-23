@@ -2,7 +2,6 @@
 using FoodOpsERP.Data;
 using FoodOpsERP.Infrastructure;
 using FoodOpsERP.Models.Manufacturing.Production.ViewModels;
-using FoodOpsERP.Services.Manufacturing.Production;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -30,7 +29,6 @@ public class DemandsController : AppController
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        await LoadLookupsAsync();
         var model = new DemandViewModel
         {
             RequiredDate = DateTime.Today.AddDays(7),
@@ -38,6 +36,7 @@ public class DemandsController : AppController
             Source = "Manual",
             Status = "Open"
         };
+        await PopulateDropdownsAsync(model); // ✅ Naya method call kiya
         return FormView("_DemandForm", "Create", model);
     }
 
@@ -46,7 +45,7 @@ public class DemandsController : AppController
     {
         if (!ModelState.IsValid)
         {
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_DemandForm", "Create", model);
         }
 
@@ -56,7 +55,7 @@ public class DemandsController : AppController
         if (!result.Success)
         {
             ModelState.AddModelError("", result.Message);
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_DemandForm", "Create", model);
         }
 
@@ -70,7 +69,7 @@ public class DemandsController : AppController
         if (model == null) return NotFound();
         if (model.Status != "Open") return Failed("Only Open demands can be edited.");
 
-        await LoadLookupsAsync();
+        await PopulateDropdownsAsync(model);
         return FormView("_DemandForm", "Edit", model);
     }
 
@@ -79,7 +78,7 @@ public class DemandsController : AppController
     {
         if (!ModelState.IsValid)
         {
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_DemandForm", "Edit", model);
         }
 
@@ -89,7 +88,7 @@ public class DemandsController : AppController
         if (!result.Success)
         {
             ModelState.AddModelError("", result.Message);
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_DemandForm", "Edit", model);
         }
 
@@ -108,11 +107,26 @@ public class DemandsController : AppController
         return Saved(result.Message);
     }
 
-    private async Task LoadLookupsAsync()
+    // ✅ Naya Method (Purana LoadLookupsAsync hata dein)
+    private async Task PopulateDropdownsAsync(DemandViewModel model)
     {
-        ViewBag.Plants = new SelectList(await _db.Plants.AsNoTracking().OrderBy(p => p.PlantName).ToListAsync(), "PlantID", "PlantName");
-        ViewBag.Products = new SelectList(await _db.Products.AsNoTracking().OrderBy(p => p.ProductName).ToListAsync(), "ProductID", "ProductName");
-        ViewBag.UOMs = new SelectList(await _db.UnitsOfMeasure.AsNoTracking().OrderBy(u => u.UOMName).ToListAsync(), "UOMID", "UOMName");
-        ViewBag.Sources = new SelectList(new[] { "Manual", "Forecast", "CustomerOrder", "Replenishment" });
+        model.PlantList = await _db.Plants.AsNoTracking()
+            .OrderBy(p => p.PlantName)
+            .Select(p => new SelectListItem { Value = p.PlantID.ToString(), Text = p.PlantName })
+            .ToListAsync();
+
+        model.ProductList = await _db.Products.AsNoTracking()
+            .OrderBy(p => p.ProductName)
+            .Select(p => new SelectListItem { Value = p.ProductID.ToString(), Text = p.ProductName })
+            .ToListAsync();
+
+        model.UOMList = await _db.UnitsOfMeasure.AsNoTracking()
+            .OrderBy(u => u.UOMName)
+            .Select(u => new SelectListItem { Value = u.UOMID.ToString(), Text = u.UOMName })
+            .ToListAsync();
+
+        // ✅ Source Hardcoded list
+        var sources = new[] { "Manual", "Forecast", "CustomerOrder", "Replenishment" };
+        model.SourceList = sources.Select(s => new SelectListItem { Value = s, Text = s }).ToList();
     }
 }

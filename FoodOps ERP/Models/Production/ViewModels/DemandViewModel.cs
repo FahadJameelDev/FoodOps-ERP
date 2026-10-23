@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering; // ✅ Yeh add karein
 
 namespace FoodOpsERP.Models.Manufacturing.Production.ViewModels;
 
@@ -44,4 +45,10 @@ public class DemandViewModel
     public string? Notes { get; set; }
 
     public DateTime CreatedAt { get; set; }
+
+    // ✅ Dropdowns ke liye nayi properties
+    public IEnumerable<SelectListItem>? PlantList { get; set; }
+    public IEnumerable<SelectListItem>? ProductList { get; set; }
+    public IEnumerable<SelectListItem>? UOMList { get; set; }
+    public IEnumerable<SelectListItem>? SourceList { get; set; }
 }

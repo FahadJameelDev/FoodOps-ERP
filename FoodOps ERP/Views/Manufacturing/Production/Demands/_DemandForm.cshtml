@@ -1,10 +1,6 @@
 ﻿@model FoodOpsERP.Models.Manufacturing.Production.ViewModels.DemandViewModel
 @{
     var isEdit = Model.DemandID != 0;
-    var plants = ViewData["Plants"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
-    var products = ViewData["Products"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
-    var uoms = ViewData["UOMs"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
-    var sources = ViewData["Sources"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
 }
 
 <form asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@(isEdit ? Model.DemandID.ToString() : null)"
@@ -20,7 +16,7 @@
         <div class="row g-3">
             <div class="col-md-6">
                 <label asp-for="PlantID" class="form-label">Plant <span class="text-danger">*</span></label>
-                <select asp-for="PlantID" asp-items="plants" class="form-select" required>
+                <select asp-for="PlantID" asp-items="Model.PlantList" class="form-select" required>
                     <option value="">Select Plant...</option>
                 </select>
                 <span asp-validation-for="PlantID" class="text-danger"></span>
@@ -28,7 +24,7 @@
 
             <div class="col-md-6">
                 <label asp-for="ProductID" class="form-label">Product <span class="text-danger">*</span></label>
-                <select asp-for="ProductID" asp-items="products" class="form-select" required>
+                <select asp-for="ProductID" asp-items="Model.ProductList" class="form-select" required>
                     <option value="">Select Product...</option>
                 </select>
                 <span asp-validation-for="ProductID" class="text-danger"></span>
@@ -48,7 +44,7 @@
 
             <div class="col-md-4">
                 <label asp-for="UOMID" class="form-label">UOM <span class="text-danger">*</span></label>
-                <select asp-for="UOMID" asp-items="uoms" class="form-select" required>
+                <select asp-for="UOMID" asp-items="Model.UOMList" class="form-select" required>
                     <option value="">Select UOM...</option>
                 </select>
                 <span asp-validation-for="UOMID" class="text-danger"></span>
@@ -56,7 +52,7 @@
 
             <div class="col-md-4">
                 <label asp-for="Source" class="form-label">Source <span class="text-danger">*</span></label>
-                <select asp-for="Source" asp-items="sources" class="form-select" required></select>
+                <select asp-for="Source" asp-items="Model.SourceList" class="form-select" required></select>
                 <span asp-validation-for="Source" class="text-danger"></span>
             </div>
 
