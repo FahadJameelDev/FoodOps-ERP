@@ -19,14 +19,12 @@ public class QCParametersController : AppController
         _db = db;
     }
 
-    // 1. Default Index (QC Setup ke liye)
     public async Task<IActionResult> Index()
     {
         var list = await _service.GetAllAsync();
         return View(list);
     }
 
-    // 2. Records (Quality Records ke liye naya page)
     public async Task<IActionResult> Records()
     {
         var list = await _service.GetAllAsync();
@@ -36,8 +34,9 @@ public class QCParametersController : AppController
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        await LoadLookupsAsync();
-        return FormView("_ParameterForm", "Create", new QCParameterViewModel { IsActive = true, ParameterType = "Numeric" });
+        var model = new QCParameterViewModel { IsActive = true, ParameterType = "Numeric" };
+        await PopulateDropdownsAsync(model); // ✅ Naya method call kiya
+        return FormView("_ParameterForm", "Create", model);
     }
 
     [HttpPost]
@@ -45,7 +44,7 @@ public class QCParametersController : AppController
     {
         if (!ModelState.IsValid)
         {
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_ParameterForm", "Create", model);
         }
 
@@ -53,7 +52,7 @@ public class QCParametersController : AppController
         if (!result.Success)
         {
             ModelState.AddModelError("", result.Message);
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_ParameterForm", "Create", model);
         }
         return Saved(result.Message, "Index");
@@ -65,7 +64,7 @@ public class QCParametersController : AppController
         var model = await _service.GetByIdAsync(id);
         if (model == null) return NotFound();
 
-        await LoadLookupsAsync();
+        await PopulateDropdownsAsync(model);
         return FormView("_ParameterForm", "Edit", model);
     }
 
@@ -74,7 +73,7 @@ public class QCParametersController : AppController
     {
         if (!ModelState.IsValid)
         {
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_ParameterForm", "Edit", model);
         }
 
@@ -82,7 +81,7 @@ public class QCParametersController : AppController
         if (!result.Success)
         {
             ModelState.AddModelError("", result.Message);
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_ParameterForm", "Edit", model);
         }
         return Saved(result.Message, "Index");
@@ -95,8 +94,12 @@ public class QCParametersController : AppController
         return result.Success ? Saved(result.Message, "Index") : Failed(result.Message);
     }
 
-    private async Task LoadLookupsAsync()
+    // ✅ Naya Method (Purana LoadLookupsAsync hata dein)
+    private async Task PopulateDropdownsAsync(QCParameterViewModel model)
     {
-        ViewBag.UOMs = new SelectList(await _db.UnitsOfMeasure.AsNoTracking().OrderBy(u => u.UOMName).ToListAsync(), "UOMID", "UOMName");
+        model.UOMList = await _db.UnitsOfMeasure.AsNoTracking()
+            .OrderBy(u => u.UOMName)
+            .Select(u => new SelectListItem { Value = u.UOMID.ToString(), Text = u.UOMName })
+            .ToListAsync();
     }
 }

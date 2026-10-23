@@ -1,7 +1,6 @@
 ﻿@model FoodOpsERP.Models.Manufacturing.Quality.ViewModels.QCParameterViewModel
 @{
     var isEdit = Model.ParameterID != 0;
-    var uoms = ViewData["UOMs"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
 }
 
 <form asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@(isEdit ? Model.ParameterID.ToString() : null)"
@@ -37,7 +36,8 @@
             </div>
             <div class="col-md-6">
                 <label asp-for="DefaultUOMID" class="form-label">Default UOM (Optional)</label>
-                <select asp-for="DefaultUOMID" asp-items="uoms" class="form-select">
+                <!-- ✅ Updated: asp-items Model se -->
+                <select asp-for="DefaultUOMID" asp-items="Model.UOMList" class="form-select">
                     <option value="">-- None --</option>
                 </select>
             </div>

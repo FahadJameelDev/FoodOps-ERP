@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering; // ✅ Yeh add karein
 
 namespace FoodOpsERP.Models.Manufacturing.Quality.ViewModels;
 
@@ -21,4 +22,7 @@ public class QCParameterViewModel
     public string? DefaultUOMName { get; set; }
 
     public bool IsActive { get; set; } = true;
+
+    // ✅ Dropdown ke liye nayi property
+    public IEnumerable<SelectListItem>? UOMList { get; set; }
 }
