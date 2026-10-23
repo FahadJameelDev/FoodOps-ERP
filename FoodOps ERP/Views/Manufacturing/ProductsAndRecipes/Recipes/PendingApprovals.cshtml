@@ -8,11 +8,20 @@
 <div class="card" id="grid-card">
     @Html.GridToolbar("Search approvals...", "approvals", Model.Count, null, _ => Html.Raw(@"<a href='/Recipes' class='btn btn-outline-secondary btn-sm'><i class='bi bi-arrow-left'></i> All Recipes</a>"))
 
-    <div class="table-scroll">
+    <div class="table-scroll" style="overflow-x: auto;">
         @if (Model.Any())
         {
-            <table class="table table-hover mb-0">
-                <thead><tr><th>Recipe Code</th><th>Product</th><th>Version</th><th>Submitted</th><th class="text-end">Actions</th></tr></thead>
+            <table class="table table-hover mb-0" style="min-width: 800px;">
+                <thead>
+                    <tr>
+                        <th>Recipe Code</th>
+                        <th>Product</th>
+                        <th>Version</th>
+                        <th>Submitted</th>
+                        <!-- ✅ Actions column ki width barha di -->
+                        <th class="text-end" style="min-width: 120px;">Actions</th>
+                    </tr>
+                </thead>
                 <tbody>
                     @foreach (var item in Model)
                     {
@@ -23,7 +32,10 @@
                             <td>@item.CreatedAt.ToString("dd MMM yyyy")</td>
                             <td class="text-end">
                                 <div class="row-actions">
-                                    <a href="/Recipes/Details/@item.RecipeID" class="btn btn-primary btn-sm"><i class="bi bi-search"></i> Review</a>
+                                    <!-- ✅ Icon hata diya, sirf text rakha aur px-3 lagaya -->
+                                    <a href="/Recipes/Details/@item.RecipeID" class="btn btn-primary btn-sm px-3">
+                                        Review
+                                    </a>
                                 </div>
                             </td>
                         </tr>
