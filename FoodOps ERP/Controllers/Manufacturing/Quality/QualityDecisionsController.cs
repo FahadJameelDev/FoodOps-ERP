@@ -19,7 +19,6 @@ public class QualityDecisionsController : AppController
         _db = db;
     }
 
-    // 1. Default Index (Yeh Quality Decision tab ke liye hai)
     public async Task<IActionResult> Index(long? batchId = null)
     {
         var list = await _service.GetAllAsync(batchId);
@@ -27,21 +26,18 @@ public class QualityDecisionsController : AppController
         return View(list);
     }
 
-    // 2. Production QC (Alag page aur active state ke liye)
     public async Task<IActionResult> ProductionQC()
     {
         var list = await _service.GetAllAsync(null);
         return View(list);
     }
 
-    // 3. Quality Decision (Alag page aur active state ke liye)
     public async Task<IActionResult> QualityDecisions()
     {
         var list = await _service.GetAllAsync(null);
         return View(list);
     }
 
-    // 4. Release Control (Alag page aur active state ke liye)
     public async Task<IActionResult> ReleaseControl()
     {
         var list = await _service.GetAllAsync(null);
@@ -51,12 +47,12 @@ public class QualityDecisionsController : AppController
     [HttpGet]
     public async Task<IActionResult> Create(long? batchId = null)
     {
-        await LoadLookupsAsync();
         var model = new QualityDecisionViewModel
         {
             BatchID = batchId ?? 0,
             Decision = "Approve"
         };
+        await PopulateDropdownsAsync(model); // ✅ Naya method call kiya
         return FormView("_DecisionForm", "Create", model);
     }
 
@@ -65,7 +61,7 @@ public class QualityDecisionsController : AppController
     {
         if (!ModelState.IsValid)
         {
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_DecisionForm", "Create", model);
         }
 
@@ -74,21 +70,24 @@ public class QualityDecisionsController : AppController
         if (!result.Success)
         {
             ModelState.AddModelError("", result.Message);
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_DecisionForm", "Create", model);
         }
 
         return Saved(result.Message, "Index");
     }
 
-    private async Task LoadLookupsAsync()
+    // ✅ Naya Method (Purana LoadLookupsAsync hata dein)
+    private async Task PopulateDropdownsAsync(QualityDecisionViewModel model)
     {
-        ViewBag.Batches = new SelectList(
-            await _db.InventoryBatches.AsNoTracking()
-                .OrderByDescending(b => b.BatchID)
-                .Take(200)
-                .Select(b => new { b.BatchID, Text = b.BatchNumber })
-                .ToListAsync(),
-            "BatchID", "Text");
+        model.BatchList = await _db.InventoryBatches.AsNoTracking()
+            .OrderByDescending(b => b.BatchID)
+            .Take(200)
+            .Select(b => new SelectListItem
+            {
+                Value = b.BatchID.ToString(),
+                Text = $"{b.BatchNumber} - {b.Product.ProductName}" // Agar Product navigation mojood hai
+            })
+            .ToListAsync();
     }
 }

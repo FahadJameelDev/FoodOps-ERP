@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering; // ✅ Yeh add karein
 
 namespace FoodOpsERP.Models.Manufacturing.Quality.ViewModels;
 
@@ -26,4 +27,7 @@ public class QualityDecisionViewModel
     public int? ApprovedByUserID { get; set; }
     public string? ApprovedByName { get; set; }
     public DateTime? ApprovedAt { get; set; }
+
+    // ✅ Dropdown ke liye nayi property
+    public IEnumerable<SelectListItem>? BatchList { get; set; }
 }
