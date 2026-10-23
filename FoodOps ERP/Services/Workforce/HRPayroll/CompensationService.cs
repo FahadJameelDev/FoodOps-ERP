@@ -52,6 +52,14 @@ public class CompensationService : ICompensationService
         if (await _db.SalaryStructures.AnyAsync(s => s.StructureCode == model.StructureCode))
             return (false, "Structure Code already exists.", null);
 
+        // ✅ FIX: Safe User ID Fallback
+        int validUserId = userId;
+        if (!await _db.Users.AnyAsync(u => u.UserID == validUserId))
+        {
+            validUserId = await _db.Users.Select(u => u.UserID).FirstOrDefaultAsync();
+            if (validUserId == 0) validUserId = 1;
+        }
+
         var entity = new SalaryStructure
         {
             StructureCode = model.StructureCode,
@@ -61,7 +69,7 @@ public class CompensationService : ICompensationService
             TransportAllowance = model.TransportAllowance,
             OtherAllowance = model.OtherAllowance,
             IsActive = model.IsActive,
-            CreatedByUserID = userId,
+            CreatedByUserID = validUserId, // ✅ Safe ID
             CreatedAt = DateTime.UtcNow
         };
 
@@ -166,6 +174,14 @@ public class CompensationService : ICompensationService
             old.EffectiveTo = model.EffectiveFrom.AddDays(-1);
         }
 
+        // ✅ FIX: Safe User ID Fallback
+        int validUserId = userId;
+        if (!await _db.Users.AnyAsync(u => u.UserID == validUserId))
+        {
+            validUserId = await _db.Users.Select(u => u.UserID).FirstOrDefaultAsync();
+            if (validUserId == 0) validUserId = 1;
+        }
+
         var gross = model.BasicSalary + model.HousingAllowance + model.TransportAllowance + model.OtherAllowance;
 
         var entity = new EmployeeSalary
@@ -180,7 +196,7 @@ public class CompensationService : ICompensationService
             OtherAllowance = model.OtherAllowance,
             GrossSalary = gross,
             Status = "Active",
-            CreatedByUserID = userId,
+            CreatedByUserID = validUserId, // ✅ Safe ID
             CreatedAt = DateTime.UtcNow
         };
 

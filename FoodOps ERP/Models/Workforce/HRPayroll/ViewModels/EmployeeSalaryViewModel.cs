@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering; // ✅ Yeh add karein
 
 namespace FoodOpsERP.Models.Workforce.HRPayroll.ViewModels;
 
@@ -36,6 +37,10 @@ public class EmployeeSalaryViewModel
     [Range(0, double.MaxValue)]
     public decimal OtherAllowance { get; set; }
 
-    public decimal GrossSalary { get; set; } // Computed
+    public decimal GrossSalary { get; set; }
     public string Status { get; set; } = "Active";
+
+    // ✅ Dropdowns ke liye nayi properties
+    public IEnumerable<SelectListItem>? EmployeeList { get; set; }
+    public IEnumerable<SelectListItem>? StructureList { get; set; }
 }

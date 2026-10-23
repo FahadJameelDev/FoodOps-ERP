@@ -85,28 +85,49 @@ public class CompensationController : AppController
     [HttpGet]
     public async Task<IActionResult> CreateEmployeeSalary()
     {
-        await LoadLookupsAsync();
-        return FormView("_EmployeeSalaryForm", "CreateEmployeeSalary", new EmployeeSalaryViewModel { EffectiveFrom = DateTime.Today });
+        var model = new EmployeeSalaryViewModel { EffectiveFrom = DateTime.Today };
+        await PopulateDropdownsAsync(model); // ✅ Naya method call kiya
+        return FormView("_EmployeeSalaryForm", "CreateEmployeeSalary", model);
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateEmployeeSalary(EmployeeSalaryViewModel model)
     {
-        if (!ModelState.IsValid) { await LoadLookupsAsync(); return Invalid("_EmployeeSalaryForm", "CreateEmployeeSalary", model); }
+        if (!ModelState.IsValid)
+        {
+            await PopulateDropdownsAsync(model);
+            return Invalid("_EmployeeSalaryForm", "CreateEmployeeSalary", model);
+        }
 
         var result = await _service.CreateEmployeeSalaryAsync(model, GetCurrentUserId());
         if (!result.Success)
         {
             ModelState.AddModelError("", result.Message);
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_EmployeeSalaryForm", "CreateEmployeeSalary", model);
         }
         return Saved(result.Message, "EmployeeSalaries");
     }
 
-    private async Task LoadLookupsAsync()
+    // ✅ Naya Method (Purana LoadLookupsAsync hata dein)
+    private async Task PopulateDropdownsAsync(EmployeeSalaryViewModel model)
     {
-        ViewBag.Employees = new SelectList(await _db.Employees.AsNoTracking().OrderBy(e => e.FirstName).ToListAsync(), "EmployeeID", "FirstName");
-        ViewBag.Structures = new SelectList(await _db.SalaryStructures.AsNoTracking().OrderBy(s => s.StructureName).ToListAsync(), "StructureID", "StructureName");
+        model.EmployeeList = await _db.Employees.AsNoTracking()
+            .OrderBy(e => e.FirstName)
+            .Select(e => new SelectListItem
+            {
+                Value = e.EmployeeID.ToString(),
+                Text = $"{e.EmployeeCode} - {e.FirstName} {e.LastName}"
+            })
+            .ToListAsync();
+
+        model.StructureList = await _db.SalaryStructures.AsNoTracking()
+            .OrderBy(s => s.StructureName)
+            .Select(s => new SelectListItem
+            {
+                Value = s.StructureID.ToString(),
+                Text = s.StructureName
+            })
+            .ToListAsync();
     }
 }

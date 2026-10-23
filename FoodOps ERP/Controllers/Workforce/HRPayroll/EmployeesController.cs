@@ -28,13 +28,13 @@ public class EmployeesController : AppController
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        await LoadLookupsAsync();
         var model = new EmployeeViewModel
         {
             JoiningDate = DateTime.Today,
             CurrentEmploymentStatus = "Active",
             IsActive = true
         };
+        await PopulateDropdownsAsync(model); // ✅ Naya method call kiya
         return FormView("_EmployeeForm", "Create", model);
     }
 
@@ -43,7 +43,7 @@ public class EmployeesController : AppController
     {
         if (!ModelState.IsValid)
         {
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_EmployeeForm", "Create", model);
         }
 
@@ -51,7 +51,7 @@ public class EmployeesController : AppController
         if (!result.Success)
         {
             ModelState.AddModelError("", result.Message);
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_EmployeeForm", "Create", model);
         }
         return Saved(result.Message, "Index");
@@ -63,7 +63,7 @@ public class EmployeesController : AppController
         var model = await _service.GetByIdAsync(id);
         if (model == null) return NotFound();
 
-        await LoadLookupsAsync();
+        await PopulateDropdownsAsync(model);
         return FormView("_EmployeeForm", "Edit", model);
     }
 
@@ -72,7 +72,7 @@ public class EmployeesController : AppController
     {
         if (!ModelState.IsValid)
         {
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_EmployeeForm", "Edit", model);
         }
 
@@ -80,7 +80,7 @@ public class EmployeesController : AppController
         if (!result.Success)
         {
             ModelState.AddModelError("", result.Message);
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_EmployeeForm", "Edit", model);
         }
         return Saved(result.Message, "Index");
@@ -93,10 +93,22 @@ public class EmployeesController : AppController
         return result.Success ? Saved(result.Message, "Index") : Failed(result.Message);
     }
 
-    private async Task LoadLookupsAsync()
+    // ✅ Naya Method (Purana LoadLookupsAsync hata dein)
+    private async Task PopulateDropdownsAsync(EmployeeViewModel model)
     {
-        ViewBag.Plants = new SelectList(await _db.Plants.AsNoTracking().OrderBy(p => p.PlantName).ToListAsync(), "PlantID", "PlantName");
-        ViewBag.Departments = new SelectList(await _db.Departments.AsNoTracking().OrderBy(d => d.DepartmentName).ToListAsync(), "DepartmentID", "DepartmentName");
-        ViewBag.Shifts = new SelectList(await _db.Shifts.AsNoTracking().OrderBy(s => s.ShiftName).ToListAsync(), "ShiftID", "ShiftName");
+        model.PlantList = await _db.Plants.AsNoTracking()
+            .OrderBy(p => p.PlantName)
+            .Select(p => new SelectListItem { Value = p.PlantID.ToString(), Text = p.PlantName })
+            .ToListAsync();
+
+        model.DepartmentList = await _db.Departments.AsNoTracking()
+            .OrderBy(d => d.DepartmentName)
+            .Select(d => new SelectListItem { Value = d.DepartmentID.ToString(), Text = d.DepartmentName })
+            .ToListAsync();
+
+        model.ShiftList = await _db.Shifts.AsNoTracking()
+            .OrderBy(s => s.ShiftName)
+            .Select(s => new SelectListItem { Value = s.ShiftID.ToString(), Text = s.ShiftName })
+            .ToListAsync();
     }
 }

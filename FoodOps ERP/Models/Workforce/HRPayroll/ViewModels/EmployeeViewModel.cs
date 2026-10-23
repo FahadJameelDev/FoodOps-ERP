@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering; // ✅ Yeh add karein
 
 namespace FoodOpsERP.Models.Workforce.HRPayroll.ViewModels;
 
@@ -64,6 +65,11 @@ public class EmployeeViewModel
     public bool IsActive { get; set; } = true;
 
     public List<EmployeeDocumentViewModel> Documents { get; set; } = new();
+
+    // ✅ Dropdowns ke liye nayi properties
+    public IEnumerable<SelectListItem>? PlantList { get; set; }
+    public IEnumerable<SelectListItem>? DepartmentList { get; set; }
+    public IEnumerable<SelectListItem>? ShiftList { get; set; }
 }
 
 public class EmployeeDocumentViewModel

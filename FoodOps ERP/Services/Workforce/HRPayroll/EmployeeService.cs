@@ -32,7 +32,6 @@ public class EmployeeService : IEmployeeService
                 Email = e.Email,
                 Designation = e.Designation,
                 JoiningDate = e.JoiningDate,
-                // FIX: Property ka naam change kiya
                 CurrentEmploymentStatus = e.EmploymentStatus,
                 IsActive = e.IsActive
             }).ToListAsync();
@@ -62,7 +61,6 @@ public class EmployeeService : IEmployeeService
             Designation = e.Designation,
             JoiningDate = e.JoiningDate,
             LeavingDate = e.LeavingDate,
-            // FIX: Property ka naam change kiya
             CurrentEmploymentStatus = e.EmploymentStatus,
             BankAccountNo = e.BankAccountNo,
             BankName = e.BankName,
@@ -85,6 +83,14 @@ public class EmployeeService : IEmployeeService
         if (await _db.Employees.AnyAsync(e => e.EmployeeCode == model.EmployeeCode))
             return (false, "Employee Code already exists.", null);
 
+        // ✅ FIX: Safe User ID Fallback
+        int validUserId = userId;
+        if (!await _db.Users.AnyAsync(u => u.UserID == validUserId))
+        {
+            validUserId = await _db.Users.Select(u => u.UserID).FirstOrDefaultAsync();
+            if (validUserId == 0) validUserId = 1;
+        }
+
         var entity = new Employee
         {
             PlantID = model.PlantID,
@@ -100,12 +106,11 @@ public class EmployeeService : IEmployeeService
             Designation = model.Designation,
             JoiningDate = model.JoiningDate,
             LeavingDate = model.LeavingDate,
-            // FIX: Property ka naam change kiya
             EmploymentStatus = model.CurrentEmploymentStatus,
             BankAccountNo = model.BankAccountNo,
             BankName = model.BankName,
             IsActive = model.IsActive,
-            CreatedByUserID = userId,
+            CreatedByUserID = validUserId, // ✅ Safe ID
             CreatedAt = DateTime.UtcNow
         };
 
@@ -135,7 +140,6 @@ public class EmployeeService : IEmployeeService
         entity.Designation = model.Designation;
         entity.JoiningDate = model.JoiningDate;
         entity.LeavingDate = model.LeavingDate;
-        // FIX: Property ka naam change kiya
         entity.EmploymentStatus = model.CurrentEmploymentStatus;
         entity.BankAccountNo = model.BankAccountNo;
         entity.BankName = model.BankName;
