@@ -23,14 +23,12 @@ public class RecipesController : AppController
     {
         var list = await _service.GetAllAsync(status);
         ViewBag.Status = status;
-        // FIX: Lamba path hata diya (Program.cs handle karega)
         return View(list);
     }
 
     public async Task<IActionResult> PendingApprovals()
     {
         var list = await _service.GetPendingApprovalsAsync();
-        // FIX: Lamba path hata diya
         return View(list);
     }
 
@@ -38,20 +36,19 @@ public class RecipesController : AppController
     {
         var model = await _service.GetByIdAsync(id);
         if (model == null) return NotFound();
-        // FIX: Lamba path hata diya
         return View(model);
     }
 
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        await LoadLookupsAsync();
         var model = new RecipeViewModel
         {
             VersionNo = 1,
             Status = "Draft",
             Items = new List<RecipeItemViewModel>()
         };
+        await PopulateDropdownsAsync(model); // ✅ Naya method call kiya
         return FormView("_RecipeForm", "Create", model);
     }
 
@@ -60,7 +57,7 @@ public class RecipesController : AppController
     {
         if (!ModelState.IsValid)
         {
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_RecipeForm", "Create", model);
         }
 
@@ -70,7 +67,7 @@ public class RecipesController : AppController
         if (!result.Success)
         {
             ModelState.AddModelError("", result.Message);
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_RecipeForm", "Create", model);
         }
 
@@ -86,7 +83,7 @@ public class RecipesController : AppController
         if (model.Status != "Draft" && model.Status != "Rejected")
             return Failed("Only Draft or Rejected recipes can be edited.");
 
-        await LoadLookupsAsync();
+        await PopulateDropdownsAsync(model);
         return FormView("_RecipeForm", "Edit", model);
     }
 
@@ -95,7 +92,7 @@ public class RecipesController : AppController
     {
         if (!ModelState.IsValid)
         {
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_RecipeForm", "Edit", model);
         }
 
@@ -105,68 +102,65 @@ public class RecipesController : AppController
         if (!result.Success)
         {
             ModelState.AddModelError("", result.Message);
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_RecipeForm", "Edit", model);
         }
 
         return Saved(result.Message, "Index");
     }
 
+    // ... (SubmitForApproval, Approve, Reject, SetCurrent wese hi rahenge)
     [HttpPost]
     public async Task<IActionResult> SubmitForApproval(int id)
     {
-        var userId = 1; // TODO
+        var userId = 1;
         var result = await _service.SubmitForApprovalAsync(id, userId);
-
-        if (!result.Success)
-            return Failed(result.Message);
-
+        if (!result.Success) return Failed(result.Message);
         return Saved(result.Message);
     }
 
     [HttpPost]
     public async Task<IActionResult> Approve(int id, string? comments = null)
     {
-        var userId = 1; // TODO
+        var userId = 1;
         var result = await _service.ApproveAsync(id, userId, comments);
-
-        if (!result.Success)
-            return Failed(result.Message);
-
+        if (!result.Success) return Failed(result.Message);
         return Saved(result.Message);
     }
 
     [HttpPost]
     public async Task<IActionResult> Reject(int id, string? comments = null)
     {
-        // FIX: Agar comments null hain, toh default message pass karein
         if (string.IsNullOrWhiteSpace(comments))
             comments = "Rejected from list view.";
 
-        var userId = 1; // TODO
+        var userId = 1;
         var result = await _service.RejectAsync(id, userId, comments);
-
-        if (!result.Success)
-            return Failed(result.Message);
-
+        if (!result.Success) return Failed(result.Message);
         return Saved(result.Message);
     }
 
     [HttpPost]
     public async Task<IActionResult> SetCurrent(int id)
     {
-        var userId = 1; // TODO
+        var userId = 1;
         var result = await _service.SetCurrentAsync(id, userId);
-
-        if (!result.Success)
-            return Failed(result.Message);
-
+        if (!result.Success) return Failed(result.Message);
         return Saved(result.Message);
     }
 
-    private async Task LoadLookupsAsync()
+    // ✅ Naya Method (Purana LoadLookupsAsync hata dein)
+    private async Task PopulateDropdownsAsync(RecipeViewModel model)
     {
-        ViewBag.Products = new SelectList(await _db.Products.AsNoTracking().OrderBy(x => x.ProductName).ToListAsync(), "ProductID", "ProductName");
-        ViewBag.UOMs = new SelectList(await _db.UnitsOfMeasure.AsNoTracking().OrderBy(x => x.UOMName).ToListAsync(), "UOMID", "UOMName");
+        model.ProductList = await _db.Products.AsNoTracking()
+            .Where(p => p.IsActive)
+            .OrderBy(x => x.ProductName)
+            .Select(x => new SelectListItem { Value = x.ProductID.ToString(), Text = x.ProductName })
+            .ToListAsync();
+
+        model.UOMList = await _db.UnitsOfMeasure.AsNoTracking()
+            .OrderBy(x => x.UOMName)
+            .Select(x => new SelectListItem { Value = x.UOMID.ToString(), Text = x.UOMName })
+            .ToListAsync();
     }
 }

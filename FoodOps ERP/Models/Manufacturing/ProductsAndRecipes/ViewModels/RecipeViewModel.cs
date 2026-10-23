@@ -1,5 +1,6 @@
 ﻿using FoodOpsERP.Models.Manufacturing.ProductsAndRecipes.ViewModels;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering; // ✅ Yeh add karein
 
 namespace FoodOpsERP.Models.Manufacturing.ProductsAndRecipes.ViewModels;
 
@@ -66,4 +67,8 @@ public class RecipeViewModel
     public DateTime? ApprovedAt { get; set; }
     public string? CreatedByName { get; set; }
     public DateTime CreatedAt { get; set; }
+
+    // ✅ Dropdowns ke liye nayi properties
+    public IEnumerable<SelectListItem>? ProductList { get; set; }
+    public IEnumerable<SelectListItem>? UOMList { get; set; }
 }

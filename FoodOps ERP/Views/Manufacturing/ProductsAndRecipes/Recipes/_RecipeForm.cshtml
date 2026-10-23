@@ -1,32 +1,35 @@
 ﻿@model FoodOpsERP.Models.Manufacturing.ProductsAndRecipes.ViewModels.RecipeViewModel
 @{
     var isEdit = Model.RecipeID != 0;
-    var products = ViewData["Products"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
-    var uoms = ViewData["UOMs"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
     var rows = Model.Items?.Count ?? 0;
 
-    // Naya Ingredient Row banane ka template
-    Func<string, object> blankRow = @<div class="repeater-row">
+    // Naya Ingredient Row banane ka template (✅ FIXED)
+    Func<string, object> blankRow = @<div class="repeater-row" style="display: grid; grid-template-columns: 3fr 1fr 1fr 1fr 50px 40px; gap: 8px; margin-bottom: 8px; align-items: center;">
         <input type="hidden" name="Items.Index" value="@item" />
         
-        <select name="Items[@item].IngredientProductID" class="form-select" required>
-            <option value="">Select Ingredient...</option>
-            @foreach (var p in products)
-            {
-                <option value="@p.Value">@p.Text</option>
-            }
-        </select>
+        <div>
+            <select name="Items[@item].IngredientProductID" class="form-select form-select-sm" required>
+                <option value="">Select Ingredient...</option>
+                @foreach (var p in Model.ProductList ?? new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>())
+                {
+                    <option value="@p.Value">@p.Text</option>
+                }
+            </select>
+        </div>
         
-        <select name="Items[@item].UOMID" class="form-select" required>
-            <option value="">UOM</option>
-            @foreach (var u in uoms)
-            {
-                <option value="@u.Value">@u.Text</option>
-            }
-        </select>
+        <div>
+            <select name="Items[@item].UOMID" class="form-select form-select-sm" required>
+                <option value="">UOM</option>
+                @foreach (var u in Model.UOMList ?? new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>())
+                {
+                    <option value="@u.Value">@u.Text</option>
+                }
+            </select>
+        </div>
         
-        <input name="Items[@item].RequiredQty" type="number" step="0.0001" min="0.0001" class="form-control num" data-qty placeholder="Qty" required />
-        <input name="Items[@item].ScrapPercent" type="number" step="0.01" min="0" max="100" class="form-control num" placeholder="Scrap %" value="0" />
+        <div><input name="Items[@item].RequiredQty" type="number" step="0.0001" min="0.0001" class="form-control form-control-sm num" data-qty placeholder="Qty" required /></div>
+        
+        <div><input name="Items[@item].ScrapPercent" type="number" step="0.01" min="0" max="100" class="form-control form-control-sm num" placeholder="Scrap %" value="0" /></div>
         
         <div class="form-check d-flex justify-content-center align-items-center mb-0" title="Critical Ingredient?">
             <input type="hidden" name="Items[@item].IsCritical" value="false" />
@@ -48,10 +51,10 @@
         }
 
         <div class="row g-3 mb-4">
-            <!-- Product Dropdown -->
+            <!-- Product Dropdown (✅ Updated) -->
             <div class="col-md-6">
                 <label asp-for="ProductID" class="form-label">Product <span class="text-danger">*</span></label>
-                <select asp-for="ProductID" asp-items="products" class="form-select" required>
+                <select asp-for="ProductID" asp-items="Model.ProductList" class="form-select" required>
                     <option value="">Select Product...</option>
                 </select>
                 <span asp-validation-for="ProductID" class="text-danger"></span>
@@ -77,10 +80,10 @@
                 <span asp-validation-for="StandardBatchSize" class="text-danger"></span>
             </div>
 
-            <!-- UOM Dropdown -->
+            <!-- UOM Dropdown (✅ Updated) -->
             <div class="col-md-4">
                 <label asp-for="BatchUOMID" class="form-label">Batch UOM <span class="text-danger">*</span></label>
-                <select asp-for="BatchUOMID" asp-items="uoms" class="form-select" required>
+                <select asp-for="BatchUOMID" asp-items="Model.UOMList" class="form-select" required>
                     <option value="">Select UOM...</option>
                 </select>
                 <span asp-validation-for="BatchUOMID" class="text-danger"></span>
@@ -133,14 +136,14 @@
                         <input type="hidden" name="Items.Index" value="@i" />
                         
                         <div>
-                            <select asp-for="Items[i].IngredientProductID" asp-items="products" class="form-select form-select-sm">
+                            <select asp-for="Items[i].IngredientProductID" asp-items="Model.ProductList" class="form-select form-select-sm">
                                 <option value="">Select...</option>
                             </select>
                             <span asp-validation-for="Items[i].IngredientProductID" class="text-danger fs-xs"></span>
                         </div>
                         
                         <div>
-                            <select asp-for="Items[i].UOMID" asp-items="uoms" class="form-select form-select-sm">
+                            <select asp-for="Items[i].UOMID" asp-items="Model.UOMList" class="form-select form-select-sm">
                                 <option value="">UOM</option>
                             </select>
                         </div>
