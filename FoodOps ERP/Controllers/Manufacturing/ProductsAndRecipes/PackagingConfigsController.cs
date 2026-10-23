@@ -23,19 +23,18 @@ public class PackagingConfigsController : AppController
     {
         var list = await _service.GetAllAsync(productId);
         ViewBag.ProductId = productId;
-        // FIX: Lamba path hata diya (agar Program.cs update hai)
         return View(list);
     }
 
     [HttpGet]
     public async Task<IActionResult> Create(int? productId = null)
     {
-        await LoadLookupsAsync(); // FIX: Dropdowns Load Kiye
         var model = new PackagingConfigViewModel
         {
             ProductID = productId ?? 0,
             IsActive = true
         };
+        await PopulateDropdownsAsync(model); // ✅ Naya method call kiya
         return FormView("_PackagingConfigForm", "Create", model);
     }
 
@@ -44,7 +43,7 @@ public class PackagingConfigsController : AppController
     {
         if (!ModelState.IsValid)
         {
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_PackagingConfigForm", "Create", model);
         }
 
@@ -54,7 +53,7 @@ public class PackagingConfigsController : AppController
         if (!result.Success)
         {
             ModelState.AddModelError("", result.Message);
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_PackagingConfigForm", "Create", model);
         }
 
@@ -67,7 +66,7 @@ public class PackagingConfigsController : AppController
         var model = await _service.GetByIdAsync(id);
         if (model == null) return NotFound();
 
-        await LoadLookupsAsync(); // FIX: Dropdowns Load Kiye
+        await PopulateDropdownsAsync(model);
         return FormView("_PackagingConfigForm", "Edit", model);
     }
 
@@ -76,7 +75,7 @@ public class PackagingConfigsController : AppController
     {
         if (!ModelState.IsValid)
         {
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_PackagingConfigForm", "Edit", model);
         }
 
@@ -86,7 +85,7 @@ public class PackagingConfigsController : AppController
         if (!result.Success)
         {
             ModelState.AddModelError("", result.Message);
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_PackagingConfigForm", "Edit", model);
         }
 
@@ -97,17 +96,21 @@ public class PackagingConfigsController : AppController
     public async Task<IActionResult> Delete(int id)
     {
         var result = await _service.DeleteAsync(id);
-
-        if (!result.Success)
-            return Failed(result.Message);
-
+        if (!result.Success) return Failed(result.Message);
         return Saved(result.Message);
     }
 
-    // Helper Method
-    private async Task LoadLookupsAsync()
+    // ✅ Naya Method (Purana LoadLookupsAsync hata dein)
+    private async Task PopulateDropdownsAsync(PackagingConfigViewModel model)
     {
-        ViewBag.Products = new SelectList(await _db.Products.AsNoTracking().OrderBy(x => x.ProductName).ToListAsync(), "ProductID", "ProductName");
-        ViewBag.UOMs = new SelectList(await _db.UnitsOfMeasure.AsNoTracking().OrderBy(x => x.UOMName).ToListAsync(), "UOMID", "UOMName");
+        model.ProductList = await _db.Products.AsNoTracking()
+            .OrderBy(x => x.ProductName)
+            .Select(x => new SelectListItem { Value = x.ProductID.ToString(), Text = x.ProductName })
+            .ToListAsync();
+
+        model.UOMList = await _db.UnitsOfMeasure.AsNoTracking()
+            .OrderBy(x => x.UOMName)
+            .Select(x => new SelectListItem { Value = x.UOMID.ToString(), Text = x.UOMName })
+            .ToListAsync();
     }
 }

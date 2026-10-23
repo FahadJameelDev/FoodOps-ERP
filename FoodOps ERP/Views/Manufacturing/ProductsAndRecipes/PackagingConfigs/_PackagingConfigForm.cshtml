@@ -1,8 +1,6 @@
 ﻿@model FoodOpsERP.Models.Manufacturing.ProductsAndRecipes.ViewModels.PackagingConfigViewModel
 @{
     var isEdit = Model.PackagingConfigID != 0;
-    var products = ViewData["Products"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
-    var uoms = ViewData["UOMs"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
 }
 
 <form asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@(isEdit ? Model.PackagingConfigID.ToString() : null)"
@@ -18,8 +16,8 @@
         <div class="row g-3">
             <div class="col-md-12">
                 <label asp-for="ProductID" class="form-label">Product <span class="text-danger">*</span></label>
-                <!-- FIX: asp-items lagaya -->
-                <select asp-for="ProductID" asp-items="products" class="form-select" required>
+                <!-- ✅ Updated: asp-items Model se -->
+                <select asp-for="ProductID" asp-items="Model.ProductList" class="form-select" required>
                     <option value="">Select Product...</option>
                 </select>
                 <span asp-validation-for="ProductID" class="text-danger"></span>
@@ -57,8 +55,8 @@
 
             <div class="col-md-6">
                 <label asp-for="WeightUOMID" class="form-label">UOM <span class="text-danger">*</span></label>
-                <!-- FIX: asp-items lagaya -->
-                <select asp-for="WeightUOMID" asp-items="uoms" class="form-select" required>
+                <!-- ✅ Updated: asp-items Model se -->
+                <select asp-for="WeightUOMID" asp-items="Model.UOMList" class="form-select" required>
                     <option value="">Select UOM...</option>
                 </select>
                 <span asp-validation-for="WeightUOMID" class="text-danger"></span>

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering; // ✅ Yeh add karein
 
 namespace FoodOpsERP.Models.Manufacturing.ProductsAndRecipes.ViewModels;
 
@@ -53,4 +54,8 @@ public class PackagingConfigViewModel
 
     [Display(Name = "Active")]
     public bool IsActive { get; set; } = true;
+
+    // ✅ Dropdowns ke liye nayi properties
+    public IEnumerable<SelectListItem>? ProductList { get; set; }
+    public IEnumerable<SelectListItem>? UOMList { get; set; }
 }
