@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering; // ✅ Added
 
 namespace FoodOpsERP.Models.Manufacturing.ProductsAndRecipes.ViewModels;
 
@@ -9,7 +10,7 @@ public class RecipeChangeRequestViewModel
     [Display(Name = "Change No")]
     public string ChangeNo { get; set; } = string.Empty;
 
-    [Required]
+    [Required(ErrorMessage = "Please select a recipe")]
     [Display(Name = "Recipe")]
     public int RecipeID { get; set; }
 
@@ -37,4 +38,7 @@ public class RecipeChangeRequestViewModel
     public DateTime? ApprovedAt { get; set; }
     public DateTime? ImplementedAt { get; set; }
     public DateTime CreatedAt { get; set; }
+
+    // ✅ Strongly-typed collection for SPA AJAX Dropdown
+    public IEnumerable<SelectListItem>? RecipeList { get; set; }
 }

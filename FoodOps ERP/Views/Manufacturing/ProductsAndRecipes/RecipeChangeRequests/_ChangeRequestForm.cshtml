@@ -1,19 +1,15 @@
 ﻿@model FoodOpsERP.Models.Manufacturing.ProductsAndRecipes.ViewModels.RecipeChangeRequestViewModel
-@{
-    var recipes = ViewData["Recipes"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
-}
 
 <form asp-action="Create" method="post" data-spa-form data-reload-url="@Url.Action("Index")" data-refresh="#grid-card" novalidate>
     
     <div class="fo-modal__body">
         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-        <input type="hidden" asp-for="RecipeID" />
 
         <div class="row g-3">
             <div class="col-md-12">
                 <label asp-for="RecipeID" class="form-label">Recipe <span class="text-danger">*</span></label>
-                <!-- FIX: asp-items lagaya -->
-                <select asp-for="RecipeID" asp-items="recipes" class="form-select" required>
+                <!-- ✅ Binded to Model.RecipeList -->
+                <select asp-for="RecipeID" asp-items="Model.RecipeList" class="form-select" required>
                     <option value="">Select Approved Recipe...</option>
                 </select>
                 <span asp-validation-for="RecipeID" class="text-danger"></span>
