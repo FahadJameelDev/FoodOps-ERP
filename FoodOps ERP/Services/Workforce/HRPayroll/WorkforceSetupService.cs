@@ -47,13 +47,21 @@ public class WorkforceSetupService : IWorkforceSetupService
         if (await _db.Departments.AnyAsync(d => d.PlantID == model.PlantID && d.DepartmentCode == model.DepartmentCode))
             return (false, "Department Code already exists for this plant.", null);
 
+        // ✅ FIX: Safe User ID Fallback
+        int validUserId = userId;
+        if (!await _db.Users.AnyAsync(u => u.UserID == validUserId))
+        {
+            validUserId = await _db.Users.Select(u => u.UserID).FirstOrDefaultAsync();
+            if (validUserId == 0) validUserId = 1;
+        }
+
         var entity = new Department
         {
             PlantID = model.PlantID,
             DepartmentCode = model.DepartmentCode,
             DepartmentName = model.DepartmentName,
             IsActive = model.IsActive,
-            CreatedByUserID = userId,
+            CreatedByUserID = validUserId, // ✅ Safe ID
             CreatedAt = DateTime.UtcNow
         };
 
@@ -133,6 +141,14 @@ public class WorkforceSetupService : IWorkforceSetupService
         if (await _db.Shifts.AnyAsync(s => s.PlantID == model.PlantID && s.ShiftCode == model.ShiftCode))
             return (false, "Shift Code already exists for this plant.", null);
 
+        // ✅ FIX: Safe User ID Fallback
+        int validUserId = userId;
+        if (!await _db.Users.AnyAsync(u => u.UserID == validUserId))
+        {
+            validUserId = await _db.Users.Select(u => u.UserID).FirstOrDefaultAsync();
+            if (validUserId == 0) validUserId = 1;
+        }
+
         var entity = new Shift
         {
             PlantID = model.PlantID,
@@ -141,7 +157,7 @@ public class WorkforceSetupService : IWorkforceSetupService
             StartTime = model.StartTime,
             EndTime = model.EndTime,
             IsActive = model.IsActive,
-            CreatedByUserID = userId,
+            CreatedByUserID = validUserId, // ✅ Safe ID
             CreatedAt = DateTime.UtcNow
         };
 

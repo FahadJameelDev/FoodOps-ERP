@@ -1,7 +1,6 @@
 ﻿@model FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.DepartmentViewModel
 @{
     var isEdit = Model.DepartmentID != 0;
-    var plants = ViewData["Plants"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
 }
 
 <form asp-action="@(isEdit ? "EditDepartment" : "CreateDepartment")" asp-route-id="@(isEdit ? Model.DepartmentID.ToString() : null)"
@@ -14,10 +13,27 @@
         }
 
         <div class="row g-3">
-            <div class="col-md-12"><label asp-for="PlantID" class="form-label">Plant <span class="text-danger">*</span></label><select asp-for="PlantID" asp-items="plants" class="form-select"><option value="">Select Plant...</option></select></div>
-            <div class="col-md-6"><label asp-for="DepartmentCode" class="form-label">Code <span class="text-danger">*</span></label><input asp-for="DepartmentCode" class="form-control" readonly="@isEdit" /></div>
-            <div class="col-md-6"><label asp-for="DepartmentName" class="form-label">Name <span class="text-danger">*</span></label><input asp-for="DepartmentName" class="form-control" /></div>
-            <div class="col-md-6"><div class="form-check mt-3"><input asp-for="IsActive" class="form-check-input" /><label asp-for="IsActive" class="form-check-label">Is Active</label></div></div>
+            <div class="col-md-12">
+                <label asp-for="PlantID" class="form-label">Plant <span class="text-danger">*</span></label>
+                <!-- ✅ Updated: asp-items Model se -->
+                <select asp-for="PlantID" asp-items="Model.PlantList" class="form-select">
+                    <option value="">Select Plant...</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="DepartmentCode" class="form-label">Code <span class="text-danger">*</span></label>
+                <input asp-for="DepartmentCode" class="form-control" readonly="@isEdit" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="DepartmentName" class="form-label">Name <span class="text-danger">*</span></label>
+                <input asp-for="DepartmentName" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <div class="form-check mt-3">
+                    <input asp-for="IsActive" class="form-check-input" />
+                    <label asp-for="IsActive" class="form-check-label">Is Active</label>
+                </div>
+            </div>
         </div>
     </div>
     <div class="fo-modal__footer">

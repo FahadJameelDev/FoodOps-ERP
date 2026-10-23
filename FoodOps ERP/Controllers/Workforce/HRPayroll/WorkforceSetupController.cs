@@ -29,17 +29,27 @@ public class WorkforceSetupController : AppController
     [HttpGet]
     public async Task<IActionResult> CreateDepartment()
     {
-        await LoadPlantsAsync();
-        return FormView("_DepartmentForm", "CreateDepartment", new DepartmentViewModel { IsActive = true });
+        var model = new DepartmentViewModel { IsActive = true };
+        await PopulateDropdownsAsync(model); // ✅ Naya method call kiya
+        return FormView("_DepartmentForm", "CreateDepartment", model);
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateDepartment(DepartmentViewModel model)
     {
-        if (!ModelState.IsValid) { await LoadPlantsAsync(); return Invalid("_DepartmentForm", "CreateDepartment", model); }
+        if (!ModelState.IsValid)
+        {
+            await PopulateDropdownsAsync(model);
+            return Invalid("_DepartmentForm", "CreateDepartment", model);
+        }
 
         var result = await _service.CreateDepartmentAsync(model, GetCurrentUserId());
-        if (!result.Success) { ModelState.AddModelError("", result.Message); await LoadPlantsAsync(); return Invalid("_DepartmentForm", "CreateDepartment", model); }
+        if (!result.Success)
+        {
+            ModelState.AddModelError("", result.Message);
+            await PopulateDropdownsAsync(model);
+            return Invalid("_DepartmentForm", "CreateDepartment", model);
+        }
 
         return Saved(result.Message, "Index");
     }
@@ -49,17 +59,26 @@ public class WorkforceSetupController : AppController
     {
         var model = await _service.GetDepartmentByIdAsync(id);
         if (model == null) return NotFound();
-        await LoadPlantsAsync();
+        await PopulateDropdownsAsync(model);
         return FormView("_DepartmentForm", "EditDepartment", model);
     }
 
     [HttpPost]
     public async Task<IActionResult> EditDepartment(DepartmentViewModel model)
     {
-        if (!ModelState.IsValid) { await LoadPlantsAsync(); return Invalid("_DepartmentForm", "EditDepartment", model); }
+        if (!ModelState.IsValid)
+        {
+            await PopulateDropdownsAsync(model);
+            return Invalid("_DepartmentForm", "EditDepartment", model);
+        }
 
         var result = await _service.UpdateDepartmentAsync(model, GetCurrentUserId());
-        if (!result.Success) { ModelState.AddModelError("", result.Message); await LoadPlantsAsync(); return Invalid("_DepartmentForm", "EditDepartment", model); }
+        if (!result.Success)
+        {
+            ModelState.AddModelError("", result.Message);
+            await PopulateDropdownsAsync(model);
+            return Invalid("_DepartmentForm", "EditDepartment", model);
+        }
 
         return Saved(result.Message, "Index");
     }
@@ -81,17 +100,27 @@ public class WorkforceSetupController : AppController
     [HttpGet]
     public async Task<IActionResult> CreateShift()
     {
-        await LoadPlantsAsync();
-        return FormView("_ShiftForm", "CreateShift", new ShiftViewModel { IsActive = true });
+        var model = new ShiftViewModel { IsActive = true };
+        await PopulateDropdownsAsync(model);
+        return FormView("_ShiftForm", "CreateShift", model);
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateShift(ShiftViewModel model)
     {
-        if (!ModelState.IsValid) { await LoadPlantsAsync(); return Invalid("_ShiftForm", "CreateShift", model); }
+        if (!ModelState.IsValid)
+        {
+            await PopulateDropdownsAsync(model);
+            return Invalid("_ShiftForm", "CreateShift", model);
+        }
 
         var result = await _service.CreateShiftAsync(model, GetCurrentUserId());
-        if (!result.Success) { ModelState.AddModelError("", result.Message); await LoadPlantsAsync(); return Invalid("_ShiftForm", "CreateShift", model); }
+        if (!result.Success)
+        {
+            ModelState.AddModelError("", result.Message);
+            await PopulateDropdownsAsync(model);
+            return Invalid("_ShiftForm", "CreateShift", model);
+        }
 
         return Saved(result.Message, "Shifts");
     }
@@ -101,17 +130,26 @@ public class WorkforceSetupController : AppController
     {
         var model = await _service.GetShiftByIdAsync(id);
         if (model == null) return NotFound();
-        await LoadPlantsAsync();
+        await PopulateDropdownsAsync(model);
         return FormView("_ShiftForm", "EditShift", model);
     }
 
     [HttpPost]
     public async Task<IActionResult> EditShift(ShiftViewModel model)
     {
-        if (!ModelState.IsValid) { await LoadPlantsAsync(); return Invalid("_ShiftForm", "EditShift", model); }
+        if (!ModelState.IsValid)
+        {
+            await PopulateDropdownsAsync(model);
+            return Invalid("_ShiftForm", "EditShift", model);
+        }
 
         var result = await _service.UpdateShiftAsync(model, GetCurrentUserId());
-        if (!result.Success) { ModelState.AddModelError("", result.Message); await LoadPlantsAsync(); return Invalid("_ShiftForm", "EditShift", model); }
+        if (!result.Success)
+        {
+            ModelState.AddModelError("", result.Message);
+            await PopulateDropdownsAsync(model);
+            return Invalid("_ShiftForm", "EditShift", model);
+        }
 
         return Saved(result.Message, "Shifts");
     }
@@ -123,8 +161,22 @@ public class WorkforceSetupController : AppController
         return result.Success ? Saved(result.Message, "Shifts") : Failed(result.Message);
     }
 
-    private async Task LoadPlantsAsync()
+    // ✅ Naya Method (Purana LoadPlantsAsync hata dein)
+    private async Task PopulateDropdownsAsync(object model)
     {
-        ViewBag.Plants = new SelectList(await _db.Plants.AsNoTracking().OrderBy(p => p.PlantName).ToListAsync(), "PlantID", "PlantName");
+        var plants = await _db.Plants.AsNoTracking()
+            .OrderBy(p => p.PlantName)
+            .Select(p => new SelectListItem { Value = p.PlantID.ToString(), Text = p.PlantName })
+            .ToListAsync();
+
+        // Hum dono ViewModels (Department aur Shift) ke liye ek hi method use kar rahe hain
+        if (model is DepartmentViewModel deptModel)
+        {
+            deptModel.PlantList = plants;
+        }
+        else if (model is ShiftViewModel shiftModel)
+        {
+            shiftModel.PlantList = plants;
+        }
     }
 }

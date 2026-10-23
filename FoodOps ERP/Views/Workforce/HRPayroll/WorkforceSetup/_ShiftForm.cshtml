@@ -1,7 +1,6 @@
 ﻿@model FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.ShiftViewModel
 @{
     var isEdit = Model.ShiftID != 0;
-    var plants = ViewData["Plants"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
 }
 
 <form asp-action="@(isEdit ? "EditShift" : "CreateShift")" asp-route-id="@(isEdit ? Model.ShiftID.ToString() : null)"
@@ -14,12 +13,40 @@
         }
 
         <div class="row g-3">
-            <div class="col-md-12"><label asp-for="PlantID" class="form-label">Plant <span class="text-danger">*</span></label><select asp-for="PlantID" asp-items="plants" class="form-select"><option value="">Select Plant...</option></select></div>
-            <div class="col-md-6"><label asp-for="ShiftCode" class="form-label">Code <span class="text-danger">*</span></label><input asp-for="ShiftCode" class="form-control" readonly="@isEdit" /></div>
-            <div class="col-md-6"><label asp-for="ShiftName" class="form-label">Name <span class="text-danger">*</span></label><input asp-for="ShiftName" class="form-control" /></div>
-            <div class="col-md-6"><label asp-for="StartTime" class="form-label">Start Time</label><input asp-for="StartTime" type="time" class="form-control" /></div>
-            <div class="col-md-6"><label asp-for="EndTime" class="form-label">End Time</label><input asp-for="EndTime" type="time" class="form-control" /></div>
-            <div class="col-md-6"><div class="form-check mt-3"><input asp-for="IsActive" class="form-check-input" /><label asp-for="IsActive" class="form-check-label">Is Active</label></div></div>
+            <div class="col-md-12">
+                <label asp-for="PlantID" class="form-label">Plant <span class="text-danger">*</span></label>
+                <!-- ✅ Updated: asp-items Model se -->
+                <select asp-for="PlantID" asp-items="Model.PlantList" class="form-select">
+                    <option value="">Select Plant...</option>
+                </select>
+                <span asp-validation-for="PlantID" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="ShiftCode" class="form-label">Code <span class="text-danger">*</span></label>
+                <input asp-for="ShiftCode" class="form-control" readonly="@isEdit" />
+                <span asp-validation-for="ShiftCode" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="ShiftName" class="form-label">Name <span class="text-danger">*</span></label>
+                <input asp-for="ShiftName" class="form-control" />
+                <span asp-validation-for="ShiftName" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="StartTime" class="form-label">Start Time</label>
+                <input asp-for="StartTime" type="time" class="form-control" />
+                <span asp-validation-for="StartTime" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="EndTime" class="form-label">End Time</label>
+                <input asp-for="EndTime" type="time" class="form-control" />
+                <span asp-validation-for="EndTime" class="text-danger"></span>
+            </div>
+            <div class="col-md-12 mt-3">
+                <div class="form-check">
+                    <input asp-for="IsActive" class="form-check-input" />
+                    <label asp-for="IsActive" class="form-check-label">Is Active</label>
+                </div>
+            </div>
         </div>
     </div>
     <div class="fo-modal__footer">

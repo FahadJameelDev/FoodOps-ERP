@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering; // ✅ Yeh add karein
 
 namespace FoodOpsERP.Models.Workforce.HRPayroll.ViewModels;
 
@@ -25,4 +26,7 @@ public class ShiftViewModel
     public TimeSpan EndTime { get; set; }
 
     public bool IsActive { get; set; } = true;
+
+    // ✅ Dropdown ke liye nayi property
+    public IEnumerable<SelectListItem>? PlantList { get; set; }
 }
