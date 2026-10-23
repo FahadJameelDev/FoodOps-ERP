@@ -9,7 +9,8 @@
 }
 else
 {
-    <table class="table table-hover mb-0">
+    <!-- ✅ FIX: min-width barha di taake text squeeze na ho -->
+    <table class="table table-hover mb-0" style="min-width: 900px;">
         <thead>
             <tr>
                 <th>Batch #</th>
@@ -17,7 +18,7 @@ else
                 <th class="num">Quantity</th>
                 <th>Expiry</th>
                 <th>QC status</th>
-                <th class="text-end">Actions</th>
+                <th class="text-end" style="min-width: 120px;">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -44,38 +45,39 @@ else
                         <div class="row-actions">
                             @if (mode == "issue")
                             {
+                                <!-- ✅ FIX: Text hataya, Sirf Icon rakha taake katay na -->
                                 <a asp-controller="MaterialIssue" asp-action="Create" asp-route-batchId="@lot.BatchID"
-                                       class="btn btn-primary btn-sm"
+                                       class="btn btn-primary btn-sm" title="Issue material"
                                        data-modal="true" data-modal-title="Issue material" data-modal-size="md" data-modal-icon="bi-box-arrow-up">
-                                    <i class="bi bi-box-arrow-up"></i>Issue
+                                    <i class="bi bi-box-arrow-up"></i>
                                 </a>
                                 <a asp-controller="MaterialIssue" asp-action="Return" asp-route-batchId="@lot.BatchID"
-                                       class="btn btn-outline-secondary btn-sm"
+                                       class="btn btn-outline-secondary btn-sm" title="Return material"
                                        data-modal="true" data-modal-title="Return material" data-modal-size="md" data-modal-icon="bi-box-arrow-in-down">
-                                    <i class="bi bi-box-arrow-in-down"></i>Return
+                                    <i class="bi bi-box-arrow-in-down"></i>
                                 </a>
                             }
                             else if (mode == "wastage")
                             {
                                 <a asp-controller="Wastage" asp-action="Create" asp-route-batchId="@lot.BatchID"
-                                       class="btn btn-outline-danger btn-sm"
+                                       class="btn btn-outline-danger btn-sm" title="Record wastage"
                                        data-modal="true" data-modal-title="Record wastage" data-modal-size="md" data-modal-icon="bi-trash3">
-                                    <i class="bi bi-trash3"></i>Record wastage
+                                    <i class="bi bi-trash3"></i>
                                 </a>
                             }
                             else
                             {
                                 <a asp-controller="Stock" asp-action="Adjust" asp-route-batchId="@lot.BatchID"
-                                       class="btn btn-outline-secondary btn-sm"
+                                       class="btn btn-outline-secondary btn-sm" title="Adjust stock"
                                        data-modal="true" data-modal-title="Adjust stock" data-modal-size="md" data-modal-icon="bi-sliders">
-                                    <i class="bi bi-sliders"></i>Adjust
+                                    <i class="bi bi-sliders"></i>
                                 </a>
                                 @if (mode == "expiry")
                                 {
                                     <a asp-controller="Wastage" asp-action="Create" asp-route-batchId="@lot.BatchID"
-                                           class="btn btn-outline-danger btn-sm"
+                                           class="btn btn-outline-danger btn-sm" title="Write off"
                                            data-modal="true" data-modal-title="Record wastage" data-modal-size="md" data-modal-icon="bi-trash3">
-                                        <i class="bi bi-trash3"></i>Write off
+                                        <i class="bi bi-trash3"></i>
                                     </a>
                                 }
                             }

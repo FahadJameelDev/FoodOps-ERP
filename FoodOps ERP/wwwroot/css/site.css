@@ -1597,13 +1597,24 @@ tr[data-href] {
     display: inline-flex;
     gap: 6px;
     justify-content: flex-end;
+    flex-wrap: nowrap;
 }
 
-    .row-actions .btn:has(> i:only-child) {
-        width: 30px;
-        height: 30px;
-        padding: 0;
+    .row-actions .btn {
+        white-space: nowrap !important;
     }
+
+        .row-actions .btn:has(> i:only-child) {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+        }
+
+/* ✅ FIX: Actions column ki width barha di taake buttons squeeze na hon */
+.table th.text-end:last-child,
+.table td.text-end:last-child {
+    min-width: 150px !important;
+}
 
 .empty-state {
     padding: 40px 16px;
