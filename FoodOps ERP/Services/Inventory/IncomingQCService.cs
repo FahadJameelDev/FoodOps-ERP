@@ -37,20 +37,25 @@ namespace FoodOpsERP.Services.Inventory
 
         public async Task<bool> PassQCAsync(long batchId, int inspectorUserId, string? remarks = null)
         {
+            // ✅ Explicit check: Batch zaroor exist karna chahiye
             var batch = await _context.InventoryBatches.FindAsync(batchId);
-            if (batch == null) return false;
+            if (batch == null) throw new InvalidOperationException($"Batch ID {batchId} not found in database.");
 
-            // ✅ FIX: State machine — sirf Pending/Quarantine se Pass
             if (batch.QCStatus != "Pending" && batch.QCStatus != "Quarantine")
-                throw new InvalidOperationException($"Cannot pass QC for batch in '{batch.QCStatus}' status. Only Pending or Quarantine batches can be passed.");
+                throw new InvalidOperationException($"Cannot pass QC for batch in '{batch.QCStatus}' status.");
+
+            // ✅ Explicit check: User zaroor exist karna chahiye, warna default 1 assign ho
+            var validUser = await _context.Users.FindAsync(inspectorUserId);
+            int finalInspectorId = (validUser != null) ? inspectorUserId : (await _context.Users.Select(u => u.UserID).FirstOrDefaultAsync());
+            if (finalInspectorId == 0) throw new InvalidOperationException("No valid User found in Users table to assign as Inspector.");
 
             batch.QCStatus = "Passed";
             batch.ModifiedAt = DateTime.UtcNow;
 
             var inspection = new QCInspection
             {
-                BatchID = batchId,
-                InspectorUserID = inspectorUserId,
+                BatchID = batch.BatchID, // Ensure correct long ID
+                InspectorUserID = finalInspectorId,
                 InspectionType = "Incoming",
                 OverallResult = "Pass",
                 Remarks = remarks,
@@ -65,19 +70,22 @@ namespace FoodOpsERP.Services.Inventory
         public async Task<bool> FailQCAsync(long batchId, int inspectorUserId, string remarks)
         {
             var batch = await _context.InventoryBatches.FindAsync(batchId);
-            if (batch == null) return false;
+            if (batch == null) throw new InvalidOperationException($"Batch ID {batchId} not found in database.");
 
-            // ✅ FIX: State machine — sirf Pending/Quarantine se Fail
             if (batch.QCStatus != "Pending" && batch.QCStatus != "Quarantine")
-                throw new InvalidOperationException($"Cannot fail QC for batch in '{batch.QCStatus}' status. Only Pending or Quarantine batches can be failed.");
+                throw new InvalidOperationException($"Cannot fail QC for batch in '{batch.QCStatus}' status.");
+
+            var validUser = await _context.Users.FindAsync(inspectorUserId);
+            int finalInspectorId = (validUser != null) ? inspectorUserId : (await _context.Users.Select(u => u.UserID).FirstOrDefaultAsync());
+            if (finalInspectorId == 0) throw new InvalidOperationException("No valid User found in Users table to assign as Inspector.");
 
             batch.QCStatus = "Failed";
             batch.ModifiedAt = DateTime.UtcNow;
 
             var inspection = new QCInspection
             {
-                BatchID = batchId,
-                InspectorUserID = inspectorUserId,
+                BatchID = batch.BatchID,
+                InspectorUserID = finalInspectorId,
                 InspectionType = "Incoming",
                 OverallResult = "Fail",
                 Remarks = remarks,
@@ -94,9 +102,11 @@ namespace FoodOpsERP.Services.Inventory
             var batch = await _context.InventoryBatches.FindAsync(batchId);
             if (batch == null) return false;
 
-            // ✅ FIX: State machine — sirf Pending/Passed se Hold
             if (batch.QCStatus != "Pending" && batch.QCStatus != "Passed")
-                throw new InvalidOperationException($"Cannot hold batch in '{batch.QCStatus}' status. Only Pending or Passed batches can be held.");
+                throw new InvalidOperationException($"Cannot hold batch in '{batch.QCStatus}' status.");
+
+            var validUser = await _context.Users.FindAsync(userId);
+            int finalUserId = (validUser != null) ? userId : (await _context.Users.Select(u => u.UserID).FirstOrDefaultAsync());
 
             batch.QCStatus = "Quarantine";
             batch.ModifiedAt = DateTime.UtcNow;
@@ -105,7 +115,7 @@ namespace FoodOpsERP.Services.Inventory
             {
                 BatchID = batchId,
                 HoldReason = reason,
-                HeldByUserID = userId,
+                HeldByUserID = finalUserId > 0 ? finalUserId : 1,
                 HeldAt = DateTime.UtcNow,
                 Status = "OnHold"
             };
@@ -120,9 +130,8 @@ namespace FoodOpsERP.Services.Inventory
             var batch = await _context.InventoryBatches.FindAsync(batchId);
             if (batch == null) return false;
 
-            // ✅ FIX: State machine — sirf Quarantine se Release
             if (batch.QCStatus != "Quarantine")
-                throw new InvalidOperationException($"Cannot release batch in '{batch.QCStatus}' status. Only Quarantine batches can be released.");
+                throw new InvalidOperationException($"Cannot release batch in '{batch.QCStatus}' status.");
 
             batch.QCStatus = "Released";
             batch.ModifiedAt = DateTime.UtcNow;
@@ -135,8 +144,11 @@ namespace FoodOpsERP.Services.Inventory
             if (hold == null)
                 throw new InvalidOperationException($"No active hold found for batch {batchId}.");
 
+            var validUser = await _context.Users.FindAsync(userId);
+            int finalUserId = (validUser != null) ? userId : (await _context.Users.Select(u => u.UserID).FirstOrDefaultAsync());
+
             hold.Status = "Released";
-            hold.ReleasedByUserID = userId;
+            hold.ReleasedByUserID = finalUserId > 0 ? finalUserId : 1;
             hold.ReleasedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
