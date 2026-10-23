@@ -53,7 +53,6 @@ public class ProductionOrdersController : AppController
     public async Task<IActionResult> RecordWastage(int id, string wastageType, decimal qty, string reason)
     {
         var result = await _service.RecordWastageAsync(id, wastageType, qty, reason, 1);
-        // FIX: 3 arguments hata kar 2 kar diye
         return result.Success ? Saved(result.Message, "Index") : Failed(result.Message);
     }
 
@@ -70,14 +69,12 @@ public class ProductionOrdersController : AppController
     public async Task<IActionResult> RecordException(int id, string exceptionType, string severity, string description)
     {
         var result = await _service.RecordExceptionAsync(id, exceptionType, severity, description, 1);
-        // FIX: 3 arguments hata kar 2 kar diye
         return result.Success ? Saved(result.Message, "Index") : Failed(result.Message);
     }
 
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        await LoadLookupsAsync();
         var model = new ProductionOrderViewModel
         {
             PlannedStart = DateTime.Today,
@@ -85,6 +82,7 @@ public class ProductionOrdersController : AppController
             Priority = 3,
             Status = "Planned"
         };
+        await PopulateDropdownsAsync(model); // ✅ Naya method call kiya
         return FormView("_OrderForm", "Create", model);
     }
 
@@ -93,7 +91,7 @@ public class ProductionOrdersController : AppController
     {
         if (!ModelState.IsValid)
         {
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_OrderForm", "Create", model);
         }
 
@@ -103,75 +101,55 @@ public class ProductionOrdersController : AppController
         if (!result.Success)
         {
             ModelState.AddModelError("", result.Message);
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_OrderForm", "Create", model);
         }
 
-        // FIX: Saved 2 arguments
         return Saved(result.Message, "Index");
     }
 
+    // ... (Release, Start, Complete, Close, Hold, Cancel, StartOperation, CompleteOperation wese hi rahenge)
     [HttpPost]
-    public async Task<IActionResult> Release(int id)
-    {
-        var result = await _service.ReleaseAsync(id, 1);
-        return result.Success ? Saved(result.Message, "Index") : Failed(result.Message);
-    }
-
+    public async Task<IActionResult> Release(int id) { var result = await _service.ReleaseAsync(id, 1); return result.Success ? Saved(result.Message, "Index") : Failed(result.Message); }
     [HttpPost]
-    public async Task<IActionResult> Start(int id)
-    {
-        var result = await _service.StartAsync(id, 1);
-        return result.Success ? Saved(result.Message, "Index") : Failed(result.Message);
-    }
-
+    public async Task<IActionResult> Start(int id) { var result = await _service.StartAsync(id, 1); return result.Success ? Saved(result.Message, "Index") : Failed(result.Message); }
     [HttpPost]
-    public async Task<IActionResult> Complete(int id)
-    {
-        var result = await _service.CompleteAsync(id, 1);
-        return result.Success ? Saved(result.Message, "Index") : Failed(result.Message);
-    }
-
+    public async Task<IActionResult> Complete(int id) { var result = await _service.CompleteAsync(id, 1); return result.Success ? Saved(result.Message, "Index") : Failed(result.Message); }
     [HttpPost]
-    public async Task<IActionResult> Close(int id)
-    {
-        var result = await _service.CloseAsync(id, 1);
-        return result.Success ? Saved(result.Message, "Index") : Failed(result.Message);
-    }
-
+    public async Task<IActionResult> Close(int id) { var result = await _service.CloseAsync(id, 1); return result.Success ? Saved(result.Message, "Index") : Failed(result.Message); }
     [HttpPost]
-    public async Task<IActionResult> Hold(int id)
-    {
-        var result = await _service.HoldAsync(id, 1);
-        return result.Success ? Saved(result.Message, "Index") : Failed(result.Message);
-    }
-
+    public async Task<IActionResult> Hold(int id) { var result = await _service.HoldAsync(id, 1); return result.Success ? Saved(result.Message, "Index") : Failed(result.Message); }
     [HttpPost]
-    public async Task<IActionResult> Cancel(int id)
-    {
-        var result = await _service.CancelAsync(id, 1);
-        return result.Success ? Saved(result.Message, "Index") : Failed(result.Message);
-    }
-
+    public async Task<IActionResult> Cancel(int id) { var result = await _service.CancelAsync(id, 1); return result.Success ? Saved(result.Message, "Index") : Failed(result.Message); }
     [HttpPost]
-    public async Task<IActionResult> StartOperation(int id)
-    {
-        var result = await _service.StartOperationAsync(id, 1);
-        return result.Success ? Saved(result.Message, "Index") : Failed(result.Message);
-    }
-
+    public async Task<IActionResult> StartOperation(int id) { var result = await _service.StartOperationAsync(id, 1); return result.Success ? Saved(result.Message, "Index") : Failed(result.Message); }
     [HttpPost]
-    public async Task<IActionResult> CompleteOperation(int id)
-    {
-        var result = await _service.CompleteOperationAsync(id, 1);
-        return result.Success ? Saved(result.Message, "Index") : Failed(result.Message);
-    }
+    public async Task<IActionResult> CompleteOperation(int id) { var result = await _service.CompleteOperationAsync(id, 1); return result.Success ? Saved(result.Message, "Index") : Failed(result.Message); }
 
-    private async Task LoadLookupsAsync()
+
+    // ✅ Naya Method (Purana LoadLookupsAsync hata dein)
+    private async Task PopulateDropdownsAsync(ProductionOrderViewModel model)
     {
-        ViewBag.Plants = new SelectList(await _db.Plants.AsNoTracking().OrderBy(p => p.PlantName).ToListAsync(), "PlantID", "PlantName");
-        ViewBag.Products = new SelectList(await _db.Products.AsNoTracking().OrderBy(p => p.ProductName).ToListAsync(), "ProductID", "ProductName");
-        ViewBag.Recipes = new SelectList(await _db.Recipes.AsNoTracking().Where(r => r.Status == "Approved").OrderBy(r => r.RecipeCode).ToListAsync(), "RecipeID", "RecipeCode");
-        ViewBag.UOMs = new SelectList(await _db.UnitsOfMeasure.AsNoTracking().OrderBy(u => u.UOMName).ToListAsync(), "UOMID", "UOMName");
+        model.PlantList = await _db.Plants.AsNoTracking()
+            .OrderBy(x => x.PlantName)
+            .Select(x => new SelectListItem { Value = x.PlantID.ToString(), Text = x.PlantName })
+            .ToListAsync();
+
+        model.ProductList = await _db.Products.AsNoTracking()
+            .Where(x => x.IsActive)
+            .OrderBy(x => x.ProductName)
+            .Select(x => new SelectListItem { Value = x.ProductID.ToString(), Text = x.ProductName })
+            .ToListAsync();
+
+        model.RecipeList = await _db.Recipes.AsNoTracking()
+            .Where(x => x.Status == "Approved")
+            .OrderBy(x => x.RecipeCode)
+            .Select(x => new SelectListItem { Value = x.RecipeID.ToString(), Text = x.RecipeCode })
+            .ToListAsync();
+
+        model.UOMList = await _db.UnitsOfMeasure.AsNoTracking()
+            .OrderBy(x => x.UOMName)
+            .Select(x => new SelectListItem { Value = x.UOMID.ToString(), Text = x.UOMName })
+            .ToListAsync();
     }
 }

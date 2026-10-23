@@ -1,10 +1,6 @@
 ﻿@model FoodOpsERP.Models.Manufacturing.Production.ViewModels.ProductionOrderViewModel
 @{
     var isEdit = Model.ProductionOrderID != 0;
-    var plants = ViewData["Plants"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
-    var products = ViewData["Products"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
-    var recipes = ViewData["Recipes"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
-    var uoms = ViewData["UOMs"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
 }
 
 <form asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@(isEdit ? Model.ProductionOrderID.ToString() : null)"
@@ -20,15 +16,18 @@
         <div class="row g-3 mb-4">
             <div class="col-md-6">
                 <label asp-for="PlantID" class="form-label">Plant <span class="text-danger">*</span></label>
-                <select asp-for="PlantID" asp-items="plants" class="form-select" required><option value="">Select Plant...</option></select>
+                <!-- ✅ Updated: asp-items Model se -->
+                <select asp-for="PlantID" asp-items="Model.PlantList" class="form-select" required><option value="">Select Plant...</option></select>
             </div>
             <div class="col-md-6">
                 <label asp-for="ProductID" class="form-label">Product <span class="text-danger">*</span></label>
-                <select asp-for="ProductID" asp-items="products" class="form-select" required><option value="">Select Product...</option></select>
+                <!-- ✅ Updated: asp-items Model se -->
+                <select asp-for="ProductID" asp-items="Model.ProductList" class="form-select" required><option value="">Select Product...</option></select>
             </div>
             <div class="col-md-6">
                 <label asp-for="RecipeID" class="form-label">Recipe <span class="text-danger">*</span></label>
-                <select asp-for="RecipeID" asp-items="recipes" class="form-select" required><option value="">Select Recipe...</option></select>
+                <!-- ✅ Updated: asp-items Model se -->
+                <select asp-for="RecipeID" asp-items="Model.RecipeList" class="form-select" required><option value="">Select Recipe...</option></select>
             </div>
             <div class="col-md-3">
                 <label asp-for="TargetQty" class="form-label">Target Qty <span class="text-danger">*</span></label>
@@ -36,7 +35,8 @@
             </div>
             <div class="col-md-3">
                 <label asp-for="UOMID" class="form-label">UOM <span class="text-danger">*</span></label>
-                <select asp-for="UOMID" asp-items="uoms" class="form-select" required><option value="">UOM</option></select>
+                <!-- ✅ Updated: asp-items Model se -->
+                <select asp-for="UOMID" asp-items="Model.UOMList" class="form-select" required><option value="">UOM</option></select>
             </div>
             <div class="col-md-3">
                 <label asp-for="Priority" class="form-label">Priority</label>

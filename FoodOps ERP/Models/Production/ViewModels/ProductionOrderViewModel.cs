@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering; // ✅ Yeh add karein
 
 namespace FoodOpsERP.Models.Manufacturing.Production.ViewModels;
 
@@ -54,4 +55,10 @@ public class ProductionOrderViewModel
     public DateTime CreatedAt { get; set; }
 
     public List<ProductionOperationViewModel> Operations { get; set; } = new();
+
+    // ✅ Dropdowns ke liye nayi properties
+    public IEnumerable<SelectListItem>? PlantList { get; set; }
+    public IEnumerable<SelectListItem>? ProductList { get; set; }
+    public IEnumerable<SelectListItem>? RecipeList { get; set; }
+    public IEnumerable<SelectListItem>? UOMList { get; set; }
 }
