@@ -36,7 +36,6 @@ public class ProductionPlansController : AppController
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        await LoadLookupsAsync();
         var model = new ProductionPlanViewModel
         {
             StartDate = DateTime.Today,
@@ -44,6 +43,7 @@ public class ProductionPlansController : AppController
             Status = "Draft",
             Lines = new List<ProductionPlanLineViewModel>()
         };
+        await PopulateDropdownsAsync(model); // ✅ Populate dropdowns
         return FormView("_PlanForm", "Create", model);
     }
 
@@ -52,7 +52,7 @@ public class ProductionPlansController : AppController
     {
         if (!ModelState.IsValid)
         {
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_PlanForm", "Create", model);
         }
 
@@ -62,7 +62,7 @@ public class ProductionPlansController : AppController
         if (!result.Success)
         {
             ModelState.AddModelError("", result.Message);
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_PlanForm", "Create", model);
         }
         return Saved(result.Message, "Index");
@@ -96,12 +96,34 @@ public class ProductionPlansController : AppController
         return result.Success ? Saved(result.Message) : Failed(result.Message);
     }
 
-    private async Task LoadLookupsAsync()
+    // ✅ Strongly-typed Populate Method
+    private async Task PopulateDropdownsAsync(ProductionPlanViewModel model)
     {
-        ViewBag.Plants = new SelectList(await _db.Plants.AsNoTracking().OrderBy(p => p.PlantName).ToListAsync(), "PlantID", "PlantName");
-        ViewBag.Products = new SelectList(await _db.Products.AsNoTracking().OrderBy(p => p.ProductName).ToListAsync(), "ProductID", "ProductName");
-        ViewBag.Recipes = new SelectList(await _db.Recipes.AsNoTracking().Where(r => r.Status == "Approved").OrderBy(r => r.RecipeCode).ToListAsync(), "RecipeID", "RecipeCode");
-        ViewBag.UOMs = new SelectList(await _db.UnitsOfMeasure.AsNoTracking().OrderBy(u => u.UOMName).ToListAsync(), "UOMID", "UOMName");
-        ViewBag.Demands = new SelectList(await _db.Demands.AsNoTracking().Where(d => d.Status == "Open").OrderBy(d => d.DemandCode).ToListAsync(), "DemandID", "DemandCode");
+        model.PlantList = await _db.Plants.AsNoTracking()
+            .OrderBy(p => p.PlantName)
+            .Select(x => new SelectListItem { Value = x.PlantID.ToString(), Text = x.PlantName })
+            .ToListAsync();
+
+        model.ProductList = await _db.Products.AsNoTracking()
+            .OrderBy(p => p.ProductName)
+            .Select(x => new SelectListItem { Value = x.ProductID.ToString(), Text = x.ProductName })
+            .ToListAsync();
+
+        model.RecipeList = await _db.Recipes.AsNoTracking()
+            .Where(r => r.Status == "Approved")
+            .OrderBy(r => r.RecipeCode)
+            .Select(x => new SelectListItem { Value = x.RecipeID.ToString(), Text = x.RecipeCode })
+            .ToListAsync();
+
+        model.UOMList = await _db.UnitsOfMeasure.AsNoTracking()
+            .OrderBy(u => u.UOMName)
+            .Select(x => new SelectListItem { Value = x.UOMID.ToString(), Text = x.UOMName })
+            .ToListAsync();
+
+        model.DemandList = await _db.Demands.AsNoTracking()
+            .Where(d => d.Status == "Open")
+            .OrderBy(d => d.DemandCode)
+            .Select(x => new SelectListItem { Value = x.DemandID.ToString(), Text = x.DemandCode })
+            .ToListAsync();
     }
 }

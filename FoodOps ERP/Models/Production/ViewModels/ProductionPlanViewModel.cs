@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering; // ✅ Added
 
 namespace FoodOpsERP.Models.Manufacturing.Production.ViewModels;
 
@@ -30,4 +31,11 @@ public class ProductionPlanViewModel
     public DateTime CreatedAt { get; set; }
 
     public List<ProductionPlanLineViewModel> Lines { get; set; } = new();
+
+    // ✅ Strongly-typed dropdown lists
+    public IEnumerable<SelectListItem>? PlantList { get; set; }
+    public IEnumerable<SelectListItem>? ProductList { get; set; }
+    public IEnumerable<SelectListItem>? RecipeList { get; set; }
+    public IEnumerable<SelectListItem>? UOMList { get; set; }
+    public IEnumerable<SelectListItem>? DemandList { get; set; }
 }
