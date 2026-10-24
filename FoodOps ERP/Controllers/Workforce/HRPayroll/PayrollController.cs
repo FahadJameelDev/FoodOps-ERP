@@ -19,14 +19,12 @@ public class PayrollController : AppController
         _db = db;
     }
 
-    // 1. Payroll Processing (Default)
     public async Task<IActionResult> Index()
     {
         var list = await _service.GetAllAsync();
         return View(list);
     }
 
-    // 2. Payroll Review (Sirf Calculated dikhana hai)
     public async Task<IActionResult> Review()
     {
         var all = await _service.GetAllAsync();
@@ -34,7 +32,6 @@ public class PayrollController : AppController
         return View(list);
     }
 
-    // 3. Payroll Finalization (Sirf Approved dikhana hai)
     public async Task<IActionResult> Finalize()
     {
         var all = await _service.GetAllAsync();
@@ -45,8 +42,9 @@ public class PayrollController : AppController
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        await LoadPlantsAsync();
-        return FormView("_PayrollForm", "Create", new { });
+        var model = new PayrollViewModel();
+        await PopulateDropdownsAsync(model);
+        return FormView("_PayrollForm", "Create", model);
     }
 
     [HttpPost]
@@ -69,7 +67,10 @@ public class PayrollController : AppController
     {
         var result = await _service.CalculatePayrollAsync(id, GetCurrentUserId());
         if (!result.Success) return Failed(result.Message);
-        return Saved(result.Message, "Details");
+
+        // ✅ FIX: Redirect back to Details with the ID parameter
+        if (IsAjax) return Saved(result.Message); // Ajax ke liye JSON
+        return RedirectToAction(nameof(Details), new { id = id });
     }
 
     [HttpPost]
@@ -77,19 +78,30 @@ public class PayrollController : AppController
     {
         var result = await _service.ApprovePayrollAsync(id, GetCurrentUserId(), comments);
         if (!result.Success) return Failed(result.Message);
-        return Saved(result.Message, "Details");
+
+        if (IsAjax) return Saved(result.Message);
+        return RedirectToAction(nameof(Details), new { id = id });
     }
 
     [HttpPost]
-    public async Task<IActionResult> FinalizePayroll(int id) // Method ka naam badal diya taake action conflict na ho
+    public async Task<IActionResult> FinalizePayroll(int id)
     {
         var result = await _service.FinalizePayrollAsync(id, GetCurrentUserId());
         if (!result.Success) return Failed(result.Message);
-        return Saved(result.Message, "Details");
+
+        if (IsAjax) return Saved(result.Message);
+        return RedirectToAction(nameof(Details), new { id = id });
     }
 
-    private async Task LoadPlantsAsync()
+    private async Task PopulateDropdownsAsync(PayrollViewModel model)
     {
-        ViewBag.Plants = new SelectList(await _db.Plants.AsNoTracking().OrderBy(p => p.PlantName).ToListAsync(), "PlantID", "PlantName");
+        model.PlantList = await _db.Plants.AsNoTracking()
+            .OrderBy(p => p.PlantName)
+            .Select(p => new SelectListItem
+            {
+                Value = p.PlantID.ToString(),
+                Text = p.PlantName
+            })
+            .ToListAsync();
     }
 }

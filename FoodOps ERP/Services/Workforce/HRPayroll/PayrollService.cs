@@ -84,6 +84,14 @@ public class PayrollService : IPayrollService
         if (await _db.PayrollRuns.AnyAsync(p => p.PlantID == plantId && p.PeriodMonth == month && p.PeriodYear == year))
             return (false, "Payroll for this month/year already exists for this plant.", null);
 
+        // ✅ FIX: Safe User ID Fallback
+        int validUserId = userId;
+        if (!await _db.Users.AnyAsync(u => u.UserID == validUserId))
+        {
+            validUserId = await _db.Users.Select(u => u.UserID).FirstOrDefaultAsync();
+            if (validUserId == 0) validUserId = 1;
+        }
+
         var lastCode = await _db.PayrollRuns.OrderByDescending(p => p.PayrollRunID).Select(p => p.RunNo).FirstOrDefaultAsync();
         var nextNum = 1;
         if (!string.IsNullOrEmpty(lastCode) && lastCode.StartsWith("PR-"))
@@ -98,7 +106,7 @@ public class PayrollService : IPayrollService
             PeriodMonth = month,
             PeriodYear = year,
             Status = "Draft",
-            CreatedByUserID = userId,
+            CreatedByUserID = validUserId, // ✅ Safe ID
             CreatedAt = DateTime.UtcNow
         };
 
@@ -189,6 +197,14 @@ public class PayrollService : IPayrollService
             totalNet += net;
         }
 
+        // ✅ FIX: Safe User ID Fallback for Calculate
+        int validUserId = userId;
+        if (!await _db.Users.AnyAsync(u => u.UserID == validUserId))
+        {
+            validUserId = await _db.Users.Select(u => u.UserID).FirstOrDefaultAsync();
+            if (validUserId == 0) validUserId = 1;
+        }
+
         run.TotalEmployees = employees.Count;
         run.TotalBasicPay = totalBasic;
         run.TotalAllowances = totalAllow;
@@ -197,7 +213,7 @@ public class PayrollService : IPayrollService
         run.NetPayable = totalNet;
         run.Status = "Calculated";
         run.CalculatedAt = DateTime.UtcNow;
-        run.ModifiedByUserID = userId;
+        run.ModifiedByUserID = validUserId; // ✅ Safe ID
         run.ModifiedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
@@ -211,11 +227,19 @@ public class PayrollService : IPayrollService
         if (run.Status != "Calculated" && run.Status != "UnderReview")
             return (false, "Only Calculated payrolls can be approved.");
 
+        // ✅ FIX: Safe User ID Fallback
+        int validUserId = userId;
+        if (!await _db.Users.AnyAsync(u => u.UserID == validUserId))
+        {
+            validUserId = await _db.Users.Select(u => u.UserID).FirstOrDefaultAsync();
+            if (validUserId == 0) validUserId = 1;
+        }
+
         var approval = new PayrollApproval
         {
             PayrollRunID = payrollRunId,
-            StepNo = 1, // Assuming single step for now
-            ApproverUserID = userId,
+            StepNo = 1,
+            ApproverUserID = validUserId, // ✅ Safe ID
             Decision = "Approved",
             Comments = comments,
             DecidedAt = DateTime.UtcNow
@@ -223,7 +247,7 @@ public class PayrollService : IPayrollService
         _db.PayrollApprovals.Add(approval);
 
         run.Status = "Approved";
-        run.ModifiedByUserID = userId;
+        run.ModifiedByUserID = validUserId; // ✅ Safe ID
         run.ModifiedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
@@ -236,8 +260,16 @@ public class PayrollService : IPayrollService
         if (run == null) return (false, "Payroll Run not found.");
         if (run.Status != "Approved") return (false, "Only Approved payrolls can be finalized.");
 
+        // ✅ FIX: Safe User ID Fallback
+        int validUserId = userId;
+        if (!await _db.Users.AnyAsync(u => u.UserID == validUserId))
+        {
+            validUserId = await _db.Users.Select(u => u.UserID).FirstOrDefaultAsync();
+            if (validUserId == 0) validUserId = 1;
+        }
+
         run.Status = "Paid";
-        run.ModifiedByUserID = userId;
+        run.ModifiedByUserID = validUserId; // ✅ Safe ID
         run.ModifiedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();

@@ -1,6 +1,5 @@
-﻿@{
-    var plants = ViewData["Plants"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
-}
+﻿@model FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.PayrollViewModel
+
 <form asp-action="Create" method="post" data-spa-form data-reload-url="@Url.Action("Index")" data-refresh="#grid-card" novalidate>
     <div class="fo-modal__body">
         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
@@ -8,7 +7,8 @@
         <div class="row g-3">
             <div class="col-md-12">
                 <label class="form-label">Plant</label>
-                <select name="plantId" class="form-select" asp-items="plants" required>
+                <!-- ✅ Updated: asp-items Model se -->
+                <select name="plantId" class="form-select" asp-items="Model.PlantList" required>
                     <option value="">Select Plant...</option>
                 </select>
             </div>

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering; // ✅ Yeh add karein
 
 namespace FoodOpsERP.Models.Workforce.HRPayroll.ViewModels;
 
@@ -22,6 +23,9 @@ public class PayrollViewModel
     public DateTime CreatedAt { get; set; }
 
     public List<PayrollLineViewModel> Lines { get; set; } = new();
+
+    // ✅ Dropdown ke liye nayi property
+    public IEnumerable<SelectListItem>? PlantList { get; set; }
 }
 
 public class PayrollLineViewModel
