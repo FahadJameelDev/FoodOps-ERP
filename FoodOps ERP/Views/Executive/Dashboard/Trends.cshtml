@@ -3,28 +3,42 @@
     ViewData["Title"] = "Trends";
     ViewData["Subtitle"] = "Historical Data";
 }
+
 <partial name="_PageHeader" />
+
 <div class="card">
     <div class="card-body">
         <canvas id="trendChart" height="100"></canvas>
     </div>
 </div>
 
-@section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const ctx = document.getElementById('trendChart').getContext('2d');
-        new Chart(ctx, {
-        type: 'bar',
-        data: {
-        labels: @Json.Serialize(Model.ProductionTrend.Select(x => x.Label)),
-        datasets: [{
-        label: 'Production Qty',
-        data: @Json.Serialize(Model.ProductionTrend.Select(x => x.Value)),
-        backgroundColor: '#10B981'
-        }]
-        },
-        options: { responsive: true, plugins: { legend: { display: false } } }
-        });
-    </script>
-}
+<!-- ✅ Script ko section se bahar nikal diya taake SPA/AJAX mein bhi chal jaye -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    (function () {
+    const canvas = document.getElementById('trendChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+        
+    // Agar pehle se chart bana ho toh destroy karein (AJAX duplicate fix)
+    if (window.myTrendChart instanceof Chart) {
+    window.myTrendChart.destroy();
+    }
+
+    window.myTrendChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+    labels: @Json.Serialize(Model.ProductionTrend.Select(x => x.Label)),
+    datasets: [{
+    label: 'Production Qty',
+    data: @Json.Serialize(Model.ProductionTrend.Select(x => x.Value)),
+    backgroundColor: '#10B981'
+    }]
+    },
+    options: {
+    responsive: true,
+    plugins: { legend: { display: false } }
+    }
+    });
+    })();
+</script>

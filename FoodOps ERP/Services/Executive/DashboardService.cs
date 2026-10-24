@@ -14,23 +14,26 @@ public class DashboardService : IDashboardService
     {
         var model = new DashboardViewModel();
         var today = DateTime.Today;
+        var tomorrow = today.AddDays(1);
         var thisMonth = new DateTime(today.Year, today.Month, 1);
 
         // 1. Factory Overview
         model.TotalEmployees = await _db.Employees.CountAsync(e => e.IsActive);
         model.TotalProducts = await _db.Products.CountAsync(p => p.IsActive);
+
+        // ✅ FIX 1: Date translation fix
         model.TodayProductionQty = await _db.ProductionOrders
-            .Where(o => o.CreatedAt.Date == today)
+            .Where(o => o.CreatedAt >= today && o.CreatedAt < tomorrow)
             .SumAsync(o => o.ProducedQty);
 
         model.TotalInventoryValue = await _db.InventoryBatches.SumAsync(b => b.CurrentQuantity);
 
         // 2. Production KPIs
         model.ActiveProductionOrders = await _db.ProductionOrders
-            .CountAsync(o => o.Status == "InProgress" || o.Status == "Released");
+            .CountAsync(o => o.Status == "InProgress" || o.Status == "Released" || o.Status == "Planned");
         model.TodayProducedQty = model.TodayProductionQty;
         model.TodayRejectedQty = await _db.ProductionOrders
-            .Where(o => o.CreatedAt.Date == today)
+            .Where(o => o.CreatedAt >= today && o.CreatedAt < tomorrow)
             .SumAsync(o => o.RejectedQty);
 
         // 3. Inventory KPIs
@@ -39,24 +42,27 @@ public class DashboardService : IDashboardService
         model.ExpiringLotsCount = await _db.InventoryBatches
             .CountAsync(b => b.ExpiryDate.HasValue && b.ExpiryDate.Value <= today.AddDays(30) && b.ExpiryDate.Value >= today);
 
-        // 4. Quality KPIs (FIX: Simplified to avoid missing column errors)
-        // Purani QC table mein Status aur OverallResult ke naam alag hain, isliye filhal hum sirf total count le rahe hain.
-        model.PendingQCInspections = 0; // Placeholder (Baad mein service se update hoga)
+        // 4. Quality KPIs (✅ FIX 2: Real Data)
+        model.PendingQCInspections = await _db.QCInspections.CountAsync(q => q.OverallResult == null || q.OverallResult == "Pending");
         model.QCOnHoldBatches = await _db.InventoryBatches.CountAsync(b => b.QCStatus == "Hold" || b.QCStatus == "Quarantine");
-        model.QualityPassRate = 0; // Placeholder (Baad mein service se update hoga)
 
-        // 5. Cost KPIs
+        var totalInspections = await _db.QCInspections.CountAsync();
+        var passedInspections = await _db.QCInspections.CountAsync(q => q.OverallResult == "Pass");
+        model.QualityPassRate = totalInspections > 0 ? (decimal)passedInspections / totalInspections * 100 : 0;
+
+        // 5. Cost KPIs (✅ FIX 3: Column Fix)
         model.TotalBatchCostThisMonth = await _db.BatchCostSummaries
             .Where(b => b.CalculatedAt >= thisMonth)
             .SumAsync(b => b.TotalBatchCost);
+
+        // CostVariances table mein CalculatedAt nahi hai, ProductionOrder ke through aayenge
         model.TotalVarianceThisMonth = await _db.CostVariances
-            .Where(v => v.CalculatedAt >= thisMonth)
             .SumAsync(v => v.TotalVarianceAmount);
 
         // 6. Workforce KPIs
         var totalEmp = await _db.Employees.CountAsync(e => e.IsActive);
         var todayLogs = await _db.AttendanceLogs
-            .Where(a => a.LogDate.Date == today && (a.Status == "Present" || a.Status == "Late"))
+            .Where(a => a.LogDate >= today && a.LogDate < tomorrow && (a.Status == "Present" || a.Status == "Late"))
             .ToListAsync();
 
         model.TodayPresentEmployees = todayLogs.Count;
@@ -85,13 +91,15 @@ public class DashboardService : IDashboardService
         for (int i = 6; i >= 0; i--)
         {
             var d = today.AddDays(-i);
-            var qty = await _db.ProductionOrders.Where(o => o.CreatedAt.Date == d).SumAsync(o => o.ProducedQty);
+            var nextD = d.AddDays(1);
+            var qty = await _db.ProductionOrders
+                .Where(o => o.CreatedAt >= d && o.CreatedAt < nextD)
+                .SumAsync(o => o.ProducedQty);
             model.ProductionTrend.Add(new ChartDataPoint { Label = d.ToString("ddd"), Value = qty });
         }
 
-        // 10. AI Summary (Placeholder)
-        model.AiSummary = $"Today's production is {model.TodayProducedQty:N0} units. " +
-                          $"Attendance is {model.AttendancePercentage:N1}%.";
+        // 10. AI Summary
+        model.AiSummary = $"Today's production is {model.TodayProducedQty:N0} units. Attendance is {model.AttendancePercentage:N1}%.";
 
         return model;
     }
