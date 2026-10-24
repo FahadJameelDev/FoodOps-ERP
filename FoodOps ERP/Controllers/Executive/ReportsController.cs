@@ -19,20 +19,19 @@ public class ReportsController : AppController
         _db = db;
     }
 
-    // 1. Reports Home Page (Filters)
     public async Task<IActionResult> Index()
     {
-        await LoadPlantsAsync();
-        return View(new ReportFilterViewModel());
+        var model = new ReportFilterViewModel();
+        await PopulateDropdownsAsync(model); // ✅ Naya method
+        return View(model);
     }
 
-    // 2. Generate Report (Smart Result View - abhi ke liye)
     [HttpPost]
     public async Task<IActionResult> Generate(ReportFilterViewModel filter)
     {
         if (!ModelState.IsValid)
         {
-            await LoadPlantsAsync();
+            await PopulateDropdownsAsync(filter);
             return View("Index", filter);
         }
 
@@ -40,11 +39,6 @@ public class ReportsController : AppController
         return View("Result", result);
     }
 
-    // ═════════════════════════════════════════════
-    // ALAG ALAG REPORTS KE LIYE 6 NAYE METHODS
-    // ═════════════════════════════════════════════
-
-    // 3. Production Report
     [HttpGet]
     public async Task<IActionResult> Production(DateTime? startDate, DateTime? endDate, int? plantId)
     {
@@ -56,10 +50,9 @@ public class ReportsController : AppController
             PlantID = plantId
         };
         var result = await _service.GenerateReportAsync(filter);
-        return View(result); // Ye Production.cshtml view ko call karega
+        return View(result);
     }
 
-    // 4. Inventory Report
     [HttpGet]
     public async Task<IActionResult> Inventory(DateTime? startDate, DateTime? endDate, int? plantId)
     {
@@ -71,10 +64,9 @@ public class ReportsController : AppController
             PlantID = plantId
         };
         var result = await _service.GenerateReportAsync(filter);
-        return View(result); // Ye Inventory.cshtml view ko call karega
+        return View(result);
     }
 
-    // 5. Quality Report
     [HttpGet]
     public async Task<IActionResult> Quality(DateTime? startDate, DateTime? endDate, int? plantId)
     {
@@ -86,10 +78,9 @@ public class ReportsController : AppController
             PlantID = plantId
         };
         var result = await _service.GenerateReportAsync(filter);
-        return View(result); // Ye Quality.cshtml view ko call karega
+        return View(result);
     }
 
-    // 6. Cost Report
     [HttpGet]
     public async Task<IActionResult> Cost(DateTime? startDate, DateTime? endDate, int? plantId)
     {
@@ -101,10 +92,9 @@ public class ReportsController : AppController
             PlantID = plantId
         };
         var result = await _service.GenerateReportAsync(filter);
-        return View(result); // Ye Cost.cshtml view ko call karega
+        return View(result);
     }
 
-    // 7. Workforce Report
     [HttpGet]
     public async Task<IActionResult> Workforce(DateTime? startDate, DateTime? endDate, int? plantId)
     {
@@ -116,10 +106,9 @@ public class ReportsController : AppController
             PlantID = plantId
         };
         var result = await _service.GenerateReportAsync(filter);
-        return View(result); // Ye Workforce.cshtml view ko call karega
+        return View(result);
     }
 
-    // 8. Executive Summary Report
     [HttpGet]
     public async Task<IActionResult> Executive(DateTime? startDate, DateTime? endDate, int? plantId)
     {
@@ -131,12 +120,15 @@ public class ReportsController : AppController
             PlantID = plantId
         };
         var result = await _service.GenerateReportAsync(filter);
-        return View(result); // Ye Executive.cshtml view ko call karega
+        return View(result);
     }
 
-    // Lookups
-    private async Task LoadPlantsAsync()
+    // ✅ Naya Method
+    private async Task PopulateDropdownsAsync(ReportFilterViewModel model)
     {
-        ViewBag.Plants = new SelectList(await _db.Plants.AsNoTracking().OrderBy(p => p.PlantName).ToListAsync(), "PlantID", "PlantName");
+        model.PlantList = await _db.Plants.AsNoTracking()
+            .OrderBy(p => p.PlantName)
+            .Select(p => new SelectListItem { Value = p.PlantID.ToString(), Text = p.PlantName })
+            .ToListAsync();
     }
 }

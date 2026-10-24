@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace FoodOpsERP.Models.Executive.ViewModels;
 
@@ -13,5 +14,8 @@ public class ReportFilterViewModel
     public DateTime EndDate { get; set; } = DateTime.Today;
 
     public int? PlantID { get; set; }
-    public string ReportType { get; set; } = "Production"; // Production, Inventory, Quality, Cost, Workforce, Executive
+    public string ReportType { get; set; } = "Production";
+
+    // ✅ Dropdown ke liye nayi property
+    public IEnumerable<SelectListItem>? PlantList { get; set; }
 }
