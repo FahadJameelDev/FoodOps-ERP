@@ -19,7 +19,6 @@ public class AttendanceController : AppController
         _db = db;
     }
 
-    // --- Attendance Logs ---
     public async Task<IActionResult> Index(DateTime? date = null)
     {
         var list = await _service.GetAllAttendanceAsync(date);
@@ -30,18 +29,23 @@ public class AttendanceController : AppController
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        await LoadLookupsAsync();
-        return FormView("_AttendanceForm", "Create", new AttendanceViewModel { LogDate = DateTime.Today, Status = "Present" });
+        var model = new AttendanceViewModel { LogDate = DateTime.Today, Status = "Present" };
+        await PopulateDropdownsAsync(model); // ✅ Naya method call kiya
+        return FormView("_AttendanceForm", "Create", model);
     }
 
     [HttpPost]
     public async Task<IActionResult> Create(AttendanceViewModel model)
     {
-        if (!ModelState.IsValid) { await LoadLookupsAsync(); return Invalid("_AttendanceForm", "Create", model); }
+        if (!ModelState.IsValid) { await PopulateDropdownsAsync(model); return Invalid("_AttendanceForm", "Create", model); }
 
         var result = await _service.CreateAttendanceAsync(model, GetCurrentUserId());
-        if (!result.Success) { ModelState.AddModelError("", result.Message); await LoadLookupsAsync(); return Invalid("_AttendanceForm", "Create", model); }
-
+        if (!result.Success)
+        {
+            ModelState.AddModelError("", result.Message);
+            await PopulateDropdownsAsync(model);
+            return Invalid("_AttendanceForm", "Create", model);
+        }
         return Saved(result.Message, "Index");
     }
 
@@ -50,22 +54,26 @@ public class AttendanceController : AppController
     {
         var model = await _service.GetAttendanceByIdAsync(id);
         if (model == null) return NotFound();
-        await LoadLookupsAsync();
+        await PopulateDropdownsAsync(model);
         return FormView("_AttendanceForm", "Edit", model);
     }
 
     [HttpPost]
     public async Task<IActionResult> Edit(AttendanceViewModel model)
     {
-        if (!ModelState.IsValid) { await LoadLookupsAsync(); return Invalid("_AttendanceForm", "Edit", model); }
+        if (!ModelState.IsValid) { await PopulateDropdownsAsync(model); return Invalid("_AttendanceForm", "Edit", model); }
 
         var result = await _service.UpdateAttendanceAsync(model, GetCurrentUserId());
-        if (!result.Success) { ModelState.AddModelError("", result.Message); await LoadLookupsAsync(); return Invalid("_AttendanceForm", "Edit", model); }
-
+        if (!result.Success)
+        {
+            ModelState.AddModelError("", result.Message);
+            await PopulateDropdownsAsync(model);
+            return Invalid("_AttendanceForm", "Edit", model);
+        }
         return Saved(result.Message, "Index");
     }
 
-    // --- Attendance Corrections ---
+    // --- Corrections ---
     public async Task<IActionResult> Corrections(string? status = null)
     {
         var list = await _service.GetAllCorrectionsAsync(status);
@@ -76,18 +84,23 @@ public class AttendanceController : AppController
     [HttpGet]
     public async Task<IActionResult> CreateCorrection(long? attendanceId = null)
     {
-        await LoadCorrectionLookupsAsync();
-        return FormView("_CorrectionForm", "CreateCorrection", new AttendanceCorrectionViewModel { AttendanceID = attendanceId ?? 0 });
+        var model = new AttendanceCorrectionViewModel { AttendanceID = attendanceId ?? 0 };
+        await PopulateCorrectionDropdownsAsync(model); // ✅ Naya method
+        return FormView("_CorrectionForm", "CreateCorrection", model);
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateCorrection(AttendanceCorrectionViewModel model)
     {
-        if (!ModelState.IsValid) { await LoadCorrectionLookupsAsync(); return Invalid("_CorrectionForm", "CreateCorrection", model); }
+        if (!ModelState.IsValid) { await PopulateCorrectionDropdownsAsync(model); return Invalid("_CorrectionForm", "CreateCorrection", model); }
 
         var result = await _service.CreateCorrectionAsync(model, GetCurrentUserId());
-        if (!result.Success) { ModelState.AddModelError("", result.Message); await LoadCorrectionLookupsAsync(); return Invalid("_CorrectionForm", "CreateCorrection", model); }
-
+        if (!result.Success)
+        {
+            ModelState.AddModelError("", result.Message);
+            await PopulateCorrectionDropdownsAsync(model);
+            return Invalid("_CorrectionForm", "CreateCorrection", model);
+        }
         return Saved(result.Message, "Corrections");
     }
 
@@ -105,19 +118,34 @@ public class AttendanceController : AppController
         return result.Success ? Saved(result.Message, "Corrections") : Failed(result.Message);
     }
 
-    private async Task LoadLookupsAsync()
+    // ✅ Naya Methods (Purana LoadLookupsAsync hata dein)
+    private async Task PopulateDropdownsAsync(AttendanceViewModel model)
     {
-        ViewBag.Employees = new SelectList(await _db.Employees.AsNoTracking().OrderBy(e => e.FirstName).ToListAsync(), "EmployeeID", "FirstName");
-        ViewBag.Shifts = new SelectList(await _db.Shifts.AsNoTracking().OrderBy(s => s.ShiftName).ToListAsync(), "ShiftID", "ShiftName");
+        model.EmployeeList = await _db.Employees.AsNoTracking()
+            .OrderBy(e => e.FirstName)
+            .Select(e => new SelectListItem
+            {
+                Value = e.EmployeeID.ToString(),
+                Text = $"{e.EmployeeCode} - {e.FirstName} {e.LastName}"
+            })
+            .ToListAsync();
+
+        model.ShiftList = await _db.Shifts.AsNoTracking()
+            .OrderBy(s => s.ShiftName)
+            .Select(s => new SelectListItem { Value = s.ShiftID.ToString(), Text = s.ShiftName })
+            .ToListAsync();
     }
 
-    private async Task LoadCorrectionLookupsAsync()
+    private async Task PopulateCorrectionDropdownsAsync(AttendanceCorrectionViewModel model)
     {
-        ViewBag.AttendanceLogs = new SelectList(
-            await _db.AttendanceLogs.AsNoTracking()
-                .OrderByDescending(a => a.LogDate).Take(100)
-                .Select(a => new { a.AttendanceID, Text = a.LogDate.ToString("dd MMM yyyy") + " - " + a.EmployeeID })
-                .ToListAsync(),
-            "AttendanceID", "Text");
+        model.AttendanceLogList = await _db.AttendanceLogs.AsNoTracking()
+            .OrderByDescending(a => a.LogDate)
+            .Take(100)
+            .Select(a => new SelectListItem
+            {
+                Value = a.AttendanceID.ToString(),
+                Text = $"{a.LogDate:dd MMM yyyy} - {_db.Employees.Where(e => e.EmployeeID == a.EmployeeID).Select(e => e.FirstName + " " + e.LastName).FirstOrDefault()}"
+            })
+            .ToListAsync();
     }
 }

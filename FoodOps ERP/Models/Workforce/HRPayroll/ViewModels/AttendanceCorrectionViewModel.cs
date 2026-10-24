@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace FoodOpsERP.Models.Workforce.HRPayroll.ViewModels;
 
@@ -28,4 +29,7 @@ public class AttendanceCorrectionViewModel
     public int? ApprovedByUserID { get; set; }
     public DateTime? ApprovedAt { get; set; }
     public DateTime CreatedAt { get; set; }
+
+    // ✅ Dropdown ke liye nayi property
+    public IEnumerable<SelectListItem>? AttendanceLogList { get; set; }
 }

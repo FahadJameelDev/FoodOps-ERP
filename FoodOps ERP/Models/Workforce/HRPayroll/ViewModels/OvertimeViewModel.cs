@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering; // ✅ Yeh add karein
 
 namespace FoodOpsERP.Models.Workforce.HRPayroll.ViewModels;
 
@@ -28,4 +29,7 @@ public class OvertimeViewModel
     public string Status { get; set; } = "Pending";
     public int? ApprovedByUserID { get; set; }
     public DateTime? ApprovedAt { get; set; }
+
+    // ✅ Dropdown ke liye nayi property
+    public IEnumerable<SelectListItem>? EmployeeList { get; set; }
 }

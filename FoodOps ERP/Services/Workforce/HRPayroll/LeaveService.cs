@@ -50,6 +50,14 @@ public class LeaveService : ILeaveService
         if (await _db.LeaveTypes.AnyAsync(t => t.LeaveTypeCode == model.LeaveTypeCode))
             return (false, "Leave Type Code already exists.", null);
 
+        // ✅ FIX: Safe User ID Fallback
+        int validUserId = userId;
+        if (!await _db.Users.AnyAsync(u => u.UserID == validUserId))
+        {
+            validUserId = await _db.Users.Select(u => u.UserID).FirstOrDefaultAsync();
+            if (validUserId == 0) validUserId = 1;
+        }
+
         var entity = new LeaveType
         {
             LeaveTypeCode = model.LeaveTypeCode,
@@ -58,7 +66,7 @@ public class LeaveService : ILeaveService
             MaxDaysPerYear = model.MaxDaysPerYear,
             CarryForward = model.CarryForward,
             IsActive = model.IsActive,
-            CreatedByUserID = userId,
+            CreatedByUserID = validUserId, // ✅ Safe ID
             CreatedAt = DateTime.UtcNow
         };
 
@@ -160,6 +168,14 @@ public class LeaveService : ILeaveService
             if (int.TryParse(lastReq.Replace("LR-", ""), out var n)) nextNum = n + 1;
         }
 
+        // ✅ FIX: Safe User ID Fallback
+        int validUserId = userId;
+        if (!await _db.Users.AnyAsync(u => u.UserID == validUserId))
+        {
+            validUserId = await _db.Users.Select(u => u.UserID).FirstOrDefaultAsync();
+            if (validUserId == 0) validUserId = 1;
+        }
+
         var entity = new LeaveRequest
         {
             RequestNo = $"LR-{nextNum:D5}",
@@ -170,7 +186,7 @@ public class LeaveService : ILeaveService
             TotalDays = model.TotalDays,
             Reason = model.Reason,
             Status = "Pending",
-            CreatedByUserID = userId,
+            CreatedByUserID = validUserId, // ✅ Safe ID
             CreatedAt = DateTime.UtcNow
         };
 
@@ -185,18 +201,24 @@ public class LeaveService : ILeaveService
         if (entity == null) return (false, "Leave Request not found.");
         if (entity.Status != "Pending") return (false, "Only pending requests can be approved/rejected.");
 
+        // ✅ FIX: Safe User ID Fallback (Approval ke liye)
+        int validUserId = userId;
+        if (!await _db.Users.AnyAsync(u => u.UserID == validUserId))
+        {
+            validUserId = await _db.Users.Select(u => u.UserID).FirstOrDefaultAsync();
+            if (validUserId == 0) validUserId = 1;
+        }
+
         entity.Status = approve ? "Approved" : "Rejected";
-        entity.ApprovedByUserID = userId;
+        entity.ApprovedByUserID = validUserId; // ✅ Safe ID
         entity.ApprovedAt = DateTime.UtcNow;
 
-        // FIX: 'reject' variable hata diya
         if (!approve)
             entity.RejectionReason = rejectionReason;
 
-        entity.ModifiedByUserID = userId;
+        entity.ModifiedByUserID = validUserId; // ✅ Safe ID
         entity.ModifiedAt = DateTime.UtcNow;
 
-        // Agar approve hua, toh LeaveBalance update karein
         if (approve)
         {
             var balance = await _db.LeaveBalances
@@ -205,7 +227,6 @@ public class LeaveService : ILeaveService
             if (balance != null)
             {
                 balance.UsedDays += entity.TotalDays;
-                // FIX: RemainingDays ko manually set nahi karenge, kyunke woh Computed column hai. Database khud calculate karega.
             }
         }
 

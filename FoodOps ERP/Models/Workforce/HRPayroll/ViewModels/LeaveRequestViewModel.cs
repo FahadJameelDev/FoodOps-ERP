@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering; // ✅ Yeh add karein
 
 namespace FoodOpsERP.Models.Workforce.HRPayroll.ViewModels;
 
@@ -34,4 +35,8 @@ public class LeaveRequestViewModel
     public int? ApprovedByUserID { get; set; }
     public DateTime? ApprovedAt { get; set; }
     public string? RejectionReason { get; set; }
+
+    // ✅ Dropdowns ke liye nayi properties
+    public IEnumerable<SelectListItem>? EmployeeList { get; set; }
+    public IEnumerable<SelectListItem>? LeaveTypeList { get; set; }
 }

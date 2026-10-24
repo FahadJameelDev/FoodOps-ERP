@@ -29,17 +29,27 @@ public class OvertimeController : AppController
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        await LoadLookupsAsync();
-        return FormView("_OvertimeForm", "Create", new OvertimeViewModel { OTDate = DateTime.Today, OTRateMultiplier = 1.50m });
+        var model = new OvertimeViewModel { OTDate = DateTime.Today, OTRateMultiplier = 1.50m };
+        await PopulateDropdownsAsync(model); // ✅ Naya method call kiya
+        return FormView("_OvertimeForm", "Create", model);
     }
 
     [HttpPost]
     public async Task<IActionResult> Create(OvertimeViewModel model)
     {
-        if (!ModelState.IsValid) { await LoadLookupsAsync(); return Invalid("_OvertimeForm", "Create", model); }
+        if (!ModelState.IsValid)
+        {
+            await PopulateDropdownsAsync(model);
+            return Invalid("_OvertimeForm", "Create", model);
+        }
 
         var result = await _service.CreateAsync(model, GetCurrentUserId());
-        if (!result.Success) { ModelState.AddModelError("", result.Message); await LoadLookupsAsync(); return Invalid("_OvertimeForm", "Create", model); }
+        if (!result.Success)
+        {
+            ModelState.AddModelError("", result.Message);
+            await PopulateDropdownsAsync(model);
+            return Invalid("_OvertimeForm", "Create", model);
+        }
 
         return Saved(result.Message, "Index");
     }
@@ -58,8 +68,16 @@ public class OvertimeController : AppController
         return result.Success ? Saved(result.Message, "Index") : Failed(result.Message);
     }
 
-    private async Task LoadLookupsAsync()
+    // ✅ Naya Method (Purana LoadLookupsAsync hata dein)
+    private async Task PopulateDropdownsAsync(OvertimeViewModel model)
     {
-        ViewBag.Employees = new SelectList(await _db.Employees.AsNoTracking().OrderBy(e => e.FirstName).ToListAsync(), "EmployeeID", "FirstName");
+        model.EmployeeList = await _db.Employees.AsNoTracking()
+            .OrderBy(e => e.FirstName)
+            .Select(e => new SelectListItem
+            {
+                Value = e.EmployeeID.ToString(),
+                Text = $"{e.EmployeeCode} - {e.FirstName} {e.LastName}"
+            })
+            .ToListAsync();
     }
 }

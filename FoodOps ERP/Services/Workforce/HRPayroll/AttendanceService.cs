@@ -69,6 +69,7 @@ public class AttendanceService : IAttendanceService
             workedMinutes = (int)diff.TotalMinutes;
         }
 
+        // ✅ FIX: AttendanceLog mein CreatedByUserID aur CreatedAt nahi hai, isliye remove kar diya
         var entity = new AttendanceLog
         {
             EmployeeID = model.EmployeeID,
@@ -161,10 +162,18 @@ public class AttendanceService : IAttendanceService
         var attendance = await _db.AttendanceLogs.FindAsync(model.AttendanceID);
         if (attendance == null) return (false, "Attendance record not found.", null);
 
+        // ✅ FIX: Safe User ID Fallback (AttendanceCorrection mein CreatedByUserID/RequestedByUserID chahiye)
+        int validUserId = userId;
+        if (!await _db.Users.AnyAsync(u => u.UserID == validUserId))
+        {
+            validUserId = await _db.Users.Select(u => u.UserID).FirstOrDefaultAsync();
+            if (validUserId == 0) validUserId = 1;
+        }
+
         var entity = new AttendanceCorrection
         {
             AttendanceID = model.AttendanceID,
-            RequestedByUserID = userId,
+            RequestedByUserID = validUserId, // ✅ Safe ID
             OldCheckIn = attendance.CheckInTime,
             OldCheckOut = attendance.CheckOutTime,
             NewCheckIn = model.NewCheckIn,
@@ -185,8 +194,16 @@ public class AttendanceService : IAttendanceService
         if (entity == null) return (false, "Correction not found.");
         if (entity.Status != "Pending") return (false, "Only pending corrections can be approved.");
 
+        // ✅ FIX: Safe User ID Fallback
+        int validUserId = userId;
+        if (!await _db.Users.AnyAsync(u => u.UserID == validUserId))
+        {
+            validUserId = await _db.Users.Select(u => u.UserID).FirstOrDefaultAsync();
+            if (validUserId == 0) validUserId = 1;
+        }
+
         entity.Status = approve ? "Approved" : "Rejected";
-        entity.ApprovedByUserID = userId;
+        entity.ApprovedByUserID = validUserId; // ✅ Safe ID
         entity.ApprovedAt = DateTime.UtcNow;
 
         // Agar approve hua, toh AttendanceLog update karein

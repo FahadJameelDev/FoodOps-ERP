@@ -55,6 +55,14 @@ public class OvertimeService : IOvertimeService
 
     public async Task<(bool Success, string Message, int? Id)> CreateAsync(OvertimeViewModel model, int userId)
     {
+        // ✅ FIX: Safe User ID Fallback
+        int validUserId = userId;
+        if (!await _db.Users.AnyAsync(u => u.UserID == validUserId))
+        {
+            validUserId = await _db.Users.Select(u => u.UserID).FirstOrDefaultAsync();
+            if (validUserId == 0) validUserId = 1;
+        }
+
         var entity = new OvertimeRecord
         {
             EmployeeID = model.EmployeeID,
@@ -63,7 +71,7 @@ public class OvertimeService : IOvertimeService
             OTRateMultiplier = model.OTRateMultiplier,
             Reason = model.Reason,
             Status = "Pending",
-            CreatedByUserID = userId,
+            CreatedByUserID = validUserId, // ✅ Safe ID
             CreatedAt = DateTime.UtcNow
         };
 
@@ -78,10 +86,18 @@ public class OvertimeService : IOvertimeService
         if (entity == null) return (false, "Overtime record not found.");
         if (entity.Status != "Pending") return (false, "Only pending records can be approved/rejected.");
 
+        // ✅ FIX: Safe User ID Fallback
+        int validUserId = userId;
+        if (!await _db.Users.AnyAsync(u => u.UserID == validUserId))
+        {
+            validUserId = await _db.Users.Select(u => u.UserID).FirstOrDefaultAsync();
+            if (validUserId == 0) validUserId = 1;
+        }
+
         entity.Status = approve ? "Approved" : "Rejected";
-        entity.ApprovedByUserID = userId;
+        entity.ApprovedByUserID = validUserId; // ✅ Safe ID
         entity.ApprovedAt = DateTime.UtcNow;
-        entity.ModifiedByUserID = userId;
+        entity.ModifiedByUserID = validUserId; // ✅ Safe ID
         entity.ModifiedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();

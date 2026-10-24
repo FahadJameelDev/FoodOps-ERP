@@ -30,20 +30,25 @@ public class LeaveController : AppController
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        await LoadLookupsAsync();
-        return FormView("_LeaveRequestForm", "Create", new LeaveRequestViewModel { FromDate = DateTime.Today, ToDate = DateTime.Today, TotalDays = 1 });
+        var model = new LeaveRequestViewModel { FromDate = DateTime.Today, ToDate = DateTime.Today, TotalDays = 1 };
+        await PopulateDropdownsAsync(model); // ✅ Naya method call kiya
+        return FormView("_LeaveRequestForm", "Create", model);
     }
 
     [HttpPost]
     public async Task<IActionResult> Create(LeaveRequestViewModel model)
     {
-        if (!ModelState.IsValid) { await LoadLookupsAsync(); return Invalid("_LeaveRequestForm", "Create", model); }
+        if (!ModelState.IsValid)
+        {
+            await PopulateDropdownsAsync(model);
+            return Invalid("_LeaveRequestForm", "Create", model);
+        }
 
         var result = await _service.CreateLeaveRequestAsync(model, GetCurrentUserId());
         if (!result.Success)
         {
             ModelState.AddModelError("", result.Message);
-            await LoadLookupsAsync();
+            await PopulateDropdownsAsync(model);
             return Invalid("_LeaveRequestForm", "Create", model);
         }
         return Saved(result.Message, "Index");
@@ -71,7 +76,7 @@ public class LeaveController : AppController
     }
 
     [HttpGet]
-    public async Task<IActionResult> CreateType()
+    public IActionResult CreateType()
     {
         return FormView("_LeaveTypeForm", "CreateType", new LeaveTypeViewModel { IsPaid = true, IsActive = true });
     }
@@ -111,9 +116,25 @@ public class LeaveController : AppController
         return result.Success ? Saved(result.Message, "LeaveTypes") : Failed(result.Message);
     }
 
-    private async Task LoadLookupsAsync()
+    // ✅ Naya Method (Purana LoadLookupsAsync hata dein)
+    private async Task PopulateDropdownsAsync(LeaveRequestViewModel model)
     {
-        ViewBag.Employees = new SelectList(await _db.Employees.AsNoTracking().OrderBy(e => e.FirstName).ToListAsync(), "EmployeeID", "FirstName");
-        ViewBag.LeaveTypes = new SelectList(await _db.LeaveTypes.AsNoTracking().OrderBy(t => t.LeaveTypeName).ToListAsync(), "LeaveTypeID", "LeaveTypeName");
+        model.EmployeeList = await _db.Employees.AsNoTracking()
+            .OrderBy(e => e.FirstName)
+            .Select(e => new SelectListItem
+            {
+                Value = e.EmployeeID.ToString(),
+                Text = $"{e.EmployeeCode} - {e.FirstName} {e.LastName}"
+            })
+            .ToListAsync();
+
+        model.LeaveTypeList = await _db.LeaveTypes.AsNoTracking()
+            .OrderBy(t => t.LeaveTypeName)
+            .Select(t => new SelectListItem
+            {
+                Value = t.LeaveTypeID.ToString(),
+                Text = t.LeaveTypeName
+            })
+            .ToListAsync();
     }
 }

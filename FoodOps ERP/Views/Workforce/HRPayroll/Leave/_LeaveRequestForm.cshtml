@@ -1,14 +1,23 @@
 ﻿@model FoodOpsERP.Models.Workforce.HRPayroll.ViewModels.LeaveRequestViewModel
-@{
-    var emps = ViewData["Employees"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
-    var types = ViewData["LeaveTypes"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new();
-}
+
 <form asp-action="Create" method="post" data-spa-form data-reload-url="@Url.Action("Index")" data-refresh="#grid-card" novalidate>
     <div class="fo-modal__body">
         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
         <div class="row g-3">
-            <div class="col-md-6"><label asp-for="EmployeeID" class="form-label">Employee</label><select asp-for="EmployeeID" asp-items="emps" class="form-select"><option value="">Select...</option></select></div>
-            <div class="col-md-6"><label asp-for="LeaveTypeID" class="form-label">Leave Type</label><select asp-for="LeaveTypeID" asp-items="types" class="form-select"><option value="">Select...</option></select></div>
+            <div class="col-md-6">
+                <label asp-for="EmployeeID" class="form-label">Employee</label>
+                <!-- ✅ Updated: asp-items Model se -->
+                <select asp-for="EmployeeID" asp-items="Model.EmployeeList" class="form-select">
+                    <option value="">Select...</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="LeaveTypeID" class="form-label">Leave Type</label>
+                <!-- ✅ Updated: asp-items Model se -->
+                <select asp-for="LeaveTypeID" asp-items="Model.LeaveTypeList" class="form-select">
+                    <option value="">Select...</option>
+                </select>
+            </div>
             <div class="col-md-4"><label asp-for="FromDate" class="form-label">From</label><input asp-for="FromDate" type="date" class="form-control" /></div>
             <div class="col-md-4"><label asp-for="ToDate" class="form-label">To</label><input asp-for="ToDate" type="date" class="form-control" /></div>
             <div class="col-md-4"><label asp-for="TotalDays" class="form-label">Total Days</label><input asp-for="TotalDays" type="number" step="0.5" class="form-control num" /></div>

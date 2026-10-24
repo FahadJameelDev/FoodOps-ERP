@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace FoodOpsERP.Models.Workforce.HRPayroll.ViewModels;
 
@@ -28,4 +29,8 @@ public class AttendanceViewModel
 
     public int? WorkedMinutes { get; set; }
     public string? Remarks { get; set; }
+
+    // ✅ Dropdowns ke liye nayi properties
+    public IEnumerable<SelectListItem>? EmployeeList { get; set; }
+    public IEnumerable<SelectListItem>? ShiftList { get; set; }
 }
