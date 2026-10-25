@@ -50,6 +50,9 @@ namespace FoodOpsERP.Models.ViewModels
 
     public class BatchItem
     {
+        // ✅ YEH LINE ADD KAREIN (Yeh missing thi)
+        public int Id { get; set; }
+
         public string BatchNumber { get; set; } = string.Empty;
         public string ProductName { get; set; } = string.Empty;
         public string ProductIcon { get; set; } = "bi-box";
