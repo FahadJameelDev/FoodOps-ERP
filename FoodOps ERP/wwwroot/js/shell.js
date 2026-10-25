@@ -117,7 +117,7 @@
         return best;
     }
 
-    /* ── 5. Module tab bar (router isi ko updateBreadcrumb ke naam se bulata hai) ── */
+    /* ── 5. Module tab bar ── */
     function updateBreadcrumb() {
         const bar = document.querySelector('.subheader');
         const nav = bar?.querySelector('.modnav');
@@ -126,6 +126,7 @@
         const active = document.querySelector('.sidebar-nav a.nav-link.active');
         const list = active?.closest('.nav-features');
         const seen = new Set();
+
         const links = list ? [...list.querySelectorAll('a.nav-link')].filter(a => {
             const href = a.getAttribute('href');
             if (!href || href === '#' || a.classList.contains('is-soon') || seen.has(href)) return false;
@@ -133,30 +134,116 @@
             return true;
         }) : [];
 
-        if (!active || links.length < 2) { bar.hidden = true; nav.replaceChildren(); return; }   // dashboard / akeli feature
-
-        const label = document.createElement('span');
-        label.className = 'modnav__label';
-        label.textContent = active.closest('.nav-item')?.querySelector('.nav-module-toggle > span')?.textContent.trim() || '';
+        if (!active || links.length < 2) {
+            bar.hidden = true;
+            nav.replaceChildren();
+            return;
+        }
 
         const strip = document.createElement('div');
         strip.className = 'modnav__tabs';
         const activeHref = active.getAttribute('href');
+
+        const iconFor = (a) => {
+            const short = (a.dataset.short || '').toLowerCase();
+            const full = (a.textContent || '').toLowerCase().replace(/\s+/g, ' ').trim();
+            const t = short + ' ' + full;
+
+            // —— more specific first ——
+            if (t.includes('incoming qc')) return 'bi-clipboard-check';
+            if (t.includes('production qc')) return 'bi-clipboard2-pulse';
+            if (t.includes('qc setup')) return 'bi-sliders';
+            if (t.includes('quality decision') || t.includes('decisions')) return 'bi-ui-checks';
+            if (t.includes('release')) return 'bi-unlock';
+            if (t.includes('quality records') || (t.includes('records') && t.includes('quality'))) return 'bi-folder2-open';
+            if (t.includes('records')) return 'bi-folder2-open';
+
+            if (t.includes('goods receiving') || t.includes('receiving') || t.includes('grn')) return 'bi-box-arrow-in-down';
+            if (t.includes('purchase')) return 'bi-cart';
+            if (t.includes('supplier')) return 'bi-building';
+            if (t.includes('movement')) return 'bi-arrow-left-right';
+            if (t.includes('lot') || t.includes('expiry')) return 'bi-calendar-x';
+            if (t.includes('material issue') || t.includes('material')) return 'bi-box-arrow-up';
+            if (t.includes('wastage')) return 'bi-trash3';
+            if (t.includes('stock')) return 'bi-box-seam';
+
+            if (t.includes('packaging')) return 'bi-box';
+            if (t.includes('catalogue') || t.includes('catalog')) return 'bi-boxes';
+            if (t.includes('versioning')) return 'bi-layers';
+            if (t.includes('change') || t.includes('changes')) return 'bi-pencil-square';
+            if (t.includes('approval') || t.includes('approvals')) return 'bi-check2-circle';
+            if (t.includes('recipe')) return 'bi-journal-text';
+            if (t.includes('product')) return 'bi-boxes';
+
+            if (t.includes('demand')) return 'bi-graph-up-arrow';
+            if (t.includes('plan')) return 'bi-diagram-3';
+            if (t.includes('batch')) return 'bi-collection';
+
+            if (t.includes('unit cost')) return 'bi-tag';
+            if (t.includes('cost component')) return 'bi-puzzle';
+            if (t.includes('batch costing')) return 'bi-receipt';
+            if (t.includes('variance control')) return 'bi-sliders2';
+            if (t.includes('variance')) return 'bi-bar-chart';
+            if (t.includes('loss')) return 'bi-graph-down';
+            if (t.includes('cost')) return 'bi-currency-dollar';
+
+            if (t.includes('correction')) return 'bi-wrench-adjustable';
+            if (t.includes('attendance')) return 'bi-person-check';
+            if (t.includes('overtime')) return 'bi-clock-history';
+            if (t.includes('leave')) return 'bi-calendar-minus';
+            if (t.includes('compensation')) return 'bi-cash-coin';
+            if (t.includes('workforce setup') || (t.includes('setup') && t.includes('workforce'))) return 'bi-sliders';
+            if (t.includes('setup')) return 'bi-sliders';
+            if (t.includes('employee')) return 'bi-person-badge';
+            if (t.includes('finalization') || t.includes('finalize')) return 'bi-check-all';
+            if (t.includes('processing')) return 'bi-gear-wide-connected';
+            if (t.includes('review')) return 'bi-search';
+            if (t.includes('payroll')) return 'bi-cash-stack';
+
+            if (t.includes('ai hub') || t.includes('assistant hub') || t.includes('hub')) return 'bi-robot';
+            if (t.includes('inventory assistant') || (t.includes('inventory') && t.includes('assistant'))) return 'bi-box-seam';
+            if (t.includes('production assistant')) return 'bi-gear';
+            if (t.includes('quality assistant')) return 'bi-patch-check';
+            if (t.includes('cost assistant')) return 'bi-currency-dollar';
+            if (t.includes('payroll assistant')) return 'bi-cash-stack';
+            if (t.includes('management assistant') || t.includes('management')) return 'bi-briefcase';
+            if (t.includes('safety')) return 'bi-shield-check';
+            if (t.includes('evidence')) return 'bi-file-earmark-text';
+            if (t.includes('audit')) return 'bi-journal-check';
+            if (t.includes('assistant')) return 'bi-chat-dots';
+
+            if (t.includes('overview') || t.includes('factory')) return 'bi-grid-1x2';
+            if (t.includes('alert')) return 'bi-exclamation-triangle';
+            if (t.includes('action')) return 'bi-lightning-charge';
+            if (t.includes('trend')) return 'bi-graph-up';
+            if (t.includes('workforce')) return 'bi-people';
+            if (t.includes('inventory')) return 'bi-box-seam';
+            if (t.includes('quality') || t.includes('qc')) return 'bi-patch-check';
+            if (t.includes('production')) return 'bi-gear';
+            if (t.includes('report')) return 'bi-file-earmark-bar-graph';
+            if (t.includes('ai summary') || t.includes('ai')) return 'bi-robot';
+
+            return 'bi-circle'; // last resort (almost never)
+        };
+
         links.forEach(a => {
             const t = document.createElement('a');
             const on = a.getAttribute('href') === activeHref;
             t.className = 'modnav__tab' + (on ? ' is-active' : '');
             t.href = a.getAttribute('href');
-            t.textContent = a.dataset.short || a.textContent.trim();
+
+            const label = (a.dataset.short || a.textContent || '').trim();
+            const icon = iconFor(a);
+            t.innerHTML = `<i class="bi ${icon}" aria-hidden="true"></i><span>${label}</span>`;
+
             if (on) t.setAttribute('aria-current', 'page');
             strip.appendChild(t);
         });
 
-        nav.replaceChildren(label, strip);
+        nav.replaceChildren(strip);
         bar.hidden = false;
         strip.querySelector('.is-active')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     }
-
     /* ── 6. Placeholder menu items ("Soon") ──────────────── */
     function markPlaceholders() {
         $$('.sidebar-nav a.nav-link[href="#"]').forEach(a => {
