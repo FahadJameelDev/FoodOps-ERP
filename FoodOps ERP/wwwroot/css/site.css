@@ -850,6 +850,7 @@ body.sidebar-open .sidebar {
         border-bottom-color: var(--emerald); /* Patli si green line */
     }
 
+
 /* ── 7. PAGE FRAME + HEADER ───────────────────────── */
 .page-content {
     flex: 1;
@@ -859,7 +860,7 @@ body.sidebar-open .sidebar {
     flex-direction: column;
     overflow-x: hidden;
     overflow-y: auto;
-    padding: 16px var(--content-x) var(--sp-5);
+    padding: 20px var(--content-x) 24px;
     transition: opacity .15s ease;
 }
 
@@ -880,32 +881,27 @@ body.sidebar-open .sidebar {
         flex: 0 1 auto;
         min-height: 0;
     }
-/* content jitna, phir andar scroll */
 
+/* ✅ Page Header (No Subtitle, No Empty Space) */
 .ph {
-    display: flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 2px 12px;
-    margin: 0 0 14px;
+    display: block;
+    margin: 0 0 16px;
 }
 
 .ph__title {
     margin: 0;
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 700;
-    letter-spacing: -.02em;
-    line-height: 1.25;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
     color: var(--text-heading);
 }
 
 .ph__sub {
-    margin: 0;
-    font-size: 13px;
-    color: var(--text-muted);
+    display: none; /* ✅ Subtitle hata diya */
 }
 
-/* legacy (dashboard abhi purane header use karta hai) */
+/* Legacy Header (Dashboard ke liye) */
 .page-header {
     display: flex;
     align-items: flex-start;
@@ -938,7 +934,7 @@ body.sidebar-open .sidebar {
     font-size: var(--fs-2xl);
     font-weight: 700;
     color: var(--text-heading);
-    letter-spacing: -.02em;
+    letter-spacing: -0.02em;
 }
 
 .page-subtitle {
@@ -990,7 +986,6 @@ body.sidebar-open .sidebar {
         color: var(--text-muted);
         margin-bottom: 16px;
     }
-
 /* ── 8. CARDS + KPI ───────────────────────────────── */
 .card {
     background: var(--card-bg);
@@ -1315,7 +1310,7 @@ body.sidebar-open .sidebar {
         color: #475569 !important;
     }
 
-/* ── 11. GRID: card + toolbar ─────────────────────── */
+/* ── 11. GRID: card + toolbar + chips + footer ────── */
 #grid-card {
     display: flex;
     flex-direction: column;
@@ -1333,40 +1328,81 @@ body.sidebar-open .sidebar {
 
 .grid-search {
     position: relative;
-    flex: 0 1 320px;
+    flex: 0 1 300px;
     margin: 0;
 }
 
     .grid-search i {
         position: absolute;
-        left: 11px;
+        left: 12px;
         top: 50%;
         transform: translateY(-50%);
         color: var(--text-light);
-        font-size: 12px;
+        font-size: 13px;
+        pointer-events: none;
     }
 
     .grid-search input {
         width: 100%;
-        height: 34px;
-        padding: 0 12px 0 32px;
+        height: 34px; /* ✅ Slim height */
+        padding: 0 12px 0 36px;
         border: 1px solid var(--line-strong);
         border-radius: var(--radius-btn);
-        background: #fff;
-        font-size: var(--fs-sm);
+        background: var(--surface-2);
+        font-size: 13px;
     }
 
         .grid-search input:focus {
             outline: 0;
+            background: #fff;
             border-color: var(--emerald);
             box-shadow: var(--ring);
         }
 
+    /* ✅ "/" hint hata diya */
+    .grid-search::after {
+        display: none;
+    }
+
 .grid-count {
-    font-size: 12px;
-    color: var(--text-muted);
-    white-space: nowrap;
+    display: none;
 }
+
+/* Status filters */
+.seg {
+    display: inline-flex;
+    gap: 6px;
+    padding: 0;
+    background: none;
+    border-radius: 0;
+}
+
+    .seg button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 30px; /* ✅ Slim */
+        padding: 0 12px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: #fff;
+        color: #475569;
+        font: 600 12px var(--font);
+        cursor: pointer;
+        transition: all var(--t-fast);
+    }
+
+        .seg button:hover {
+            background: var(--surface-2);
+            border-color: var(--line-strong);
+            color: var(--text-heading);
+        }
+
+        .seg button.is-on {
+            background: #E7F8F0;
+            border-color: rgba(16,185,129,.5);
+            color: #065F46;
+        }
 
 .grid-actions {
     display: flex;
@@ -1375,34 +1411,26 @@ body.sidebar-open .sidebar {
     margin-left: auto;
 }
 
-.seg {
-    display: inline-flex;
-    padding: 2px;
-    background: #E9EEF3;
-    border-radius: 8px;
+/* ✅ Add Button slim kiya */
+.grid-toolbar .btn {
+    height: 34px;
+    padding: 0 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: var(--radius-btn);
 }
 
-    .seg button {
-        padding: 4px 12px;
-        border: 0;
-        border-radius: 6px;
-        background: transparent;
-        color: #475569;
-        font: 600 12px var(--font);
-        cursor: pointer;
-        transition: all var(--t-fast);
+.grid-toolbar .btn-primary {
+    box-shadow: none; /* ✅ Ubhra hua look hataya */
+    background: var(--emerald);
+    border-color: var(--emerald);
+    color: #fff;
+}
+
+    .grid-toolbar .btn-primary:hover {
+        background: var(--emerald-dark);
+        border-color: var(--emerald-dark);
     }
-
-        .seg button:hover {
-            color: var(--text-heading);
-        }
-
-        .seg button.is-on {
-            background: #fff;
-            color: var(--text-heading);
-            box-shadow: 0 1px 2px rgba(15,23,42,.12);
-        }
-
 /* ── 12. DATA TABLE ───────────────────────────────── */
 .table-responsive {
     overflow-x: auto;
@@ -1416,8 +1444,12 @@ body.sidebar-open .sidebar {
 #grid-card .table-scroll {
     flex: 1 1 auto;
     border-top: 1px solid var(--line);
-    border-radius: 0 0 var(--radius-card) var(--radius-card);
+    border-radius: 0;
 }
+
+    #grid-card .table-scroll:last-child {
+        border-radius: 0 0 var(--radius-card) var(--radius-card);
+    }
 
 .table {
     width: 100%;
@@ -1433,73 +1465,43 @@ body.sidebar-open .sidebar {
         white-space: nowrap;
     }
 
+    /* ✅ Slim Header + Center Align */
     .table thead th {
         position: sticky;
         top: 0;
         z-index: 3;
-        height: 42px;
+        height: 38px; /* ✅ Patla kiya */
         padding: 0 16px;
-        text-align: left;
-        background: #F1F5F9;
-        color: #334155;
-        font-size: 12px;
+        text-align: center; /* ✅ Center kiya */
+        background: var(--surface-2);
+        color: var(--text-muted);
+        font-size: 11px;
         font-weight: 600;
-        border-bottom: 1px solid var(--line-strong);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--line);
         cursor: pointer;
         user-select: none;
         transition: background var(--t-fast);
     }
 
         .table thead th + th {
-            border-left: 1px solid #E2E8F0;
+            border-left: 1px solid var(--line);
         }
 
         .table thead th:hover, .table thead th[aria-sort] {
-            background: #E8EEF4;
+            background: var(--surface-3);
             color: var(--text-heading);
         }
 
-        .table thead th.num {
-            text-align: right;
-        }
-
-        .table thead th[aria-sort]::after {
-            content: "";
-            display: inline-block;
-            margin-left: 6px;
-            vertical-align: middle;
-            border: 4px solid transparent;
-        }
-
-        .table thead th[aria-sort="ascending"]::after {
-            border-bottom-color: currentColor;
-            border-top-width: 0;
-        }
-
-        .table thead th[aria-sort="descending"]::after {
-            border-top-color: currentColor;
-            border-bottom-width: 0;
-        }
-
-        .table thead th:not([aria-sort]):not(.text-end:last-child):hover::after {
-            content: "";
-            display: inline-block;
-            margin-left: 6px;
-            vertical-align: middle;
-            border: 4px solid transparent;
-            border-top-color: #94A3B8;
-            border-bottom-width: 0;
-        }
-
+    /* ✅ Body rows center align */
     .table tbody td {
-        height: 46px;
+        height: 48px;
         padding: 0 16px;
-        max-width: 360px;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        text-align: center; /* ✅ Center kiya */
         vertical-align: middle;
         background: #fff;
-        border-bottom: 1px solid #E2E8F0;
+        border-bottom: 1px solid #E6EBF1;
     }
 
     .table tbody tr:nth-child(even) td {
@@ -1507,13 +1509,14 @@ body.sidebar-open .sidebar {
     }
 
     .table tbody tr:hover td {
-        background: #EEF7F2;
+        background: var(--surface-2);
     }
 
     .table tbody tr:last-child td {
         border-bottom: 0;
     }
 
+/* ✅ Scroll Fix */
 tr[hidden] {
     display: none;
 }
@@ -1522,15 +1525,16 @@ tr[data-href] {
     cursor: pointer;
 }
 
-/* frozen columns: pehla aur Actions */
 .table th:first-child, .table td:first-child {
+    width: 1%;
     position: sticky;
     left: 0;
+    text-align: left; /* Code column left hi rahega */
 }
 
 .table td:first-child {
     z-index: 2;
-    box-shadow: 1px 0 0 #E2E8F0;
+    box-shadow: 1px 0 0 #E6EBF1;
 }
 
 .table thead th:first-child {
@@ -1538,24 +1542,24 @@ tr[data-href] {
 }
 
 .table th.text-end:last-child, .table td.text-end:last-child {
+    width: 1%;
     position: sticky;
     right: 0;
 }
 
 .table td.text-end:last-child {
     z-index: 2;
-    box-shadow: -1px 0 0 #E2E8F0;
+    box-shadow: -1px 0 0 #E6EBF1;
 }
 
 .table thead th.text-end:last-child {
     z-index: 5;
     cursor: default;
-    box-shadow: -1px 0 0 #CBD5E1;
 }
 
-    .table thead th.text-end:last-child:hover {
-        background: #F1F5F9;
-    }
+.col-fit {
+    width: 1%;
+}
 
 .table .code {
     font-weight: 700;
@@ -1597,12 +1601,6 @@ tr[data-href] {
             height: 30px;
             padding: 0;
         }
-
-/* ✅ FIX: Actions column ki width barha di taake buttons squeeze na hon */
-.table th.text-end:last-child,
-.table td.text-end:last-child {
-    min-width: 150px !important;
-}
 
 .empty-state {
     padding: 40px 16px;

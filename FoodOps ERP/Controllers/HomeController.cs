@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization; // <-- YEH LINE NAYI HAI
 using FoodOpsERP.Models.ViewModels;
 using FoodOpsERP.Data;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,7 @@ using System.Diagnostics;
 
 namespace FoodOpsERP.Controllers
 {
+    [Authorize] // <-- YEH LINE NAYI HAI
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

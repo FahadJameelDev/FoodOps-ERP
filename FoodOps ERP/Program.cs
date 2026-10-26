@@ -207,7 +207,7 @@ app.UseRouting();
 app.UseSession();
 
 // 7.4 Authentication (future — Identity)
-// app.UseAuthentication();
+ app.UseAuthentication();
 
 app.UseAuthorization();
 
