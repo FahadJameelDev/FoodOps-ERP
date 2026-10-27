@@ -801,9 +801,10 @@ body.sidebar-open .sidebar {
     min-width: 0;
     display: flex;
     flex-direction: column;
-    overflow-x: hidden;
-    overflow-y: auto;
-    padding: 16px var(--content-x) 24px;
+    overflow-x: hidden; /* ✅ Horizontal overflow hidden taake side scroll na aaye */
+    overflow-y: auto; /* ✅ Vertical scrollbar wapas aaye */
+    /* ✅ Perfect Symmetry: Left aur Right padding barabar */
+    padding: 16px var(--content-x) 24px var(--content-x);
     transition: opacity .15s ease;
 }
 
@@ -921,13 +922,18 @@ body.sidebar-open .sidebar {
     position: relative;
     z-index: 1;
 }
-/* ── 8. CARDS + KPI ───────────────────────────────── */
+/* ── 8. CARDS + KPI (MICROSOFT FLUENT - SUPREME LEVEL) ───────────────────────────────── */
 .card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
+    background: #ffffff;
+    border: 1px solid var(--border);
     border-radius: var(--radius-card);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    transition: box-shadow 0.2s ease;
 }
+
+    .card:hover {
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+    }
 
     .card > :first-child {
         border-top-left-radius: inherit;
@@ -943,7 +949,7 @@ body.sidebar-open .sidebar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--sp-3) var(--sp-4);
+    padding: 16px 20px;
     background: transparent;
     border-bottom: 1px solid var(--divider);
 }
@@ -951,99 +957,131 @@ body.sidebar-open .sidebar {
 .card-title {
     display: flex;
     align-items: center;
-    gap: var(--sp-2);
+    gap: 8px;
     margin: 0;
-    font-size: var(--fs-md);
+    font-size: 15px;
     font-weight: 600;
     color: var(--text-heading);
 }
 
 .card-body {
-    padding: var(--sp-4);
+    padding: 20px;
 }
 
+/* ✅ PREMIUM KPI CARD */
 .kpi-card {
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: var(--sp-4) var(--sp-5);
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
+    padding: 20px 24px;
+    background: #ffffff;
+    border: 1px solid var(--border);
     border-radius: var(--radius-card);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    transition: all 0.25s ease-in-out;
+    overflow: hidden;
 }
+
+    /* Hover par premium lift aur shadow */
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06), 0 2px 8px rgba(15, 23, 42, 0.04);
+        border-color: #CBD5E1;
+    }
 
 .kpi-header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    margin-bottom: var(--sp-3);
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
 }
 
 .kpi-title {
-    font-size: var(--fs-sm);
+    font-size: 13px;
     font-weight: 600;
-    line-height: 1.3;
-    color: var(--text-body);
+    line-height: 1.4;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
 }
 
 .kpi-icon {
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 10px;
-    font-size: 18px;
+    font-size: 20px;
+    transition: transform 0.25s ease;
 }
 
-    .kpi-icon.kpi-emerald {
-        background: var(--emerald-subtle);
-        color: var(--emerald-dark);
-    }
+.kpi-card:hover .kpi-icon {
+    transform: scale(1.05) rotate(-3deg);
+}
 
-    .kpi-icon.kpi-amber {
-        background: var(--warning-bg);
-        color: var(--warning);
-    }
+.kpi-icon.kpi-emerald {
+    background: #ECFDF5;
+    color: var(--emerald-dark);
+}
 
-    .kpi-icon.kpi-red {
-        background: var(--danger-bg);
-        color: var(--danger);
-    }
+.kpi-icon.kpi-amber {
+    background: #FFFBEB;
+    color: var(--warning);
+}
 
+.kpi-icon.kpi-red {
+    background: #FEF2F2;
+    color: var(--danger);
+}
+
+.kpi-icon.kpi-blue {
+    background: #EFF6FF;
+    color: var(--info);
+}
+
+/* ✅ PREMIUM KPI VALUE */
 .kpi-value {
-    margin-bottom: var(--sp-2);
-    font-size: 28px;
+    margin-bottom: 4px;
+    font-size: 32px;
     font-weight: 700;
-    line-height: 1.1;
-    letter-spacing: -.02em;
+    line-height: 1;
+    letter-spacing: -0.03em;
     color: var(--text-heading);
     font-variant-numeric: tabular-nums;
+    position: relative;
+    z-index: 1;
 }
 
 .kpi-meta {
-    margin-bottom: var(--sp-3);
-    font-size: var(--fs-xs);
+    margin-bottom: 16px;
+    font-size: 12px;
     font-weight: 500;
     color: var(--text-muted);
+    position: relative;
+    z-index: 1;
 }
 
 .kpi-progress {
     width: 100%;
     height: 6px;
-    margin-bottom: var(--sp-3);
+    margin-bottom: 16px;
     overflow: hidden;
     background: var(--divider);
     border-radius: 3px;
+    position: relative;
+    z-index: 1;
 }
 
 .kpi-progress-bar {
     height: 100%;
     background: var(--emerald);
     border-radius: 3px;
-    transition: width var(--t-slow);
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .kpi-action {
@@ -1051,19 +1089,23 @@ body.sidebar-open .sidebar {
     align-items: center;
     justify-content: center;
     align-self: flex-start;
-    padding: 5px 12px;
+    padding: 6px 14px;
     border: 1px solid var(--border);
     border-radius: var(--radius-btn);
     background: #fff;
     color: var(--text-body);
-    font-size: var(--fs-xs);
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
-    transition: all var(--t-fast);
+    transition: all 0.2s;
+    position: relative;
+    z-index: 1;
 }
 
     .kpi-action:hover {
-        background: var(--workspace-bg);
+        background: var(--surface-2);
+        border-color: var(--line-strong);
+        color: var(--text-heading);
     }
 
     .kpi-action.action-amber {
@@ -1086,62 +1128,105 @@ body.sidebar-open .sidebar {
             background: var(--danger-bg);
         }
 
-/* ── 9. BUTTONS ───────────────────────────────────── */
+/* ✅ AGAR AAPKI HTML MEIN KPI GRID HAI (Jaise 4 cards ek line mein) */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+
+}
+/* ✅ FIX: KPI Cards ka Grid Gap barhaya (Microsoft Style) */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px; /* ✅ 16px se 24px kiya */
+    margin-bottom: 24px;
+}
+
+/* ✅ FIX: Chart ke andar ka background aur padding */
+.card-body canvas,
+.card-body .chart-container {
+    background: #FAFBFC; /* Halka grey background chart ke liye */
+    border-radius: 8px;
+    padding: 16px;
+}
+
+/* ── 9. BUTTONS (MICROSOFT FLUENT - SUPREME LEVEL) ───────────────────────────────────── */
 .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: var(--sp-2);
-    padding: var(--sp-2) var(--sp-3);
+    gap: 8px;
+    padding: 8px 16px;
     border: 1px solid transparent;
     border-radius: var(--radius-btn);
-    font: 500 var(--fs-sm)/1.4 var(--font);
+    font: 600 13px var(--font);
     white-space: nowrap;
     cursor: pointer;
-    transition: all var(--t-fast);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
 }
 
     .btn:focus {
         outline: none;
-        box-shadow: var(--ring);
+        box-shadow: 0 0 0 3px var(--emerald-glow);
     }
 
     .btn:disabled {
-        opacity: .6;
+        opacity: 0.6;
         cursor: not-allowed;
+        pointer-events: none;
     }
 
+/* ✅ Small Button (Tables ke andar) */
 .btn-sm {
-    padding: 5px 12px;
-    font-size: var(--fs-xs);
+    padding: 6px 12px;
+    font-size: 12px;
+    gap: 6px;
 }
 
+/* ✅ Primary Button (Emerald) */
 .btn-primary {
     background: var(--emerald);
     border-color: var(--emerald);
-    color: #fff;
+    color: #ffffff;
+    box-shadow: 0 1px 2px rgba(16, 185, 129, 0.2);
 }
 
     .btn-primary:hover {
         background: var(--emerald-dark);
         border-color: var(--emerald-dark);
-        color: #fff;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        transform: translateY(-1px);
     }
 
+    .btn-primary:active {
+        transform: translateY(0);
+        box-shadow: none;
+    }
+
+/* ✅ Danger Button (Delete) */
 .btn-danger {
     background: var(--danger);
     border-color: var(--danger);
-    color: #fff;
+    color: #ffffff;
+    box-shadow: 0 1px 2px rgba(239, 68, 68, 0.2);
 }
 
     .btn-danger:hover {
         background: #DC2626;
         border-color: #DC2626;
-        color: #fff;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        transform: translateY(-1px);
     }
 
+/* ✅ Secondary Outline Button (Back / Cancel) */
 .btn-outline-secondary {
-    background: #fff;
+    background: #ffffff;
     border-color: var(--line-strong);
     color: var(--text-body);
 }
@@ -1150,10 +1235,17 @@ body.sidebar-open .sidebar {
         background: var(--surface-2);
         border-color: var(--line-strong);
         color: var(--text-heading);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.04);
     }
 
+    .btn-outline-secondary:active {
+        transform: translateY(0);
+    }
+
+/* ✅ Danger Outline Button (Table Actions) */
 .btn-outline-danger {
-    background: #fff;
+    background: #ffffff;
     border-color: #F2C4C4;
     color: #B91C1C;
 }
@@ -1162,8 +1254,15 @@ body.sidebar-open .sidebar {
         background: var(--danger-bg);
         border-color: #F2C4C4;
         color: #B91C1C;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(239, 68, 68, 0.1);
     }
 
+    .btn-outline-danger:active {
+        transform: translateY(0);
+    }
+
+/* ✅ Loading State (Spinner) */
 .btn.is-loading {
     position: relative;
     color: transparent !important;
@@ -1179,17 +1278,19 @@ body.sidebar-open .sidebar {
         position: absolute;
         top: 50%;
         left: 50%;
-        width: 14px;
-        height: 14px;
-        margin: -7px 0 0 -7px;
-        border: 2px solid rgba(255,255,255,.45);
+        width: 16px;
+        height: 16px;
+        margin: -8px 0 0 -8px;
+        border: 2px solid rgba(255,255,255,0.4);
         border-top-color: #fff;
         border-radius: 50%;
-        animation: spin .6s linear infinite;
+        animation: spin 0.6s linear infinite;
     }
 
-.btn-outline-secondary.is-loading::after, .btn-outline-danger.is-loading::after {
-    border-color: rgba(0,0,0,.15);
+/* Secondary/Danger Outline ke liye spinner color */
+.btn-outline-secondary.is-loading::after,
+.btn-outline-danger.is-loading::after {
+    border-color: rgba(0,0,0,0.15);
     border-top-color: var(--text-body);
 }
 
@@ -1640,74 +1741,99 @@ tr[data-href] {
     color: var(--text-muted);
 }
 
-/* ── 14. ALERT ITEMS (dashboard) ──────────────────── */
+/* ── 14. ALERT ITEMS (MICROSOFT FLUENT - SUPREME LEVEL) ──────────────────── */
 .alert-item {
     display: flex;
     align-items: center;
-    gap: var(--sp-3);
-    margin-bottom: var(--sp-2);
-    padding: var(--sp-2) var(--sp-3);
+    gap: 16px;
+    margin-bottom: 12px;
+    padding: 16px 20px; /* ✅ Padding barhai taake box bada aur premium lage */
     border: 1px solid transparent;
-    border-radius: var(--radius-btn);
+    border-radius: var(--radius-card); /* ✅ Sharp corners ki jagah Card radius */
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
 }
+
+    .alert-item:hover {
+        transform: translateX(2px); /* ✅ Hover par halka sa right shift */
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
 
     .alert-item:last-child {
         margin-bottom: 0;
     }
 
+/* ✅ Icon Container (Bada aur Clean) */
 .alert-item-icon {
-    width: 28px;
-    height: 28px;
+    width: 36px; /* ✅ Size barhaya */
+    height: 36px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: #fff;
-    font-size: 13px;
+    background: #ffffff;
+    font-size: 16px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Halki si shadow */
 }
 
 .alert-item-content {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* Title aur desc ke beech space */
 }
 
 .alert-item-title {
-    margin-bottom: 2px;
-    font-size: var(--fs-xs);
+    margin: 0;
+    font-size: 14px; /* ✅ Title size barhaya */
     font-weight: 600;
     color: var(--text-heading);
 }
 
 .alert-item-desc {
-    margin-bottom: 2px;
-    font-size: 10px;
+    margin: 0;
+    font-size: 12px;
     color: var(--text-muted);
 }
 
 .alert-item-time {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--text-light);
 }
 
+/* ✅ View Button (Microsoft Pill Style) */
 .alert-item-action {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     flex-shrink: 0;
-    padding: 2px 8px;
-    border: 1px solid transparent;
-    border-radius: var(--radius-btn);
-    background: #fff;
-    font-size: 10px;
-    font-weight: 500;
+    padding: 6px 16px;
+    border: 1px solid var(--border);
+    border-radius: 999px; /* ✅ Gol (Pill) button */
+    background: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
     white-space: nowrap;
     cursor: pointer;
-    transition: all var(--t-fast);
+    transition: all 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
 }
 
+    .alert-item-action:hover {
+        background: var(--surface-2);
+        border-color: var(--line-strong);
+        color: var(--text-heading);
+    }
+
+/* ── Alert Variants ── */
+
+/* Danger (QC Hold) */
 .alert-item-danger {
-    background: var(--danger-bg);
-    border-color: rgba(239,68,68,.2);
+    background: #FEF2F2; /* Halka Red */
+    border-color: #FECACA;
 }
 
     .alert-item-danger .alert-item-icon {
@@ -1715,18 +1841,20 @@ tr[data-href] {
     }
 
     .alert-item-danger .alert-item-action {
-        border-color: var(--danger);
-        color: var(--danger);
+        border-color: #FCA5A5;
+        color: #B91C1C;
     }
 
         .alert-item-danger .alert-item-action:hover {
             background: var(--danger);
+            border-color: var(--danger);
             color: #fff;
         }
 
+/* Warning (Low Stock / Expiring) */
 .alert-item-warning {
-    background: var(--warning-bg);
-    border-color: rgba(245,158,11,.2);
+    background: #FFFBEB; /* Halka Yellow */
+    border-color: #FDE68A;
 }
 
     .alert-item-warning .alert-item-icon {
@@ -1734,18 +1862,20 @@ tr[data-href] {
     }
 
     .alert-item-warning .alert-item-action {
-        border-color: var(--warning);
+        border-color: #FCD34D;
         color: #B45309;
     }
 
         .alert-item-warning .alert-item-action:hover {
             background: var(--warning);
+            border-color: var(--warning);
             color: #fff;
         }
 
+/* Info (Default) */
 .alert-item-info {
-    background: var(--info-bg);
-    border-color: rgba(59,130,246,.2);
+    background: #EFF6FF; /* Halka Blue */
+    border-color: #BFDBFE;
 }
 
     .alert-item-info .alert-item-icon {
@@ -1753,15 +1883,15 @@ tr[data-href] {
     }
 
     .alert-item-info .alert-item-action {
-        border-color: var(--info);
-        color: var(--info);
+        border-color: #93C5FD;
+        color: #1D4ED8;
     }
 
         .alert-item-info .alert-item-action:hover {
             background: var(--info);
+            border-color: var(--info);
             color: #fff;
         }
-
 /* ── 15. FOOTER ───────────────────────────────────── */
 .footer {
     flex-shrink: 0;
@@ -2134,191 +2264,100 @@ tr[data-href] {
     color: var(--info);
 }
 
-/* ── 19. HELPERS ──────────────────────────────────── */
-.info-strip {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin-bottom: 16px;
-    padding: 10px 14px;
-    background: var(--surface-2);
-    border: 1px solid var(--divider);
-    border-radius: var(--radius-btn);
-    font-size: var(--fs-sm);
-}
+/* ── 19. HELPERS (MICROSOFT FLUENT - SUPREME TILES) ──────────────────────────────────── */
 
-    .info-strip span {
-        display: block;
-        color: var(--text-muted);
-        font-size: var(--fs-xs);
-    }
-
-    .info-strip b {
-        color: var(--text-heading);
-    }
-
-.repeater-head, .repeater-row {
-    display: grid;
-    grid-template-columns: minmax(180px,2.2fr) minmax(90px,1fr) minmax(90px,1fr) minmax(90px,1fr) 90px 32px;
-    gap: 8px;
-    align-items: center;
-}
-
-.repeater-head {
-    padding-bottom: 6px;
-    font-size: var(--fs-xs);
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: .03em;
-}
-
-.repeater-row {
-    margin-bottom: 8px;
-}
-
-.line-total {
-    text-align: right;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-    color: var(--text-heading);
-}
-
-.repeater-foot {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid var(--divider);
-}
-
-.choice-group {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-}
-
-.choice {
-    position: relative;
-    margin: 0;
-    cursor: pointer;
-}
-
-    .choice input {
-        position: absolute;
-        inset: 0;
-        opacity: 0;
-    }
-
-    .choice span {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-        padding: 12px 8px;
-        border: 1.5px solid var(--border);
-        border-radius: 10px;
-        font-weight: 600;
-        color: var(--text-body);
-        transition: all var(--t-fast);
-    }
-
-        .choice span i {
-            font-size: 20px;
-        }
-
-    .choice input:focus-visible + span {
-        box-shadow: var(--ring);
-    }
-
-.choice--pass input:checked + span {
-    border-color: var(--success);
-    background: var(--success-bg);
-    color: #047857;
-}
-
-.choice--fail input:checked + span {
-    border-color: var(--danger);
-    background: var(--danger-bg);
-    color: #B91C1C;
-}
-
-.choice--hold input:checked + span {
-    border-color: var(--warning);
-    background: var(--warning-bg);
-    color: #B45309;
-}
-
-.tile-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: var(--sp-4);
-    margin-bottom: var(--sp-5);
-}
-
+/* ✅ Premium AI Hub Tiles */
 .tile {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 16px;
-    background: #fff;
-    border: 1px solid var(--card-border);
+    gap: 16px;
+    padding: 20px 24px;
+    background: #ffffff;
+    border: 1px solid var(--border);
     border-radius: var(--radius-card);
     color: var(--text-body);
-    box-shadow: var(--shadow-sm);
-    transition: all var(--t-fast);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
 }
 
-a.tile:hover {
-    border-color: var(--emerald);
-    box-shadow: var(--shadow-md);
-    color: var(--text-body);
-}
+    /* ✅ Hover Effect: Lift + Glow */
+    a.tile:hover, .tile:hover {
+        transform: translateY(-3px);
+        border-color: #CBD5E1;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04);
+        color: var(--text-body);
+    }
 
+/* ✅ Icon Container (Premium) */
 .tile-icon {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 10px;
-    font-size: 20px;
+    border-radius: 12px;
+    font-size: 22px;
+    transition: transform 0.3s ease;
 }
 
+/* Hover par icon animate ho */
+.tile:hover .tile-icon {
+    transform: scale(1.05) rotate(-5deg);
+}
+
+/* ✅ Icon Colors (Subtle Backgrounds) */
 .tile-icon--ok {
-    background: var(--emerald-subtle);
+    background: #ECFDF5;
     color: var(--emerald-dark);
 }
 
 .tile-icon--warn {
-    background: var(--warning-bg);
-    color: #B45309;
+    background: #FFFBEB;
+    color: var(--warning);
 }
 
 .tile-icon--info {
-    background: var(--info-bg);
-    color: #1D4ED8;
+    background: #EFF6FF;
+    color: var(--info);
 }
 
 .tile-icon--bad {
-    background: var(--danger-bg);
-    color: #B91C1C;
+    background: #FEF2F2;
+    color: var(--danger);
 }
 
-.tile-value {
-    font-size: 24px;
-    font-weight: 700;
-    line-height: 1.1;
+/* ✅ Tile Text */
+.tile-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tile-title {
+    font-size: 15px;
+    font-weight: 600;
     color: var(--text-heading);
+    line-height: 1.2;
 }
 
-.tile-label {
-    font-size: var(--fs-sm);
+.tile-desc {
+    font-size: 12px;
     color: var(--text-muted);
+    line-height: 1.4;
 }
 
+/* ✅ Grid Layout (Agar 3 columns chahiye) */
+.tile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px; /* Thoda gap barhaya */
+    margin-bottom: 24px;
+}
 /* ── 20. UTILITIES ────────────────────────────────── */
 .fs-xs {
     font-size: var(--fs-xs) !important;
@@ -2486,3 +2525,52 @@ a.tile:hover {
         transition-duration: .01ms !important;
     }
 }
+/* ============================================================
+   ✅ FINAL OVERRIDE FIX: TABLE ACTIONS ALIGNMENT
+   ============================================================ */
+
+/* 1. Actions Column (Header aur Body) */
+.table th.text-end:last-child,
+.table td.text-end:last-child {
+    position: sticky !important;
+    right: 0 !important;
+    text-align: center !important; /* Center align */
+    width: 100px !important; /* Fixed width */
+    min-width: 100px !important;
+    padding: 0 8px !important;
+}
+
+.table td.text-end:last-child {
+    z-index: 2 !important;
+    box-shadow: -1px 0 0 #E6EBF1 !important;
+    background: #fff !important;
+}
+
+.table thead th.text-end:last-child {
+    z-index: 5 !important;
+    cursor: default !important;
+}
+
+/* 2. Buttons ke container ka alignment */
+.row-actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important; /* Center mein laao */
+    gap: 8px !important; /* Gap barhao */
+    flex-wrap: nowrap !important;
+}
+
+    /* 3. Buttons ka size aur shape */
+    .row-actions .btn {
+        white-space: nowrap !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+        .row-actions .btn:has(> i:only-child) {
+            width: 32px !important; /* Size barhao */
+            height: 32px !important;
+            padding: 0 !important;
+            border-radius: 6px !important;
+        }
