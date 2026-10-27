@@ -1,8 +1,10 @@
-﻿@* Slim page header — no icon tile, 20px title, inline subtitle *@
+﻿@* Top-Notch Page Header (BBJAN Style) *@
 <div class="ph">
-    <h1 class="ph__title">@ViewData["Title"]</h1>
-    @if (ViewData["Subtitle"] is string sub)
-    {
-        <p class="ph__sub">@sub</p>
-    }
-</div> 
+    <div class="ph__title-row">
+        <span class="ph__icon"><i class="bi bi-box-seam"></i></span>
+        <h1 class="ph__title">@ViewData["Title"]</h1>
+    </div>
+    <div class="ph__actions">
+        @* Yahan right side ke actions aa sakte hain, filhal khali hai *@
+    </div>
+</div>

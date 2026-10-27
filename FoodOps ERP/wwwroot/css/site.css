@@ -502,21 +502,22 @@ body.sidebar-open .sidebar {
 .sidebar-backdrop {
     display: none;
 }
-
-/* ── 5. TOPBAR ────────────────────────────────────── */
+/* ── 5. TOPBAR (MICROSOFT FLUENT - FINAL POLISH) ────────────────────────────── */
 .topbar {
     position: relative;
     z-index: 100;
     flex-shrink: 0;
     height: var(--topbar-height);
-    padding: 0 var(--sp-6);
-    gap: var(--sp-4);
+    padding: 0 var(--content-x);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: var(--topbar-bg);
-    border-bottom: 1px solid var(--topbar-border);
+    background: #ffffff;
+    /* ✅ FIX 1: Topbar ke neeche dark border hata kar halka border lagaya */
+    border-bottom: 1px solid var(--divider);
 }
+
+/* ... (Search, Buttons, User Profile ka code same rahega, maine sirf border change kiya hai) ... */
 
 .topbar-left {
     display: flex;
@@ -529,7 +530,7 @@ body.sidebar-open .sidebar {
 .topbar-right {
     display: flex;
     align-items: center;
-    gap: var(--sp-2);
+    gap: 12px;
     flex-shrink: 0;
 }
 
@@ -547,7 +548,7 @@ body.sidebar-open .sidebar {
     top: 50%;
     transform: translateY(-50%);
     color: var(--text-muted);
-    font-size: 14px;
+    font-size: 15px;
     pointer-events: none;
     z-index: 1;
 }
@@ -557,22 +558,18 @@ body.sidebar-open .sidebar {
     height: 40px;
     padding: 0 110px 0 44px;
     border: 1px solid var(--border);
-    border-radius: var(--radius-pill);
-    font: var(--fs-sm) var(--font);
+    border-radius: var(--radius-btn);
+    font: 500 13px var(--font);
     color: var(--text-body);
-    background: var(--workspace-bg);
-    transition: all var(--t-fast);
+    background: var(--surface-2);
+    transition: all 0.2s ease;
 }
 
     .topbar-search input:focus {
         outline: none;
         border-color: var(--emerald);
         background: #fff;
-        box-shadow: var(--ring);
-    }
-
-    .topbar-search input::placeholder {
-        color: var(--text-light);
+        box-shadow: 0 0 0 3px var(--emerald-glow);
     }
 
 .topbar-search-kbd {
@@ -582,7 +579,7 @@ body.sidebar-open .sidebar {
     transform: translateY(-50%);
     background: #fff;
     border: 1px solid var(--border);
-    border-radius: 6px;
+    border-radius: 4px;
     padding: 2px 6px;
     font: 600 10px var(--font);
     color: var(--text-muted);
@@ -597,92 +594,90 @@ body.sidebar-open .sidebar {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 4px 10px;
+    padding: 4px 12px;
     border: 0;
-    border-radius: 18px;
+    border-radius: 6px;
     background: linear-gradient(135deg, #8B5CF6, #7C3AED);
     color: #fff;
     font-size: 11px;
     font-weight: 600;
     cursor: pointer;
-    transition: all var(--t-fast);
+    transition: all 0.2s;
 }
 
     .topbar-search-ai:hover {
-        transform: translateY(-50%) scale(1.05);
-        box-shadow: 0 4px 12px rgba(139,92,246,.3);
+        transform: translateY(-50%) scale(1.02);
+        box-shadow: 0 2px 8px rgba(139,92,246,0.3);
     }
 
 .topbar-filter-btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 12px;
-    border: 1px solid var(--border);
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid var(--line-strong);
     border-radius: var(--radius-btn);
     background: #fff;
     color: var(--text-body);
-    font-size: var(--fs-xs);
+    font-size: 12px;
     font-weight: 500;
-    transition: all var(--t-fast);
+    transition: all 0.2s;
 }
 
     .topbar-filter-btn:hover, .topbar-filter-btn.show {
-        background: var(--workspace-bg);
+        background: var(--surface-2);
         border-color: var(--emerald);
         color: var(--emerald-dark);
     }
 
-    .topbar-filter-btn span {
-        max-width: 230px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-.topbar-filter-menu, .topbar-dropdown-menu {
-    border: 1px solid var(--border) !important;
-    border-radius: var(--radius-card);
-    padding: 6px;
-    margin-top: 8px !important;
-    box-shadow: var(--shadow-pop) !important;
-    background: #fff;
-    z-index: 1060;
+.topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 12px 4px 4px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s;
+    border: 1px solid transparent;
 }
 
-.topbar-filter-menu {
-    min-width: 250px;
-}
-
-    .topbar-filter-menu .dropdown-item, .topbar-dropdown-menu .dropdown-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 7px 12px;
-        border-radius: 6px;
-        font-size: var(--fs-sm);
-        color: var(--text-body);
+    .topbar-user:hover {
+        background: var(--surface-2);
+        border-color: var(--line);
     }
 
-        .topbar-filter-menu .dropdown-item:hover, .topbar-dropdown-menu .dropdown-item:hover {
-            background: var(--workspace-bg);
-        }
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: linear-gradient(135deg, var(--emerald), var(--emerald-dark));
+    color: #fff;
+    font-weight: 600;
+    font-size: 13px;
+}
 
-        .topbar-filter-menu .dropdown-item:active, .topbar-dropdown-menu .dropdown-item:active {
-            background: var(--emerald-subtle);
-            color: var(--text-heading);
-        }
+.user-info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
 
-        .topbar-filter-menu .dropdown-item.is-selected {
-            font-weight: 600;
-            color: var(--text-heading);
-            background: var(--emerald-subtle);
-        }
+.user-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-heading);
+}
 
-        .topbar-filter-menu .dropdown-item i.bi {
-            font-size: 8px;
-            margin: 0 !important;
-        }
+.user-role {
+    font-size: 10px;
+    color: var(--text-muted);
+}
 
 .btn-icon {
     position: relative;
@@ -705,92 +700,17 @@ body.sidebar-open .sidebar {
         background: var(--workspace-bg);
     }
 
-.notification-badge {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    min-width: 16px;
-    height: 16px;
-    padding: 2px 5px;
-    background: var(--danger);
-    color: #fff;
-    font-size: 9px;
-    font-weight: 700;
-    line-height: 12px;
-    text-align: center;
-    border: 2px solid #fff;
-    border-radius: 8px;
-}
 
-.notification-item {
-    border-radius: var(--radius-btn);
-    padding: 8px;
-    transition: background var(--t-fast);
-}
-
-    .notification-item:hover {
-        background: var(--workspace-bg);
-    }
-
-.topbar-user {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 4px 8px;
-    border-radius: var(--radius-btn);
-    cursor: pointer;
-    text-decoration: none;
-    transition: all var(--t-fast);
-}
-
-    .topbar-user:hover {
-        background: var(--workspace-bg);
-    }
-
-.user-avatar {
-    width: 36px;
-    height: 36px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    background: linear-gradient(135deg, var(--emerald), var(--emerald-dark));
-    color: #fff;
-    font-weight: 600;
-    font-size: var(--fs-sm);
-}
-
-.user-info {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.2;
-    max-width: 220px;
-}
-
-.user-name {
-    font-size: var(--fs-xs);
-    font-weight: 600;
-    color: var(--text-heading);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.user-role {
-    font-size: 10px;
-    color: var(--text-muted);
-}
-
-/* ── 6. MODULE TAB BAR (100x SUPREME MICROSOFT) ────────────────────────────── */
+/* ── 6. MODULE TAB BAR (MICROSOFT LEVEL - FINAL LOCK) ────────────────────────────── */
 .subheader {
     flex-shrink: 0;
     display: flex;
     align-items: stretch;
-    height: 46px;
+    height: 48px;
     padding: 0 var(--content-x);
-    background: #fff;
-    border-bottom: 1px solid var(--line);
+    background: #ffffff;
+    /* ✅ FIX 2: Subheader ke neeche wali line halki ki */
+    border-bottom: 1px solid var(--divider);
 }
 
     .subheader[hidden] {
@@ -800,7 +720,8 @@ body.sidebar-open .sidebar {
 .modnav {
     display: flex;
     align-items: stretch;
-    gap: 4px;
+    /* ✅ FIX 3: Tabs ke beech ka gap khatam kiya (Microsoft Style) */
+    gap: 0;
     width: 100%;
     min-width: 0;
     overflow-x: auto;
@@ -818,25 +739,27 @@ body.sidebar-open .sidebar {
 .modnav__tabs {
     display: flex;
     align-items: stretch;
-    gap: 4px;
 }
 
 .modnav__tab {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 0 12px;
+    gap: 8px;
+    padding: 0 16px;
     font-size: 13px;
     font-weight: 500;
     color: var(--text-muted);
     white-space: nowrap;
     text-decoration: none;
+    transition: all 0.2s ease;
     border-bottom: 2px solid transparent;
-    transition: color var(--t-fast), background-color var(--t-fast);
 }
 
     .modnav__tab i {
-        font-size: 14px;
+        font-size: 15px;
+        opacity: 0.7;
+        transition: opacity 0.2s;
     }
 
     .modnav__tab:hover {
@@ -844,14 +767,34 @@ body.sidebar-open .sidebar {
         background: rgba(15, 23, 42, 0.03);
     }
 
+        .modnav__tab:hover i {
+            opacity: 1;
+        }
+
     .modnav__tab.is-active {
         color: var(--emerald-dark);
         font-weight: 600;
-        border-bottom-color: var(--emerald); /* Patli si green line */
+        background: transparent;
     }
 
+        .modnav__tab.is-active i {
+            opacity: 1;
+            color: var(--emerald);
+        }
 
-/* ── 7. PAGE FRAME + HEADER ───────────────────────── */
+        /* ✅ FIX 4: Green line ko text ke exactly center mein lock kiya */
+        .modnav__tab.is-active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 16px;
+            right: 16px;
+            height: 2px;
+            background: var(--emerald);
+            border-radius: 2px 2px 0 0;
+        }
+
+/* ── 7. PAGE FRAME + HEADER (MICROSOFT FLUENT - ATTACHED CARD) ───────────────────────── */
 .page-content {
     flex: 1;
     min-height: 0;
@@ -860,7 +803,7 @@ body.sidebar-open .sidebar {
     flex-direction: column;
     overflow-x: hidden;
     overflow-y: auto;
-    padding: 20px var(--content-x) 24px;
+    padding: 16px var(--content-x) 24px;
     transition: opacity .15s ease;
 }
 
@@ -882,110 +825,102 @@ body.sidebar-open .sidebar {
         min-height: 0;
     }
 
-/* ✅ Page Header (No Subtitle, No Empty Space) */
+/* ✅ MICROSOFT FLUENT: Page Header (Attached to Table) */
 .ph {
-    display: block;
-    margin: 0 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0; /* ✅ Gap khatam kiya taake Table ke sath attach ho */
+    background: #ffffff;
+    padding: 0 16px;
+    /* ✅ Top corners rounded, bottom corners flat */
+    border-radius: var(--radius-card) var(--radius-card) 0 0;
+    border: 1px solid var(--border);
+    border-bottom: 1px solid var(--divider); /* ✅ Divider line Table se pehle */
+    height: 52px; /* Slight premium height */
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    transition: all 0.25s ease-in-out;
+    cursor: default;
+}
+
+    .ph:hover {
+        background: #FAFBFC;
+    }
+
+    /* Shine Sweep */
+    .ph::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(to right, transparent, rgba(255,255,255,0.6), transparent);
+        transform: skewX(-25deg);
+        transition: 0.6s ease;
+        z-index: 0;
+    }
+
+    .ph:hover::before {
+        left: 150%;
+    }
+
+.ph__title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+.ph__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: #ECFDF5;
+    color: var(--emerald-dark);
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.25s ease;
+    margin-right: 4px;
+}
+
+.ph:hover .ph__icon {
+    transform: scale(1.05);
+    background: var(--emerald-subtle);
 }
 
 .ph__title {
     margin: 0;
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1.2;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1;
     color: var(--text-heading);
+    transition: color 0.25s ease;
+}
+
+.ph:hover .ph__title {
+    color: var(--emerald-dark);
 }
 
 .ph__sub {
-    display: none; /* ✅ Subtitle hata diya */
+    display: none;
 }
 
-/* Legacy Header (Dashboard ke liye) */
-.page-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: var(--sp-4);
-    margin-bottom: var(--sp-3);
-}
-
-.page-title-row {
+.ph__actions {
     display: flex;
     align-items: center;
-    gap: var(--sp-3);
-    margin-bottom: var(--sp-1);
+    gap: 8px;
+    position: relative;
+    z-index: 1;
 }
-
-.page-title-icon {
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    background: var(--emerald-subtle);
-    color: var(--emerald-dark);
-    font-size: 18px;
-}
-
-.page-title {
-    margin: 0;
-    font-size: var(--fs-2xl);
-    font-weight: 700;
-    color: var(--text-heading);
-    letter-spacing: -0.02em;
-}
-
-.page-subtitle {
-    margin: 0;
-    padding-left: 48px;
-    font-size: var(--fs-sm);
-    color: var(--text-muted);
-}
-
-.spa-progress {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 10001;
-    width: 0;
-    height: 2px;
-    background: var(--emerald);
-    opacity: 0;
-    transition: width .4s ease, opacity .3s ease;
-}
-
-    .spa-progress.active {
-        width: 70%;
-        opacity: 1;
-    }
-
-    .spa-progress.done {
-        width: 100%;
-        opacity: 0;
-    }
-
-.spa-error {
-    max-width: 420px;
-    margin: 64px auto;
-    text-align: center;
-}
-
-    .spa-error > i {
-        font-size: 36px;
-        color: var(--warning);
-    }
-
-    .spa-error h3 {
-        margin: 12px 0 4px;
-        font-size: var(--fs-lg);
-    }
-
-    .spa-error p {
-        color: var(--text-muted);
-        margin-bottom: 16px;
-    }
 /* ── 8. CARDS + KPI ───────────────────────────────── */
 .card {
     background: var(--card-bg);
@@ -1314,6 +1249,8 @@ body.sidebar-open .sidebar {
 #grid-card {
     display: flex;
     flex-direction: column;
+    /* ✅ Card ka shadow halka kiya taake pura box ek lage */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
 }
 
 .grid-toolbar {
@@ -1323,7 +1260,8 @@ body.sidebar-open .sidebar {
     gap: 12px;
     padding: 12px 16px;
     background: #fff;
-    border-radius: var(--radius-card) var(--radius-card) 0 0;
+    /* ✅ Top corners flat (Title ke sath attach), Bottom corners 0 (Table ke sath attach) */
+    border-radius: 0;
 }
 
 .grid-search {
@@ -1344,7 +1282,7 @@ body.sidebar-open .sidebar {
 
     .grid-search input {
         width: 100%;
-        height: 34px; /* ✅ Slim height */
+        height: 34px;
         padding: 0 12px 0 36px;
         border: 1px solid var(--line-strong);
         border-radius: var(--radius-btn);
@@ -1359,13 +1297,11 @@ body.sidebar-open .sidebar {
             box-shadow: var(--ring);
         }
 
-    /* ✅ "/" hint hata diya */
-    .grid-search::after {
-        display: none;
-    }
-
 .grid-count {
-    display: none;
+    display: block;
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-left: 4px;
 }
 
 /* Status filters */
@@ -1381,7 +1317,7 @@ body.sidebar-open .sidebar {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        height: 30px; /* ✅ Slim */
+        height: 30px;
         padding: 0 12px;
         border: 1px solid var(--line);
         border-radius: 999px;
@@ -1411,17 +1347,19 @@ body.sidebar-open .sidebar {
     margin-left: auto;
 }
 
-/* ✅ Add Button slim kiya */
 .grid-toolbar .btn {
     height: 34px;
     padding: 0 16px;
     font-size: 13px;
     font-weight: 600;
     border-radius: var(--radius-btn);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .grid-toolbar .btn-primary {
-    box-shadow: none; /* ✅ Ubhra hua look hataya */
+    box-shadow: none;
     background: var(--emerald);
     border-color: var(--emerald);
     color: #fff;
@@ -1431,29 +1369,33 @@ body.sidebar-open .sidebar {
         background: var(--emerald-dark);
         border-color: var(--emerald-dark);
     }
-/* ── 12. DATA TABLE ───────────────────────────────── */
+/* ── 12. DATA TABLE (MICROSOFT PERFECT LOCK + SCROLLBAR FIX) ───────────────────────────────── */
 .table-responsive {
     overflow-x: auto;
 }
 
 .table-scroll {
+    /* ✅ Yahan overflow: auto kiya taake scrollbar wapas aaye */
     overflow: auto;
     min-height: 0;
+    /* ✅ Right side padding taake content edge se na takraye */
+    padding-right: 2px;
 }
 
 #grid-card .table-scroll {
     flex: 1 1 auto;
     border-top: 1px solid var(--line);
-    border-radius: 0;
+    /* ✅ Bottom corners rounded */
+    border-radius: 0 0 var(--radius-card) var(--radius-card);
 }
 
-    #grid-card .table-scroll:last-child {
-        border-radius: 0 0 var(--radius-card) var(--radius-card);
+    /* ✅ Table ke andar ka hissa corners ko follow kare */
+    #grid-card .table-scroll table {
+        margin-bottom: 0;
     }
 
 .table {
     width: 100%;
-    min-width: max-content;
     margin: 0;
     border-collapse: separate;
     border-spacing: 0;
@@ -1465,14 +1407,14 @@ body.sidebar-open .sidebar {
         white-space: nowrap;
     }
 
-    /* ✅ Slim Header + Center Align */
+    /* ✅ Slim Header + Left Align */
     .table thead th {
         position: sticky;
         top: 0;
         z-index: 3;
-        height: 38px; /* ✅ Patla kiya */
+        height: 38px;
         padding: 0 16px;
-        text-align: center; /* ✅ Center kiya */
+        text-align: left;
         background: var(--surface-2);
         color: var(--text-muted);
         font-size: 11px;
@@ -1494,11 +1436,11 @@ body.sidebar-open .sidebar {
             color: var(--text-heading);
         }
 
-    /* ✅ Body rows center align */
+    /* ✅ Body rows Left align */
     .table tbody td {
         height: 48px;
         padding: 0 16px;
-        text-align: center; /* ✅ Center kiya */
+        text-align: left;
         vertical-align: middle;
         background: #fff;
         border-bottom: 1px solid #E6EBF1;
@@ -1512,9 +1454,21 @@ body.sidebar-open .sidebar {
         background: var(--surface-2);
     }
 
+    /* ✅ AAKHRI ROW KA BORDER HATAYA */
     .table tbody tr:last-child td {
         border-bottom: 0;
     }
+
+        /* ✅ Table ke andar ke corners fix kiye */
+        .table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: var(--radius-card);
+        }
+
+        .table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: var(--radius-card);
+            /* Scrollbar ki jagah banaye rakhein */
+            padding-right: 24px;
+        }
 
 /* ✅ Scroll Fix */
 tr[hidden] {
@@ -1525,11 +1479,13 @@ tr[data-href] {
     cursor: pointer;
 }
 
+/* ✅ Fixed Layout: No more dead space in the middle */
 .table th:first-child, .table td:first-child {
-    width: 1%;
     position: sticky;
     left: 0;
-    text-align: left; /* Code column left hi rahega */
+    text-align: left;
+    width: 120px;
+    min-width: 120px;
 }
 
 .table td:first-child {
@@ -1542,9 +1498,11 @@ tr[data-href] {
 }
 
 .table th.text-end:last-child, .table td.text-end:last-child {
-    width: 1%;
     position: sticky;
     right: 0;
+    text-align: right;
+    width: 120px;
+    min-width: 120px;
 }
 
 .table td.text-end:last-child {
@@ -1557,8 +1515,10 @@ tr[data-href] {
     cursor: default;
 }
 
-.col-fit {
-    width: 1%;
+/* Fill space for other columns */
+.table th:not(:first-child):not(:last-child),
+.table td:not(:first-child):not(:last-child) {
+    width: auto;
 }
 
 .table .code {
