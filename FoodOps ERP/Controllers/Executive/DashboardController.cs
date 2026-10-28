@@ -1,8 +1,11 @@
 ﻿using FoodOpsERP.Infrastructure;
 using FoodOpsERP.Services.Executive;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization; // <-- YEH ADD KAREIN
 
 namespace FoodOpsERP.Controllers.Executive;
+
+[Authorize(Roles = "Administrator, Executive")] // <-- YEH ADD KAREIN
 
 public class DashboardController : AppController
 {

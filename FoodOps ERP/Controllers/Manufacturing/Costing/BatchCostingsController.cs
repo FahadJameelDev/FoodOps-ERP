@@ -2,8 +2,12 @@
 using FoodOpsERP.Models.Manufacturing.Costing.ViewModels;
 using FoodOpsERP.Services.Manufacturing.Costing;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization; // <-- YEH LINE NAYI HAI
+
 
 namespace FoodOpsERP.Controllers.Manufacturing.Costing;
+
+[Authorize(Roles = "Administrator, Cost Accountant")] // <-- YEH LINE NAYI HAI
 
 public class BatchCostingsController : AppController
 {

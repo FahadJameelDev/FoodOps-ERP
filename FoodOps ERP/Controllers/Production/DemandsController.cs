@@ -5,8 +5,11 @@ using FoodOpsERP.Models.Manufacturing.Production.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FoodOpsERP.Controllers.Manufacturing.Production;
+
+[Authorize(Roles = "Administrator, Production Manager")]
 
 public class DemandsController : AppController
 {

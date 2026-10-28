@@ -2574,3 +2574,121 @@ tr[data-href] {
             padding: 0 !important;
             border-radius: 6px !important;
         }
+/* ============================================================
+   ✅ FINAL ULTIMATE FIX: PREMIUM SPA ERROR PAGE
+   ============================================================ */
+
+/* 1. Pura Screen Blur (Background) */
+body:has(.spa-error) .page-content::before {
+    content: '' !important;
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(15, 23, 42, 0.4) !important;
+    backdrop-filter: blur(5px) !important;
+    z-index: 9998 !important;
+    pointer-events: none !important;
+}
+
+/* 2. Center Popup Box */
+.spa-error {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 90% !important;
+    max-width: 460px !important;
+    z-index: 9999 !important;
+    text-align: center !important;
+    background: #ffffff !important;
+    padding: 40px 32px !important;
+    border-radius: 16px !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: 0 24px 64px rgba(15, 23, 42, 0.2) !important;
+    animation: popIn 0.3s ease forwards !important;
+}
+
+    /* 3. Icon Container (Red Warning) */
+    .spa-error > i {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 64px !important;
+        height: 64px !important;
+        background: #FEF2F2 !important;
+        color: #EF4444 !important;
+        font-size: 32px !important;
+        border-radius: 50% !important;
+        margin-bottom: 20px !important;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15) !important;
+    }
+
+    /* 4. Headings & Text */
+    .spa-error h3 {
+        margin: 0 0 8px !important;
+        font-size: 22px !important;
+        font-weight: 700 !important;
+        color: #0F172A !important;
+        letter-spacing: -0.02em !important;
+    }
+
+    .spa-error p {
+        color: #64748B !important;
+        font-size: 14px !important;
+        margin-bottom: 28px !important;
+        line-height: 1.5 !important;
+    }
+
+/* 5. Buttons Layout */
+.spa-error-actions {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 12px !important;
+}
+
+/* 6. Close (X) Button Top Right */
+.spa-error-close {
+    position: absolute !important;
+    top: 16px !important;
+    right: 16px !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 50% !important;
+    color: #64748B !important;
+    cursor: pointer !important;
+    transition: all 0.2s !important;
+}
+
+    .spa-error-close:hover {
+        background: #F1F5F9 !important;
+        color: #0F172A !important;
+        transform: scale(1.1) !important;
+    }
+
+    .spa-error-close i {
+        font-size: 16px !important;
+    }
+
+    /* 7. Remove Ugly Focus Ring (Green Outline) from Buttons */
+    .spa-error .btn:focus,
+    .spa-error-close:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+/* 8. Smooth Pop-in Animation */
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -45%) scale(0.95) !important;
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1) !important;
+    }
+}

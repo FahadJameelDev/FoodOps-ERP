@@ -49,12 +49,23 @@
         });
     }
 
+    /* ✅ UPDATED: Premium Error Screen with Go Back (X) Button */
     function errorHtml(message, url) {
         return `<div class="spa-error">
+            <button type="button" class="spa-error-close" onclick="window.FoodOpsSPA.navigateToHistory()" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
             <i class="bi bi-exclamation-triangle"></i>
             <h3>Couldn't load this page</h3>
             <p>${esc(message)}</p>
-            <button type="button" class="btn btn-primary" data-spa-retry="${encodeURIComponent(url)}">Try again</button>
+            <div class="spa-error-actions">
+                <button type="button" class="btn btn-outline-secondary" onclick="window.FoodOpsSPA.navigateToHistory()">
+                    Go Back
+                </button>
+                <button type="button" class="btn btn-primary" data-spa-retry="${encodeURIComponent(url)}">
+                    Try again
+                </button>
+            </div>
         </div>`;
     }
 
@@ -254,9 +265,15 @@
     window.FoodOpsSPA = {
         navigate: url => loadPage(url, true),
         reload: () => loadPage(currentUrl, false),
-        refresh
+        refresh: refresh, // ✅ Yeh explicitly likhein
+        navigateToHistory: function () { // ✅ Naya function
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '/'; // Agar history khali ho toh Home
+            }
+        }
     };
-
     document.addEventListener('DOMContentLoaded', () => {
         history.replaceState({ url: currentUrl }, '', currentUrl);
         document.addEventListener('click', onClick);

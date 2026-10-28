@@ -5,8 +5,11 @@ using FoodOpsERP.Services.Manufacturing.Quality;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FoodOpsERP.Controllers.Manufacturing.Quality;
+
+[Authorize(Roles = "Administrator, QC Inspector")]
 
 public class QCParametersController : AppController
 {

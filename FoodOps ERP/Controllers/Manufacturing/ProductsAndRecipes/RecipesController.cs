@@ -2,11 +2,14 @@
 using FoodOpsERP.Infrastructure;
 using FoodOpsERP.Models.Manufacturing.ProductsAndRecipes.ViewModels;
 using FoodOpsERP.Services.Manufacturing.ProductsAndRecipes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace FoodOpsERP.Controllers.Manufacturing.ProductsAndRecipes;
+
+[Authorize(Roles = "Administrator, Production Manager")]
 
 public class RecipesController : AppController
 {

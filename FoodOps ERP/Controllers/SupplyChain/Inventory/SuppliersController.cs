@@ -1,8 +1,11 @@
 ﻿using FoodOpsERP.Models.ViewModels.Inventory;
 using FoodOpsERP.Services.Inventory;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FoodOpsERP.Controllers.SupplyChain.Inventory;
+
+[Authorize(Roles = "Administrator, Store Manager")] // <-- YEH LINE NAYI HAI
 
 public class SuppliersController : BaseInventoryController
 {

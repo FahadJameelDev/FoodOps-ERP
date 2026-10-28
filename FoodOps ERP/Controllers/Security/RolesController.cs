@@ -2,8 +2,11 @@
 using FoodOpsERP.Models.Security.ViewModels;
 using FoodOpsERP.Services.Security;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization; // <-- YEH ADD KAREIN
 
 namespace FoodOpsERP.Controllers.Security;
+
+[Authorize(Roles = "Administrator")] // <-- SIRF ADMIN
 
 public class RolesController : AppController
 {

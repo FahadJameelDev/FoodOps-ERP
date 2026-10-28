@@ -2,11 +2,14 @@
 using FoodOpsERP.Infrastructure;
 using FoodOpsERP.Models.Workforce.HRPayroll.ViewModels;
 using FoodOpsERP.Services.Workforce.HRPayroll;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace FoodOpsERP.Controllers.Workforce.HRPayroll;
+
+[Authorize(Roles = "Administrator, HR Manager")]
 
 public class WorkforceSetupController : AppController
 {

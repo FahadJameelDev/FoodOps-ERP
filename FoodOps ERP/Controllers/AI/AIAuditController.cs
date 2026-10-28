@@ -1,8 +1,12 @@
 ﻿using FoodOpsERP.Infrastructure;
 using FoodOpsERP.Services.AI;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization; // <-- YEH ADD KAREIN
 
 namespace FoodOpsERP.Controllers.AI;
+
+[Authorize(Roles = "Administrator, AI Assistant")] // <-- YEH ADD KAREIN
+
 
 public class AIAuditController : AppController
 {

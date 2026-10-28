@@ -5,8 +5,11 @@ using FoodOpsERP.Services.Manufacturing.ProductsAndRecipes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FoodOpsERP.Controllers.Manufacturing.ProductsAndRecipes;
+
+[Authorize(Roles = "Administrator, Production Manager")]
 
 public class PackagingConfigsController : AppController
 {

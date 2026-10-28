@@ -2,11 +2,15 @@
 using FoodOpsERP.Infrastructure;
 using FoodOpsERP.Models.Manufacturing.Quality.ViewModels;
 using FoodOpsERP.Services.Manufacturing.Quality;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace FoodOpsERP.Controllers.Manufacturing.Quality;
+
+[Authorize(Roles = "Administrator, QC Inspector")]
 
 public class QualityDecisionsController : AppController
 {

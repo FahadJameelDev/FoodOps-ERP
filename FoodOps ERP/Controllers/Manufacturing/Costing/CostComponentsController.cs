@@ -2,11 +2,15 @@
 using FoodOpsERP.Infrastructure;
 using FoodOpsERP.Models.Manufacturing.Costing.ViewModels;
 using FoodOpsERP.Services.Manufacturing.Costing;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace FoodOpsERP.Controllers.Manufacturing.Costing;
+
+[Authorize(Roles = "Administrator, Cost Accountant")] // <-- YEH LINE NAYI HAI
 
 public class CostComponentsController : AppController
 {

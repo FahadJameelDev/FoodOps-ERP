@@ -5,8 +5,11 @@ using FoodOpsERP.Services.Workforce.HRPayroll;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FoodOpsERP.Controllers.Workforce.HRPayroll;
+
+[Authorize(Roles = "Administrator, HR Manager")]
 
 public class CompensationController : AppController
 {

@@ -2,11 +2,15 @@
 using FoodOpsERP.Infrastructure;
 using FoodOpsERP.Models.Manufacturing.Production.ViewModels;
 using FoodOpsERP.Services.Manufacturing.Production;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace FoodOpsERP.Controllers.Manufacturing.Production;
+
+[Authorize(Roles = "Administrator, Production Manager")]
 
 public class ProductionOrdersController : AppController
 {
