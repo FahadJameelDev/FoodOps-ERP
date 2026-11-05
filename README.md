@@ -9,72 +9,25 @@
 A robust, enterprise-grade Food Manufacturing ERP system built using **ASP.NET Core MVC (.NET 10)** with **Razor Views (Server-Side Rendering)** on the backend, integrated with **EF Core 10 & SQL Server**. The frontend features a highly customized **Fluent Design SPA Dashboard** powered by **Vanilla JS, Bootstrap 5, and Custom CSS**. The system also integrates **Google Gemini AI** for real-time database querying and operational insights.
 
 ---
+### 📂 Backend Project Breakdown
 
-## 🏗️ Architecture Overview
+The backend is built as a **Single ASP.NET Core MVC Project** with strict folder-level separation of concerns. This eliminates cross-project dependency issues while maintaining Clean Architecture principles.
 
-The system is designed following **Clean Architecture** principles within a Single ASP.NET Core MVC project. This ensures a strict separation of concerns, decoupling the UI from the Business Logic and Data Access layers.
+*   **`Controllers/` (Presentation):** Handles HTTP requests, routing, and returns Razor Views. Organized into sub-folders like `Executive`, `Manufacturing`, `SupplyChain`, etc., for modular routing.
+*   **`Services/` (Business Logic):** The core engine of the ERP. Contains interfaces and implementations for Inventory, Production, HR, and **AI Integration**. Decoupled from the database.
+*   **`Data/` (Data Access):** Houses the `ApplicationDbContext` and EF Core configurations. Handles all database migrations and relationships.
+*   **`Models/` (Domain Entities):** Contains database Entities (Database tables) and ViewModels (Data transfer objects for the UI).
+*   **`Infrastructure/`:** Contains cross-cutting concerns like `AppController` (Base controller), `GridHtml.cs` (Custom Razor helpers for dynamic tables), and custom View Location Expanders.
+*   **`Middlewares/`:** Custom Global Exception Handling Middleware to catch and log unhandled errors gracefully.
 
-```mermaid
-graph TD
-    classDef ui fill:#d4edda,stroke:#28a745,stroke-width:2px;
-    classDef logic fill:#cce5ff,stroke:#007bff,stroke-width:2px;
-    classDef data fill:#f8d7da,stroke:#dc3545,stroke-width:2px;
-    classDef models fill:#fff3cd,stroke:#ffc107,stroke-width:2px;
+---
 
-    subgraph Presentation Layer
-        V[Razor Views .cshtml]:::ui
-        JS[wwwroot/ - spa-router.js, ui.js]:::ui
-        C[Controllers/]:::ui
-    end
+### 🎨 Frontend Integration
 
-    subgraph Business Logic Layer
-        S[Services/ - Inventory, AI, HR]:::logic
-        I[Infrastructure/ - AppController, Middlewares]:::logic
-    end
+The frontend is not a separate SPA project (like React or Angular), but rather a highly customized **Server-Side Rendered (SSR) Application** using **Razor Views (.cshtml)** and **Vanilla JavaScript**.
 
-    subgraph Data Access Layer
-        D[Data/ - ApplicationDbContext]:::data
-        DB[(SQL Server Database)]:::data
-    end
-
-    subgraph Domain Models
-        M[Models/ - Entities, ViewModels]:::models
-    end
-
-    V --> C
-    JS --> C
-    C --> S
-    S --> D
-    D --> DB
-    S --> M
-    C --> M                                                                                                                                                                                                                                                                                          1. **Presentation Layer:** 
-   Razor Views, Custom Vanilla JS (SPA Router), and MVC Controllers handle the UI/UX and client-side interactions.
-
-2. **Business Logic Layer:** 
-   Service classes (`Services/`) and cross-cutting concerns (`Infrastructure/`) handle domain logic, AI integration, and global exception handling.
-
-3. **Data Access Layer:** 
-   EF Core `ApplicationDbContext` manages database operations, migrations, and query execution.
-
-4. **Domain Models:** 
-   Core Entities and ViewModels are shared across all layers to ensure type safety and consistency.
-🎤 Interviewer Ko Kya Bolna Hai? (The Pitch)
-Agar interviewer poochay: "Aapne project ka architecture kaise design kiya?"
-
-Aap confidently bolein:
-
-*"Sir, maine N-Tier Architecture follow ki hai:
-
-Presentation: Razor Views + Custom Vanilla JS SPA Router (UI/UX ke liye).
-
-Business Logic: Services aur Infrastructure (AI, Exception Handling).
-
-Data Access: EF Core ApplicationDbContext.
-
-Domain Models: Entities aur ViewModels jo sab layers mein share hote hain.
-
-Isse code maintainable, testable, aur scalable rehta hai."*
-
-Ab aapka README aur Architecture dono Interview Ready hain! 🚀🏆
-
-This response is AI-generated, for reference only.
+*   **Razor Views:** The UI is rendered on the server and delivered as complete HTML. However, our custom `spa-router.js` intercepts link clicks and fetches only the inner HTML, providing a seamless Single Page Application (SPA) feel without any full-page reloads.
+*   **Custom UI Engine (`wwwroot/`):** 
+    *   `site.css`: Contains our custom Fluent Design System tokens, overriding standard Bootstrap.
+    *   `ui.js` / `shell.js`: Handles interactive elements like dynamic modals, toasts, grid searching/sorting, and sidebar state management.
+*   **Zero-Build Step:** Unlike React (which requires Webpack/Vite build steps), our frontend runs directly from the `wwwroot` directory, making deployment incredibly fast and lightweight.
