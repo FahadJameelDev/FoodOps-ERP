@@ -47,7 +47,34 @@ graph TD
     S --> D
     D --> DB
     S --> M
-    C --> M
+    C --> M                                                                                                                                                                                                                                                                                          1. **Presentation Layer:** 
+   Razor Views, Custom Vanilla JS (SPA Router), and MVC Controllers handle the UI/UX and client-side interactions.
 
+2. **Business Logic Layer:** 
+   Service classes (`Services/`) and cross-cutting concerns (`Infrastructure/`) handle domain logic, AI integration, and global exception handling.
 
+3. **Data Access Layer:** 
+   EF Core `ApplicationDbContext` manages database operations, migrations, and query execution.
 
+4. **Domain Models:** 
+   Core Entities and ViewModels are shared across all layers to ensure type safety and consistency.
+🎤 Interviewer Ko Kya Bolna Hai? (The Pitch)
+Agar interviewer poochay: "Aapne project ka architecture kaise design kiya?"
+
+Aap confidently bolein:
+
+*"Sir, maine N-Tier Architecture follow ki hai:
+
+Presentation: Razor Views + Custom Vanilla JS SPA Router (UI/UX ke liye).
+
+Business Logic: Services aur Infrastructure (AI, Exception Handling).
+
+Data Access: EF Core ApplicationDbContext.
+
+Domain Models: Entities aur ViewModels jo sab layers mein share hote hain.
+
+Isse code maintainable, testable, aur scalable rehta hai."*
+
+Ab aapka README aur Architecture dono Interview Ready hain! 🚀🏆
+
+This response is AI-generated, for reference only.
