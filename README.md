@@ -160,9 +160,7 @@ The system features an automated, transactional auditing design at the database 
 *   **Concurrency Control:** `RowVersion` (Timestamp) is applied on all tables to prevent data overwrites during simultaneous user edits.
 *   **AI Audit Logs:** Every AI interaction is tracked in the `AIAssistantLogs` table, storing the `DomainContext`, `QuestionSummary`, and `ExecutionTimeMs` for performance and usage monitoring.
 *   **Append-Only Logs:** Tables like `ProductionStatusHistory` and `InventoryTransactions` are designed as immutable logs (no updates or deletes allowed) for strict traceability.
-```
-
-## 🏗️ Architecture Overview
+   🏗️ Architecture Overview
 
 The system is designed following **Clean Architecture** principles within a Single ASP.NET Core MVC project. This ensures a strict separation of concerns, decoupling the UI from the Business Logic and Data Access layers.
 
