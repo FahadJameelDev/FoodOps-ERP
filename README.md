@@ -8,7 +8,58 @@
 
 A robust, enterprise-grade Food Manufacturing ERP system built using **ASP.NET Core MVC (.NET 10)** with **Razor Views (Server-Side Rendering)** on the backend, integrated with **EF Core 10 & SQL Server**. The frontend features a highly customized **Fluent Design SPA Dashboard** powered by **Vanilla JS, Bootstrap 5, and Custom CSS**. The system also integrates **Google Gemini AI** for real-time database querying and operational insights.
 
+
+## 🏗️ Architecture Overview
+
+The system is designed following **Clean Architecture** principles within a Single ASP.NET Core MVC project. This ensures a strict separation of concerns, decoupling the UI from the Business Logic and Data Access layers.
+
+```mermaid
+graph TD
+    classDef ui fill:#d4edda,stroke:#28a745,stroke-width:2px;
+    classDef logic fill:#cce5ff,stroke:#007bff,stroke-width:2px;
+    classDef data fill:#f8d7da,stroke:#dc3545,stroke-width:2px;
+    classDef models fill:#fff3cd,stroke:#ffc107,stroke-width:2px;
+
+    subgraph Presentation_Layer [Presentation Layer]
+        V[Razor Views .cshtml]:::ui
+        JS[wwwroot/ - spa-router.js, ui.js]:::ui
+        C[Controllers/]:::ui
+    end
+
+    subgraph Business_Logic_Layer [Business Logic Layer]
+        S[Services/ - Inventory, AI, HR]:::logic
+        I[Infrastructure/ - AppController, Middlewares]:::logic
+    end
+
+    subgraph Data_Access_Layer [Data Access Layer]
+        D[Data/ - ApplicationDbContext]:::data
+        DB[(SQL Server Database)]:::data
+    end
+
+    subgraph Domain_Models [Domain Models]
+        M[Models/ - Entities, ViewModels]:::models
+    end
+
+    V --> C
+    JS --> C
+    C --> S
+    S --> D
+    D --> DB
+    S --> M
+    C --> M
+    D --> M
+    I --> C
+```
+
+*   **Presentation Layer:** Razor Views, Custom Vanilla JS (SPA Router), and MVC Controllers handle the UI/UX.
+*   **Business Logic Layer:** Service classes (`Services/`) and cross-cutting concerns (`Infrastructure/`) handle domain logic, AI integration, and global exception handling.
+*   **Data Access Layer:** EF Core `ApplicationDbContext` manages database operations.
+*   **Domain Models:** Core Entities and ViewModels used across all layers.
+```
+
 ---
+
+
 
 ### 📂 Backend Project Breakdown
 
