@@ -2,17 +2,95 @@
     ViewData["Title"] = "AI Safety Rules";
     ViewData["Subtitle"] = "Rules and restrictions for AI Assistant";
 }
-<partial name="_PageHeader" />
 
-<div class="card">
-    <div class="card-body">
-        <h5>AI Safety Rules (Placeholder)</h5>
-        <p class="text-muted">Yeh page AI Safety rules dikhayega.</p>
-        <ul>
-            <li>AI sirf read-only data access kar sakta hai.</li>
-            <li>AI kisi bhi critical action (delete, approve) ko autonomously nahi kar sakta.</li>
-            <li>Har AI action ka log (Evidence) rakha jata hai.</li>
-        </ul>
-        <a asp-action="Index" class="btn btn-outline-secondary mt-3"><i class="bi bi-arrow-left"></i>Back to Audit Logs</a>
+<style>
+    .page-content { padding: 12px var(--content-x) 12px var(--content-x) !important; }
+
+    .safety-dashboard {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        height: calc(100vh - 140px);
+    }
+
+    /* Premium Header */
+    .safety-header-card {
+        display: flex; align-items: center; justify-content: space-between;
+        background: #ffffff; border: 1px solid var(--border);
+        border-radius: var(--radius-card); padding: 12px 16px; flex-shrink: 0;
+    }
+    .header-icon { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #FEF2F2; color: #DC2626; border-radius: 8px; font-size: 18px; }
+    .header-title { font-size: 18px; font-weight: 700; color: var(--text-heading); margin: 0; line-height: 1.2; }
+    .header-subtitle { font-size: 11px; color: var(--text-muted); margin: 0; }
+
+    /* Content Card */
+    .safety-content-card {
+        flex: 1;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-card);
+        padding: 32px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .rule-item {
+        display: flex; align-items: flex-start; gap: 16px;
+        padding: 16px 0; border-bottom: 1px solid var(--divider);
+    }
+    .rule-item:last-child { border-bottom: none; }
+    
+    .rule-icon {
+        width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 20px; background: #EFF6FF; color: #2563EB;
+    }
+    .rule-text { flex-grow: 1; }
+    .rule-title { font-size: 15px; font-weight: 600; color: var(--text-heading); margin: 0 0 4px 0; }
+    .rule-desc { font-size: 13px; color: var(--text-muted); margin: 0; line-height: 1.5; }
+</style>
+
+<div class="safety-dashboard">
+    <!-- Header -->
+    <div class="safety-header-card">
+        <div class="d-flex align-items-center gap-3">
+            <div class="header-icon"><i class="bi bi-shield-check"></i></div>
+            <div>
+                <h1 class="header-title">AI Safety Rules</h1>
+                <p class="header-subtitle">Rules and restrictions for AI Assistant</p>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm py-2 px-3" style="font-size: 12px;">
+                <i class="bi bi-arrow-left me-1"></i> Back to Audit Logs
+            </a>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="safety-content-card">
+        <div class="rule-item">
+            <div class="rule-icon" style="background: #ECFDF5; color: #059669;"><i class="bi bi-eye"></i></div>
+            <div class="rule-text">
+                <h5 class="rule-title">Read-Only Access</h5>
+                <p class="rule-desc">AI Assistant can only read data. It cannot modify, update, or delete any records in the system.</p>
+            </div>
+        </div>
+
+        <div class="rule-item">
+            <div class="rule-icon" style="background: #FEF2F2; color: #DC2626;"><i class="bi bi-slash-circle"></i></div>
+            <div class="rule-text">
+                <h5 class="rule-title">No Autonomous Actions</h5>
+                <p class="rule-desc">AI cannot perform critical actions like deleting, approving, or releasing records without explicit user confirmation.</p>
+            </div>
+        </div>
+
+        <div class="rule-item">
+            <div class="rule-icon" style="background: #FEF3C7; color: #D97706;"><i class="bi bi-journal-text"></i></div>
+            <div class="rule-text">
+                <h5 class="rule-title">Full Audit Trail</h5>
+                <p class="rule-desc">Every AI interaction is logged in the database with the exact question, answer, and timestamp. Evidence is always available.</p>
+            </div>
+        </div>
     </div>
 </div>

@@ -128,6 +128,7 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 // ═══════════════════════════════════════════════════════════
 // 4.5 AI ENGINE SERVICES
 // ═══════════════════════════════════════════════════════════
+builder.Services.AddHttpClient(); // <-- Yeh line zaroori hai HttpClient factory ke liye
 builder.Services.AddScoped<IAIAssistantService, AIAssistantService>();
 builder.Services.AddScoped<IAIAuditService, AIAuditService>();
 builder.Services.AddScoped<IAIInsightService, AIInsightService>();

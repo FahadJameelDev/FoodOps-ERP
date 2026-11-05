@@ -7,11 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace FoodOpsERP.Controllers.Manufacturing.Production;
 
 [Authorize(Roles = "Administrator, Production Manager")]
-
 public class ProductionOrdersController : AppController
 {
     private readonly IProductionOrderService _service;
@@ -37,10 +35,55 @@ public class ProductionOrdersController : AppController
         return View(model);
     }
 
+    // ✅ UPDATED: Execution - Loads Batches, Recipe Items, Packaging Configs
     public async Task<IActionResult> Execution(int id)
     {
         var model = await _service.GetExecutionAsync(id);
         if (model == null) return NotFound();
+
+        // 1. ✅ Batches (Inventory) load karein
+        model.BatchList = await _db.InventoryBatches
+            .AsNoTracking()
+            .Where(b => b.CurrentQuantity > 0)
+            .OrderBy(b => b.BatchNumber)
+            .Select(b => new SelectListItem
+            {
+                Value = b.BatchID.ToString(),
+                Text = b.BatchNumber + " (Qty: " + b.CurrentQuantity.ToString("N2") + ")"
+            })
+            .ToListAsync();
+
+        // 2. ✅ Recipe Items load karein (Safe Version - No Property Errors)
+        if (model.Order?.RecipeID > 0)
+        {
+            model.RecipeItemList = await _db.RecipeItems
+                .AsNoTracking()
+                .Where(r => r.RecipeID == model.Order.RecipeID)
+                .OrderBy(r => r.LineNo)
+                .Select(r => new SelectListItem
+                {
+                    Value = r.RecipeItemID.ToString(),
+                    // ✅ Safe text (kyunki aapke model mein IngredientName/UOMCode nahi hai)
+                    Text = "Item ID: " + r.RecipeItemID
+                })
+                .ToListAsync();
+        }
+
+        // 3. ✅ Packaging Configs load karein (Safe Version - No Property Errors)
+        if (model.Order?.ProductID > 0)
+        {
+            model.PackagingConfigList = await _db.PackagingConfigs
+                .AsNoTracking()
+                .Where(p => p.ProductID == model.Order.ProductID)
+                .Select(p => new SelectListItem
+                {
+                    Value = p.PackagingConfigID.ToString(),
+                    // ✅ Safe text (kyunki aapke model mein PackageSize/UOMCode nahi hai)
+                    Text = "Packaging ID: " + p.PackagingConfigID
+                })
+                .ToListAsync();
+        }
+
         return View(model);
     }
 
@@ -86,7 +129,7 @@ public class ProductionOrdersController : AppController
             Priority = 3,
             Status = "Planned"
         };
-        await PopulateDropdownsAsync(model); // ✅ Naya method call kiya
+        await PopulateDropdownsAsync(model);
         return FormView("_OrderForm", "Create", model);
     }
 
@@ -112,7 +155,7 @@ public class ProductionOrdersController : AppController
         return Saved(result.Message, "Index");
     }
 
-    // ... (Release, Start, Complete, Close, Hold, Cancel, StartOperation, CompleteOperation wese hi rahenge)
+    // Workflow Actions
     [HttpPost]
     public async Task<IActionResult> Release(int id) { var result = await _service.ReleaseAsync(id, 1); return result.Success ? Saved(result.Message, "Index") : Failed(result.Message); }
     [HttpPost]
@@ -130,8 +173,7 @@ public class ProductionOrdersController : AppController
     [HttpPost]
     public async Task<IActionResult> CompleteOperation(int id) { var result = await _service.CompleteOperationAsync(id, 1); return result.Success ? Saved(result.Message, "Index") : Failed(result.Message); }
 
-
-    // ✅ Naya Method (Purana LoadLookupsAsync hata dein)
+    // ✅ Populate Dropdowns for Create/Edit Forms
     private async Task PopulateDropdownsAsync(ProductionOrderViewModel model)
     {
         model.PlantList = await _db.Plants.AsNoTracking()

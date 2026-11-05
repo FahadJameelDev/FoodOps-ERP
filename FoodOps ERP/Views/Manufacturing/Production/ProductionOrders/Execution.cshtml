@@ -4,32 +4,133 @@
     ViewData["Subtitle"] = "Material Issue and Output Recording";
 }
 
-<partial name="_PageHeader" />
+<style>
+    /* ✅ MICROSOFT FLUENT - PREMIUM EXECUTION PAGE */
+    .page-content { padding: 12px var(--content-x) 12px var(--content-x) !important; }
 
-<div class="row g-3">
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header"><h5 class="card-title"><i class="bi bi-box-arrow-in-down"></i>Material Execution</h5></div>
-            <div class="card-body">
-                <p class="text-muted small">Yahan se material issue hoga (BatchMaterialIssues).</p>
-                <div class="mb-3">
-                    <label class="form-label">Select Batch / Lot</label>
-                    <select class="form-select"><option>Select Inventory Batch...</option></select>
-                </div>
-                <button class="btn btn-primary btn-sm">Issue Material</button>
+    .execution-dashboard {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        height: calc(100vh - 140px);
+    }
+
+    /* Premium Header */
+    .execution-header-card {
+        display: flex; align-items: center; justify-content: space-between;
+        background: #fff; border: 1px solid var(--border);
+        border-radius: var(--radius-card); padding: 12px 16px; flex-shrink: 0;
+    }
+    .header-icon { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #ECFDF5; color: #059669; border-radius: 8px; font-size: 18px; }
+    .header-title { font-size: 18px; font-weight: 700; color: var(--text-heading); margin: 0; line-height: 1.2; }
+    .header-subtitle { font-size: 11px; color: var(--text-muted); margin: 0; }
+
+    /* Two Column Grid */
+    .execution-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        flex: 1;
+        min-height: 0;
+    }
+
+    /* Card */
+    .execution-card {
+        background: #fff; border: 1px solid var(--border);
+        border-radius: var(--radius-card);
+        display: flex; flex-direction: column;
+        overflow: hidden;
+    }
+    .execution-card-header {
+        padding: 12px 16px; border-bottom: 1px solid var(--divider);
+        display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+    }
+    .execution-card-header h5 {
+        font-size: 15px; font-weight: 600; margin: 0; color: var(--text-heading);
+    }
+    .execution-card-body {
+        padding: 16px; flex: 1;
+        display: flex; flex-direction: column; gap: 16px;
+    }
+
+    /* Form */
+    .form-label { font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 6px; }
+    .form-control, .form-select {
+        height: 42px; border-radius: 8px; border: 1px solid var(--line-strong);
+        font-size: 13px; color: var(--text-body);
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: var(--emerald); box-shadow: 0 0 0 3px var(--emerald-glow);
+    }
+</style>
+
+<div class="execution-dashboard">
+    
+    <!-- 1. PREMIUM HEADER -->
+    <div class="execution-header-card">
+        <div class="d-flex align-items-center gap-3">
+            <div class="header-icon"><i class="bi bi-play-circle"></i></div>
+            <div>
+                <h1 class="header-title">Execution: @Model.Order.OrderNumber</h1>
+                <p class="header-subtitle">Material Issue and Output Recording</p>
             </div>
         </div>
+        <div class="d-flex align-items-center gap-2">
+            <a asp-action="Details" asp-route-id="@Model.Order.ProductionOrderID" class="btn btn-outline-secondary btn-sm py-2 px-3" style="font-size: 12px;">
+                <i class="bi bi-arrow-left me-1"></i> Back
+            </a>
+        </div>
     </div>
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header"><h5 class="card-title"><i class="bi bi-box-arrow-up"></i>Production Output</h5></div>
-            <div class="card-body">
-                <p class="text-muted small">Yahan final produced goods record hongi (BatchOutputLogs).</p>
-                <div class="mb-3">
-                    <label class="form-label">Produced Qty (@Model.Order.UOMName)</label>
-                    <input type="number" class="form-control" />
+
+    <!-- 2. TWO COLUMN GRID -->
+    <div class="execution-grid">
+        
+        <!-- Left: Material Execution -->
+        <div class="execution-card">
+            <div class="execution-card-header">
+                <i class="bi bi-box-arrow-in-down text-primary"></i>
+                <h5>Material Execution</h5>
+            </div>
+            <div class="execution-card-body">
+                <p class="text-muted" style="font-size: 13px; margin: 0;">Yahan se material issue hoga (BatchMaterialIssues).</p>
+                
+                <div>
+                    <label class="form-label">Select Batch / Lot</label>
+                    <select id="batchSelect" class="form-select">
+                        <option value="">Select Inventory Batch...</option>
+                        @if (Model.BatchList != null)
+                        {
+                            foreach (var batch in Model.BatchList)
+                            {
+                                <option value="@batch.Value">@batch.Text</option>
+                            }
+                        }
+                    </select>
                 </div>
-                <button class="btn btn-success btn-sm">Record Output</button>
+                
+                <button class="btn btn-primary btn-sm py-2 px-3" style="font-size: 12px;">
+                    <i class="bi bi-check-circle me-1"></i> Issue Material
+                </button>
+            </div>
+        </div>
+
+        <!-- Right: Production Output -->
+        <div class="execution-card">
+            <div class="execution-card-header">
+                <i class="bi bi-box-arrow-up text-success"></i>
+                <h5>Production Output</h5>
+            </div>
+            <div class="execution-card-body">
+                <p class="text-muted" style="font-size: 13px; margin: 0;">Yahan final produced goods record hongi (BatchOutputLogs).</p>
+                
+                <div>
+                    <label class="form-label">Produced Qty (@Model.Order.UOMName)</label>
+                    <input type="number" class="form-control" placeholder="Enter quantity..." />
+                </div>
+                
+                <button class="btn btn-success btn-sm py-2 px-3" style="font-size: 12px;">
+                    <i class="bi bi-check-circle me-1"></i> Record Output
+                </button>
             </div>
         </div>
     </div>

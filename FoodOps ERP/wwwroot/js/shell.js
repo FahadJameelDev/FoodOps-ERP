@@ -259,22 +259,63 @@
         const kbd = document.querySelector('.topbar-search-kbd');
         if (kbd && !/Mac|iPhone|iPad/i.test(navigator.platform || navigator.userAgent)) kbd.textContent = 'Ctrl K';
 
+        const searchInput = document.getElementById('globalSearch');
+        const searchForm = document.getElementById('globalSearchForm');
+
+        // ✅ FIX: Search Form Submit (Enter dabane par)
+        if (searchForm && searchInput) {
+            searchForm.addEventListener('submit', (e) => {
+                // Hamesha pehle default submit roko
+                e.preventDefault();
+
+                const query = searchInput.value.trim();
+
+                // Agar query khali hai, toh focus karo
+                if (!query) {
+                    searchInput.focus();
+                    return;
+                }
+
+                // URL encode karo (spaces ko %20 mein badlo)
+                const url = `/Search?q=${encodeURIComponent(query)}`;
+
+                // Agar SPA Router available hai, toh use karo
+                if (window.FoodOpsSPA && typeof window.FoodOpsSPA.navigate === 'function') {
+                    window.FoodOpsSPA.navigate(url);
+                } else {
+                    // Warna normal redirect karo
+                    window.location.href = url;
+                }
+            });
+        }
+
+        // Ctrl+K shortcut
         document.addEventListener('keydown', e => {
-            const search = document.getElementById('globalSearch');
             if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
                 e.preventDefault();
-                search?.focus(); search?.select();
-            } else if (e.key === 'Escape' && search && document.activeElement === search) {
-                search.blur();
+                searchInput?.focus();
+                searchInput?.select();
+            } else if (e.key === 'Escape' && searchInput && document.activeElement === searchInput) {
+                searchInput.blur();
             }
         });
 
-        document.querySelector('.topbar-search-ai')?.addEventListener('click', e => {
-            e.preventDefault(); e.stopPropagation();
-            window.showToast?.('AI Assistant coming soon…', 'info');
-        });
-    }
+        // ✅ AI Button (Topbar wala)
+        const aiBtn = document.querySelector('.topbar-search-ai');
+        if (aiBtn) {
+            aiBtn.addEventListener('click', e => {
+                e.preventDefault();
+                e.stopPropagation();
 
+                const aiUrl = '/AIAssistant';
+                if (window.FoodOpsSPA && typeof window.FoodOpsSPA.navigate === 'function') {
+                    window.FoodOpsSPA.navigate(aiUrl);
+                } else {
+                    window.location.href = aiUrl;
+                }
+            });
+        }
+    }
     /* ── 8. Filters (group-wise selection, persist, event) ─ */
     const FILTER_KEY = 'foodops_filters_v1';
     const FILTER_DEFAULTS = {

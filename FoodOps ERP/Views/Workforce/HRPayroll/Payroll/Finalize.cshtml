@@ -3,38 +3,187 @@
     ViewData["Title"] = "Payroll Finalization";
     ViewData["Subtitle"] = "Finalize approved payrolls";
 }
-<partial name="_PageHeader" />
 
-<div class="card" id="grid-card">
-    @Html.GridToolbar("Search payrolls...", "payrolls", Model.Count, null, null)
+<style>
+    /* ✅ MICROSOFT FLUENT - PREMIUM PAYROLL FINALIZATION */
+    .page-content { padding: 12px var(--content-x) 12px var(--content-x) !important; }
 
-    <div class="table-scroll">
+    .payroll-dashboard {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        height: calc(100vh - 140px);
+    }
+
+    /* Premium Header */
+    .payroll-header-card {
+        display: flex; align-items: center; justify-content: space-between;
+        background: #ffffff; border: 1px solid var(--border);
+        border-radius: var(--radius-card); padding: 12px 16px; flex-shrink: 0;
+    }
+    .header-icon { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #ECFDF5; color: var(--emerald-dark); border-radius: 8px; font-size: 18px; }
+    .header-title { font-size: 18px; font-weight: 700; color: var(--text-heading); margin: 0; line-height: 1.2; }
+    .header-subtitle { font-size: 11px; color: var(--text-muted); margin: 0; }
+
+    /* Main Card */
+    .payroll-card {
+        flex: 1;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-card);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        min-height: 0;
+    }
+
+    /* Toolbar */
+    .toolbar-wrapper {
+        padding: 12px 16px; border-bottom: 1px solid var(--divider); flex-shrink: 0;
+        display: flex; align-items: center; gap: 12px;
+    }
+    .search-wrapper { position: relative; flex: 0 1 320px; }
+    .search-wrapper i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94A3B8; font-size: 14px; }
+    .search-wrapper input {
+        width: 100%; height: 36px; padding: 0 12px 0 36px; border: 1px solid var(--line-strong);
+        border-radius: 8px; background: var(--surface-2); font-size: 13px;
+    }
+    .search-wrapper input:focus { outline: none; background: #fff; border-color: var(--emerald); }
+
+    /* Table */
+    .table-body-scroll { flex: 1; overflow-y: auto; min-height: 0; }
+    .premium-table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 0; }
+    .premium-table th {
+        background: var(--surface-2); color: var(--text-muted); font-size: 11px; font-weight: 600;
+        text-transform: uppercase; letter-spacing: 0.05em; padding: 12px 16px;
+        text-align: left; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 2;
+    }
+    .premium-table td {
+        padding: 12px 16px; font-size: 13px; color: var(--text-body);
+        border-bottom: 1px solid var(--divider); vertical-align: middle;
+    }
+    .premium-table tr:last-child td { border-bottom: none; }
+    .premium-table tr:hover td { background: var(--surface-2); }
+
+    /* ✅ Premium Empty State */
+    .empty-state-premium {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        text-align: center;
+        min-height: 0;
+    }
+    .empty-icon-circle {
+        width: 80px; height: 80px;
+        background: #F1F5F9;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+        color: #94A3B8;
+        margin-bottom: 20px;
+    }
+    .empty-title { font-size: 18px; font-weight: 700; color: var(--text-heading); margin: 0 0 8px 0; }
+    .empty-desc { font-size: 14px; color: var(--text-muted); margin: 0 0 24px 0; max-width: 400px; line-height: 1.5; }
+</style>
+
+<div class="payroll-dashboard">
+    
+    <!-- 1. PREMIUM HEADER -->
+    <div class="payroll-header-card">
+        <div class="d-flex align-items-center gap-3">
+            <div class="header-icon"><i class="bi bi-check2-circle"></i></div>
+            <div>
+                <h1 class="header-title">Payroll Finalization</h1>
+                <p class="header-subtitle">Finalize approved payrolls</p>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm py-2 px-3" style="font-size: 12px;">
+                <i class="bi bi-arrow-left me-1"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <!-- 2. MAIN CARD -->
+    <div class="payroll-card">
+        
         @if (Model.Any())
         {
-            <table class="table table-hover mb-0">
-                <thead><tr><th>Run #</th><th>Month/Year</th><th>Plant</th><th class="num">Employees</th><th class="num">Net Payable</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr data-href="@Url.Action("Details", new { id = item.PayrollRunID })">
-                            <td><span class="code">@item.RunNo</span></td>
-                            <td>@item.PeriodMonth / @item.PeriodYear</td>
-                            <td>@item.PlantName</td>
-                            <td class="num">@item.TotalEmployees</td>
-                            <td class="num">@item.NetPayable.ToString("N2")</td>
-                            <td><partial name="_StatusPill" model="item.Status" /></td>
-                            <td class="text-end">
-                                <a href="@Url.Action("Details", new { id = item.PayrollRunID })" class="btn btn-sm btn-outline-secondary"><i class="bi bi-eye"></i></a>
-                            </td>
+            <!-- Toolbar -->
+            <div class="toolbar-wrapper">
+                <div class="search-wrapper">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search payrolls..." onkeyup="filterTable()" />
+                </div>
+                <span class="badge bg-surface-2 text-muted border px-3 py-2" style="font-size: 12px; border-radius: 6px;">
+                    @Model.Count Records
+                </span>
+            </div>
+
+            <!-- Table -->
+            <div class="table-body-scroll">
+                <table class="premium-table" id="payrollTable">
+                    <thead>
+                        <tr>
+                            <th>Run #</th>
+                            <th>Month/Year</th>
+                            <th>Plant</th>
+                            <th class="text-end">Employees</th>
+                            <th class="text-end">Net Payable</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td><strong>@item.RunNo</strong></td>
+                                <td>@item.PeriodMonth / @item.PeriodYear</td>
+                                <td>@item.PlantName</td>
+                                <td class="text-end">@item.TotalEmployees</td>
+                                <td class="text-end fw-bold">@item.NetPayable.ToString("N2")</td>
+                                <td><partial name="_StatusPill" model="item.Status" /></td>
+                                <td class="text-end">
+                                    <a href="@Url.Action("Details", new { id = item.PayrollRunID })" class="btn btn-sm btn-outline-secondary py-1 px-2">
+                                        <i class="bi bi-eye"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         }
         else
         {
-
-            <partial name="_EmptyState" model='"No payrolls pending finalization."' />
+            <!-- ✅ Premium Empty State -->
+            <div class="empty-state-premium">
+                <div class="empty-icon-circle">
+                    <i class="bi bi-check2-all"></i>
+                </div>
+                <h3 class="empty-title">All Finalized!</h3>
+                <p class="empty-desc">There are no payrolls pending finalization. All approved payrolls have been processed and finalized.</p>
+                <a asp-action="Index" class="btn btn-primary px-4 py-2" style="font-size: 13px;">
+                    <i class="bi bi-arrow-left me-2"></i> Back to Payroll
+                </a>
+            </div>
         }
     </div>
+
 </div>
+
+<script>
+    function filterTable() {
+        const input = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('#payrollTable tbody tr');
+        rows.forEach(row => {
+            row.style.display = row.textContent.toLowerCase().includes(input) ? '' : 'none';
+        });
+    }
+</script>

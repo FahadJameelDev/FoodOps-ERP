@@ -1,25 +1,167 @@
 ﻿@model FoodOpsERP.Models.AI.ViewModels.AIChatViewModel
 
-<div class="card">
-    <div class="card-header">
-        <h5 class="card-title"><i class="bi bi-robot"></i>@Model.DomainContext Assistant</h5>
-        <a asp-action="Index" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i>Back</a>
-    </div>
-    <div class="card-body">
-        <div id="chat-history" class="mb-3" style="max-height: 400px; overflow-y: auto;">
-            <!-- Chat history will appear here -->
-            <div class="alert alert-info">
-                Hello! I am your @Model.DomainContext Assistant. How can I help you today?
+<style>
+    /* ✅ MICROSOFT FLUENT - PREMIUM AI CHAT INTERFACE */
+    .chat-dashboard { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 12px; 
+        height: calc(100vh - 200px); /* Adjust height based on page header */
+        min-height: 0;
+    }
+
+    /* Chat Container */
+    .chat-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: #F8FAFC; /* Halka grey background chat ke liye */
+        border: 1px solid var(--border);
+        border-radius: var(--radius-card);
+        overflow: hidden;
+        min-height: 0;
+    }
+
+    /* Chat History Area */
+    .chat-history {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        scroll-behavior: smooth;
+    }
+
+    /* Message Bubbles */
+    .message-row {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        max-width: 85%;
+    }
+    .message-row.user {
+        align-self: flex-end;
+        flex-direction: row-reverse;
+    }
+    .message-row.ai {
+        align-self: flex-start;
+    }
+
+    .avatar {
+        width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
+    .avatar.ai-avatar { background: linear-gradient(135deg, #8B5CF6, #7C3AED); color: #fff; }
+    .avatar.user-avatar { background: var(--emerald); color: #fff; }
+
+    .message-bubble {
+        padding: 12px 16px;
+        border-radius: 12px;
+        font-size: 13px;
+        line-height: 1.5;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        position: relative;
+    }
+    .message-bubble.ai {
+        background: #fff;
+        border: 1px solid var(--border);
+        color: var(--text-heading);
+        border-top-left-radius: 2px;
+    }
+    .message-bubble.user {
+        background: var(--emerald);
+        color: #fff;
+        border-top-right-radius: 2px;
+    }
+
+    /* Loading Animation (Typing) */
+    .typing-indicator {
+        display: flex; gap: 4px; align-items: center; padding: 4px 0;
+    }
+    .typing-indicator span {
+        width: 6px; height: 6px; background: #A78BFA; border-radius: 50%;
+        animation: typing 1.4s infinite ease-in-out both;
+    }
+    .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+    .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+    @@keyframes typing {
+        0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+        40% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Input Area */
+    .chat-input-area {
+        padding: 16px 24px;
+        background: #fff;
+        border-top: 1px solid var(--border);
+        flex-shrink: 0;
+    }
+    .chat-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    .chat-input-wrapper input {
+        width: 100%;
+        padding: 14px 50px 14px 20px;
+        border: 1px solid var(--line-strong);
+        border-radius: 12px;
+        background: var(--surface-2);
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+    .chat-input-wrapper input:focus {
+        outline: none;
+        background: #fff;
+        border-color: var(--emerald);
+        box-shadow: 0 0 0 3px var(--emerald-glow);
+    }
+    .chat-send-btn {
+        position: absolute;
+        right: 6px;
+        width: 40px; height: 40px;
+        border-radius: 10px; border: none;
+        background: var(--emerald); color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .chat-send-btn:hover {
+        background: var(--emerald-dark);
+        transform: scale(1.05);
+    }
+    .chat-send-btn:disabled {
+        background: #CBD5E1; cursor: not-allowed; transform: none;
+    }
+</style>
+
+<div class="chat-dashboard">
+    <div class="chat-container">
+        
+        <!-- Chat History -->
+        <div id="chat-history" class="chat-history">
+            <!-- Initial AI Message -->
+            <div class="message-row ai">
+                <div class="avatar ai-avatar"><i class="bi bi-stars"></i></div>
+                <div class="message-bubble ai">
+                    Hello! I am your @Model.DomainContext Assistant. How can I help you today?
+                </div>
             </div>
         </div>
 
-        <form id="chat-form" data-domain="@Model.DomainContext">
-            @Html.AntiForgeryToken()
-            <div class="input-group">
-                <input type="text" id="chat-input" class="form-control" placeholder="Ask a question..." autocomplete="off" required />
-                <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i> Send</button>
-            </div>
-        </form>
+        <!-- Input Area -->
+        <div class="chat-input-area">
+            <form id="chat-form" data-domain="@Model.DomainContext">
+                @Html.AntiForgeryToken()
+                <div class="chat-input-wrapper">
+                    <input type="text" id="chat-input" placeholder="Ask about @Model.DomainContext.ToLower() data..." autocomplete="off" required />
+                    <button type="submit" id="chat-submit" class="chat-send-btn">
+                        <i class="bi bi-send-fill"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -27,19 +169,38 @@
     document.getElementById('chat-form').addEventListener('submit', async function (e) {
         e.preventDefault();
         const input = document.getElementById('chat-input');
+        const submitBtn = document.getElementById('chat-submit');
         const question = input.value.trim();
         if (!question) return;
 
         const history = document.getElementById('chat-history');
         const domain = this.dataset.domain;
 
-        // User message
-        history.innerHTML += `<div class="alert alert-secondary text-end">${question}</div>`;
+        // 1. Add User Message
+        const userMsgHtml = `
+            <div class="message-row user">
+                <div class="avatar user-avatar"><i class="bi bi-person-fill"></i></div>
+                <div class="message-bubble user">${question.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+            </div>`;
+        history.insertAdjacentHTML('beforeend', userMsgHtml);
+        
         input.value = '';
+        input.focus();
+        submitBtn.disabled = true;
+        history.scrollTop = history.scrollHeight;
 
-        // AI loading
+        // 2. Add Typing Indicator
         const loadingId = 'loading-' + Date.now();
-        history.innerHTML += `<div id="${loadingId}" class="alert alert-light text-muted">Thinking...</div>`;
+        const loadingHtml = `
+            <div id="${loadingId}" class="message-row ai">
+                <div class="avatar ai-avatar"><i class="bi bi-stars"></i></div>
+                <div class="message-bubble ai">
+                    <div class="typing-indicator">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            </div>`;
+        history.insertAdjacentHTML('beforeend', loadingHtml);
         history.scrollTop = history.scrollHeight;
 
         try {
@@ -56,15 +217,35 @@
 
             document.getElementById(loadingId).remove();
             
+            // 3. Add AI Response
+            let aiMsgHtml = '';
             if (data.success) {
-                history.innerHTML += `<div class="alert alert-success">${data.answer}</div>`;
+                const formattedAnswer = data.answer.replace(/\n/g, '<br>');
+                aiMsgHtml = `
+                    <div class="message-row ai">
+                        <div class="avatar ai-avatar"><i class="bi bi-stars"></i></div>
+                        <div class="message-bubble ai">${formattedAnswer}</div>
+                    </div>`;
             } else {
-                history.innerHTML += `<div class="alert alert-danger">${data.message}</div>`;
+                aiMsgHtml = `
+                    <div class="message-row ai">
+                        <div class="avatar ai-avatar" style="background: #FEF2F2; color: #DC2626;"><i class="bi bi-exclamation-triangle"></i></div>
+                        <div class="message-bubble ai" style="border-color: #FECACA; color: #B91C1C; background: #FEF2F2;">${data.message}</div>
+                    </div>`;
             }
+            history.insertAdjacentHTML('beforeend', aiMsgHtml);
+
         } catch (err) {
             document.getElementById(loadingId).remove();
-            history.innerHTML += `<div class="alert alert-danger">Network error. Please try again.</div>`;
+            const errMsgHtml = `
+                <div class="message-row ai">
+                    <div class="avatar ai-avatar" style="background: #FEF2F2; color: #DC2626;"><i class="bi bi-wifi-off"></i></div>
+                    <div class="message-bubble ai" style="border-color: #FECACA; color: #B91C1C; background: #FEF2F2;">Network error. Please try again.</div>
+                </div>`;
+            history.insertAdjacentHTML('beforeend', errMsgHtml);
+        } finally {
+            submitBtn.disabled = false;
+            history.scrollTop = history.scrollHeight;
         }
-        history.scrollTop = history.scrollHeight;
     });
 </script>

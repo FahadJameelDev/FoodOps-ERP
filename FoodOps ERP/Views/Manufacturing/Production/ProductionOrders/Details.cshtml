@@ -4,90 +4,138 @@
     ViewData["Subtitle"] = $"Status: {Model.Status}";
 }
 
-<partial name="_PageHeader" />
+<style>
+    .page-content { padding: 12px var(--content-x) 12px var(--content-x) !important; }
+    .order-dashboard { display: flex; flex-direction: column; gap: 12px; height: calc(100vh - 140px); }
 
-<div class="row g-3">
-    <div class="col-lg-8">
-        <div class="card mb-3">
-            <div class="card-header">
-                <h5 class="card-title"><i class="bi bi-info-circle"></i>Order Info <partial name="_StatusPill" model="Model.Status" /></h5>
-                <div class="grid-tools">
-                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i>Back</a>
-                    
-                    @if (Model.Status == "Planned")
-                    {
-                        <button type="button" class="btn btn-primary btn-sm" data-action-url="@Url.Action("Release", new { id = Model.ProductionOrderID })" data-confirm-title="Release Order?" data-confirm-text="Release" data-reload-url="@Url.Action("Details", new { id = Model.ProductionOrderID })"><i class="bi bi-box-arrow-up"></i>Release</button>
-                    }
-                    @if (Model.Status == "Released" || Model.Status == "OnHold")
-                    {
-                        <button type="button" class="btn btn-success btn-sm" data-action-url="@Url.Action("Start", new { id = Model.ProductionOrderID })" data-confirm-title="Start Order?" data-confirm-text="Start" data-reload-url="@Url.Action("Details", new { id = Model.ProductionOrderID })"><i class="bi bi-play-fill"></i>Start</button>
-                    }
-                    @if (Model.Status == "InProgress")
-                    {
-                        <button type="button" class="btn btn-warning btn-sm text-dark" data-action-url="@Url.Action("Hold", new { id = Model.ProductionOrderID })" data-confirm-title="Hold Order?" data-confirm-text="Hold" data-reload-url="@Url.Action("Details", new { id = Model.ProductionOrderID })"><i class="bi bi-pause-fill"></i>Hold</button>
-                        <button type="button" class="btn btn-success btn-sm" data-action-url="@Url.Action("Complete", new { id = Model.ProductionOrderID })" data-confirm-title="Complete Order?" data-confirm-text="Complete" data-reload-url="@Url.Action("Details", new { id = Model.ProductionOrderID })"><i class="bi bi-check-circle"></i>Complete</button>
-                    }
-                    @if (Model.Status == "Completed")
-                    {
-                        <button type="button" class="btn btn-secondary btn-sm" data-action-url="@Url.Action("Close", new { id = Model.ProductionOrderID })" data-confirm-title="Close Order?" data-confirm-text="Close" data-reload-url="@Url.Action("Details", new { id = Model.ProductionOrderID })"><i class="bi bi-lock"></i>Close</button>
-                    }
-                    @if (Model.Status != "Closed" && Model.Status != "Cancelled")
-                    {
-                        <button type="button" class="btn btn-outline-danger btn-sm" data-action-url="@Url.Action("Cancel", new { id = Model.ProductionOrderID })" data-confirm-title="Cancel Order?" data-confirm-text="Cancel" data-reload-url="@Url.Action("Details", new { id = Model.ProductionOrderID })"><i class="bi bi-x-circle"></i>Cancel</button>
-                    }
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Product</span><b>@Model.ProductName</b></div>
-                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Recipe</span><b>@Model.RecipeCode</b></div>
-                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Target Qty</span><b>@Model.TargetQty @Model.UOMName</b></div>
-                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Produced Qty</span><b>@Model.ProducedQty</b></div>
-                    <div class="col-md-4"><span class="text-muted d-block fs-xs">Rejected Qty</span><b>@Model.RejectedQty</b></div>
-                </div>
+    /* Header */
+    .order-header-card { display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-card); padding: 12px 16px; flex-shrink: 0; }
+    .header-icon { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #ECFDF5; color: var(--emerald-dark); border-radius: 8px; font-size: 18px; }
+    .header-title { font-size: 18px; font-weight: 700; color: var(--text-heading); margin: 0; line-height: 1.2; }
+    .header-subtitle { font-size: 11px; color: var(--text-muted); margin: 0; }
+
+    /* Info Grid */
+    .info-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-card); padding: 16px; flex-shrink: 0; }
+    .info-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+    .info-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block; }
+    .info-value { font-size: 14px; font-weight: 600; color: var(--text-heading); }
+
+    /* Table Card */
+    .table-card { flex: 1; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-card); display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+    .table-card-header { padding: 12px 16px; border-bottom: 1px solid var(--divider); flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; }
+    .table-card-title { font-size: 15px; font-weight: 600; color: var(--text-heading); margin: 0; display: flex; align-items: center; gap: 8px; }
+    .table-body-scroll { flex: 1; overflow-y: auto; min-height: 0; }
+
+    .premium-table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 0; }
+    .premium-table th { background: var(--surface-2); color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 2; }
+    .premium-table td { padding: 12px 16px; font-size: 13px; color: var(--text-body); border-bottom: 1px solid var(--divider); vertical-align: middle; }
+    .premium-table tr:last-child td { border-bottom: none; }
+    .premium-table tr:hover td { background: var(--surface-2); }
+
+    /* Quick Actions Bar (Full Width) */
+    .quick-actions-bar { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-card); padding: 12px 16px; flex-shrink: 0; }
+</style>
+
+<div class="order-dashboard">
+    <!-- Header -->
+    <div class="order-header-card">
+        <div class="d-flex align-items-center gap-3">
+            <div class="header-icon"><i class="bi bi-boxes"></i></div>
+            <div>
+                <h1 class="header-title">Order @Model.OrderNumber <partial name="_StatusPill" model="Model.Status" /></h1>
+                <p class="header-subtitle">Production Order</p>
             </div>
         </div>
+        <div class="d-flex align-items-center gap-2">
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm py-2 px-3" style="font-size: 12px;"><i class="bi bi-arrow-left me-1"></i> Back</a>
+            @if (Model.Status == "Planned") { <button type="button" class="btn btn-primary btn-sm py-2 px-3" style="font-size: 12px;" data-action-url="@Url.Action("Release", new { id = Model.ProductionOrderID })" data-confirm-title="Release Order?" data-confirm-text="Release" data-reload-url="@Url.Action("Details", new { id = Model.ProductionOrderID })"><i class="bi bi-box-arrow-up me-1"></i>Release</button> }
+            @if (Model.Status == "Released" || Model.Status == "OnHold") { <button type="button" class="btn btn-success btn-sm py-2 px-3" style="font-size: 12px;" data-action-url="@Url.Action("Start", new { id = Model.ProductionOrderID })" data-confirm-title="Start Order?" data-confirm-text="Start" data-reload-url="@Url.Action("Details", new { id = Model.ProductionOrderID })"><i class="bi bi-play-fill me-1"></i>Start</button> }
+            @if (Model.Status == "InProgress") { 
+                <button type="button" class="btn btn-warning btn-sm py-2 px-3 text-dark" style="font-size: 12px;" data-action-url="@Url.Action("Hold", new { id = Model.ProductionOrderID })" data-confirm-title="Hold Order?" data-confirm-text="Hold" data-reload-url="@Url.Action("Details", new { id = Model.ProductionOrderID })"><i class="bi bi-pause-fill me-1"></i>Hold</button> 
+                <button type="button" class="btn btn-success btn-sm py-2 px-3" style="font-size: 12px;" data-action-url="@Url.Action("Complete", new { id = Model.ProductionOrderID })" data-confirm-title="Complete Order?" data-confirm-text="Complete" data-reload-url="@Url.Action("Details", new { id = Model.ProductionOrderID })"><i class="bi bi-check-circle me-1"></i>Complete</button> 
+            }
+            @if (Model.Status == "Completed") { <button type="button" class="btn btn-secondary btn-sm py-2 px-3" style="font-size: 12px;" data-action-url="@Url.Action("Close", new { id = Model.ProductionOrderID })" data-confirm-title="Close Order?" data-confirm-text="Close" data-reload-url="@Url.Action("Details", new { id = Model.ProductionOrderID })"><i class="bi bi-lock me-1"></i>Close</button> }
+            @if (Model.Status != "Closed" && Model.Status != "Cancelled") { <button type="button" class="btn btn-outline-danger btn-sm py-2 px-3" style="font-size: 12px;" data-action-url="@Url.Action("Cancel", new { id = Model.ProductionOrderID })" data-confirm-title="Cancel Order?" data-confirm-text="Cancel" data-reload-url="@Url.Action("Details", new { id = Model.ProductionOrderID })"><i class="bi bi-x-circle me-1"></i>Cancel</button> }
+        </div>
+    </div>
 
-        <div class="card">
-            <div class="card-header"><h5 class="card-title"><i class="bi bi-gear-wide-connected"></i>Operations</h5></div>
-            <div class="table-responsive">
-                <table class="table table-sm mb-0">
-                    <thead><tr><th>#</th><th>Operation</th><th>Work Center</th><th class="num">Std Mins</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
-                    <tbody>
-                        @foreach (var op in Model.Operations)
-                        {
-                            <tr>
-                                <td>@op.SequenceOrder</td>
-                                <td><strong>@op.OperationName</strong></td>
-                                <td>@op.WorkCenterName</td>
-                                <td class="num">@op.StandardMinutes</td>
-                                <td><partial name="_StatusPill" model="op.Status" /></td>
-                                <td class="text-end">
-                                    @if (op.Status == "Pending" || op.Status == "Paused")
-                                    {
-                                        <button type="button" class="btn btn-sm btn-success" data-action-url="@Url.Action("StartOperation", new { id = op.OperationID })" data-confirm-title="Start Operation?" data-confirm-text="Start" data-reload-url="@Url.Action("Details", new { id = Model.ProductionOrderID })">Start</button>
-                                    }
-                                    @if (op.Status == "Running")
-                                    {
-                                        <button type="button" class="btn btn-sm btn-primary" data-action-url="@Url.Action("CompleteOperation", new { id = op.OperationID })" data-confirm-title="Complete Operation?" data-confirm-text="Complete" data-reload-url="@Url.Action("Details", new { id = Model.ProductionOrderID })">Complete</button>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+    <!-- Info Grid -->
+    <div class="info-card">
+        <div class="info-grid">
+            <div>
+                <span class="info-label">Product</span>
+                <span class="info-value">@Model.ProductName</span>
+            </div>
+            <div>
+                <span class="info-label">Recipe</span>
+                <span class="info-value">@Model.RecipeCode</span>
+            </div>
+            <div>
+                <span class="info-label">Target Qty</span>
+                <span class="info-value">@Model.TargetQty @Model.UOMName</span>
+            </div>
+            <div>
+                <span class="info-label">Produced Qty</span>
+                <span class="info-value text-success">@Model.ProducedQty</span>
+            </div>
+            <div>
+                <span class="info-label">Rejected Qty</span>
+                <span class="info-value text-danger">@Model.RejectedQty</span>
             </div>
         </div>
     </div>
 
-    <div class="col-lg-4">
-        <div class="card mb-3">
-            <div class="card-header"><h5 class="card-title"><i class="bi bi-lightning-charge"></i>Quick Actions</h5></div>
-            <div class="card-body d-flex flex-column gap-2">
-                <a href="@Url.Action("Execution", new { id = Model.ProductionOrderID })" class="btn btn-outline-primary btn-sm"><i class="bi bi-box-arrow-up"></i>Material Execution / Output</a>
-                <a href="@Url.Action("Wastage", new { id = Model.ProductionOrderID })" class="btn btn-outline-secondary btn-sm"><i class="bi bi-trash3"></i>Record Wastage</a>
-                <a href="@Url.Action("Exceptions", new { id = Model.ProductionOrderID })" class="btn btn-outline-danger btn-sm"><i class="bi bi-exclamation-triangle"></i>Report Exception</a>
-            </div>
+    <!-- Quick Actions (Full Width) -->
+    <div class="quick-actions-bar">
+        <span class="fw-bold text-muted me-2" style="font-size: 12px;">QUICK ACTIONS:</span>
+        <a href="@Url.Action("Execution", new { id = Model.ProductionOrderID })" class="btn btn-outline-primary btn-sm py-1 px-3" style="font-size: 12px;"><i class="bi bi-box-arrow-up me-1"></i>Material Execution</a>
+        <a href="@Url.Action("Wastage", new { id = Model.ProductionOrderID })" class="btn btn-outline-secondary btn-sm py-1 px-3" style="font-size: 12px;"><i class="bi bi-trash3 me-1"></i>Record Wastage</a>
+        <a href="@Url.Action("Exceptions", new { id = Model.ProductionOrderID })" class="btn btn-outline-danger btn-sm py-1 px-3" style="font-size: 12px;"><i class="bi bi-exclamation-triangle me-1"></i>Report Exception</a>
+    </div>
+
+    <!-- Operations Table -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <h5 class="table-card-title"><i class="bi bi-gear-wide-connected"></i> Operations</h5>
+            <span class="badge bg-surface-2 text-muted border px-3 py-2" style="font-size: 12px; border-radius: 6px;">
+                @(Model.Operations?.Count ?? 0) Operations
+            </span>
+        </div>
+        <div class="table-body-scroll">
+            <table class="premium-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Operation</th>
+                        <th>Work Center</th>
+                        <th class="text-end">Std Mins</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var op in Model.Operations)
+                    {
+                        <tr>
+                            <td>@op.SequenceOrder</td>
+                            <td><strong>@op.OperationName</strong></td>
+                            <td>@op.WorkCenterName</td>
+                            <td class="text-end">@op.StandardMinutes</td>
+                            <td><partial name="_StatusPill" model="op.Status" /></td>
+                            <td class="text-end">
+                                @if (op.Status == "Pending" || op.Status == "Paused")
+                                {
+                                    <button type="button" class="btn btn-sm btn-success py-1 px-3" style="font-size: 11px;" data-action-url="@Url.Action("StartOperation", new { id = op.OperationID })" data-confirm-title="Start Operation?" data-confirm-text="Start" data-reload-url="@Url.Action("Details", new { id = Model.ProductionOrderID })">Start</button>
+                                }
+                                @if (op.Status == "Running")
+                                {
+                                    <button type="button" class="btn btn-sm btn-primary py-1 px-3" style="font-size: 11px;" data-action-url="@Url.Action("CompleteOperation", new { id = op.OperationID })" data-confirm-title="Complete Operation?" data-confirm-text="Complete" data-reload-url="@Url.Action("Details", new { id = Model.ProductionOrderID })">Complete</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

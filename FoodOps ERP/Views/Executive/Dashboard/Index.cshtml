@@ -4,115 +4,210 @@
     ViewData["Subtitle"] = "Factory Overview & KPIs";
 }
 
-<partial name="_PageHeader" />
+<style>
+    /* ✅ MICROSOFT FLUENT - FINAL LOCKED EXECUTIVE DASHBOARD */
+    .page-content { padding: 12px var(--content-x) 12px var(--content-x) !important; }
 
-<!-- 1. Factory Overview & KPIs Grid -->
-<div class="row g-3 mb-4">
-    <div class="col-md-3">
-        <div class="card kpi-card">
-            <div class="kpi-header">
-                <div class="kpi-title">Employees</div>
-                <div class="kpi-icon kpi-emerald"><i class="bi bi-people"></i></div>
-            </div>
-            <div class="kpi-value">@Model.TotalEmployees</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card kpi-card">
-            <div class="kpi-header">
-                <div class="kpi-title">Active Prod. Orders</div>
-                <div class="kpi-icon kpi-amber"><i class="bi bi-gear"></i></div>
-            </div>
-            <div class="kpi-value">@Model.ActiveProductionOrders</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card kpi-card">
-            <div class="kpi-header">
-                <div class="kpi-title">Today's Production</div>
-                <div class="kpi-icon kpi-emerald"><i class="bi bi-box-seam"></i></div>
-            </div>
-            <div class="kpi-value">@Model.TodayProducedQty.ToString("N0")</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card kpi-card">
-            <div class="kpi-header">
-                <div class="kpi-title">Quality Pass Rate</div>
-                <div class="kpi-icon kpi-emerald"><i class="bi bi-patch-check"></i></div>
-            </div>
-            <div class="kpi-value">@Model.QualityPassRate.ToString("N1")%</div>
-        </div>
-    </div>
-</div>
+    .exec-dashboard { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 8px; 
+        height: 100%; /* Poori screen fill karega */
+        min-height: 0;
+    }
 
-<div class="row g-3">
-    <!-- 9. Trends Chart -->
-    <div class="col-lg-8">
-        <div class="card h-100">
-            <div class="card-header"><h5 class="card-title"><i class="bi bi-graph-up"></i>Production Trend (Last 7 Days)</h5></div>
-            <div class="card-body">
-                <canvas id="productionChart" height="100"></canvas>
+    /* Header */
+    .exec-header {
+        display: flex; align-items: center; justify-content: space-between;
+        background: #ffffff; border: 1px solid var(--border);
+        border-radius: var(--radius-card); padding: 10px 16px; flex-shrink: 0;
+    }
+    .header-icon { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #ECFDF5; color: var(--emerald-dark); border-radius: 8px; font-size: 18px; }
+    .header-title { font-size: 18px; font-weight: 700; color: var(--text-heading); margin: 0; line-height: 1.2; }
+    .header-subtitle { font-size: 11px; color: var(--text-muted); margin: 0; }
+
+    /* Grid */
+    .exec-grid { display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; }
+    
+    /* Row Heights */
+    .row-kpi { flex: 0 0 auto; flex-shrink: 0; }
+    
+    /* Main Row: Chart + Right Side */
+    .row-main { 
+        flex: 1; /* Bachi hui jagah le lega */
+        display: grid; 
+        grid-template-columns: 2fr 1fr; 
+        gap: 8px; 
+        min-height: 0; 
+    }
+
+    /* Universal Card */
+    .dash-card { display: flex; flex-direction: column; height: 100%; border-radius: var(--radius-card); border: 1px solid var(--border); background: #fff; overflow: hidden; }
+    .dash-card-header { padding: 8px 12px; background: #fff; border-bottom: 1px solid var(--divider); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .dash-card-title { font-size: 12px; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 6px; color: var(--text-heading); }
+    .dash-card-body { flex: 1; padding: 8px; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+    .dash-card-body.p-0 { padding: 0; display: block; }
+
+    /* KPI Cards */
+    .kpi-card { padding: 12px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; border-radius: var(--radius-card); border: 1px solid var(--border); background: #fff; }
+    .kpi-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+    .kpi-value { font-size: 26px; font-weight: 700; color: var(--text-heading); margin: 4px 0 0 0; line-height: 1; }
+    
+    /* Premium Double Border Icons */
+    .kpi-icon-wrapper { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; border: 2px solid; padding: 2px; }
+    .kpi-icon-inner { width: 100%; height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+
+    /* Chart Container Fix */
+    .chart-container { position: absolute; top: 0; left: 0; right: 0; bottom: 0; padding: 10px; }
+
+    /* AI Summary Bar (Flex item) */
+    .ai-summary-bar {
+        background: #F8FAFC; border: 1px solid var(--border); border-radius: var(--radius-card);
+        padding: 10px 16px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; /* Neeche fix rahega */
+    }
+</style>
+
+<div class="exec-dashboard">
+    
+    <!-- 1. HEADER -->
+    <div class="exec-header">
+        <div class="d-flex align-items-center gap-3">
+            <div class="header-icon"><i class="bi bi-speedometer2"></i></div>
+            <div>
+                <h1 class="header-title">Executive Dashboard</h1>
+                <p class="header-subtitle">Factory Overview & KPIs</p>
             </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-surface-2 text-muted border px-3 py-2" style="font-size: 11px; border-radius: 6px; font-weight: 500;">
+                <i class="bi bi-clock-history text-success"></i> Live Data
+            </span>
+            <button type="button" class="btn btn-outline-secondary btn-sm py-2 px-3" onclick="location.reload()" style="font-size: 11px;">
+                <i class="bi bi-arrow-clockwise"></i> Refresh
+            </button>
         </div>
     </div>
 
-    <!-- 7. Critical Alerts & 8. Action Queue -->
-    <div class="col-lg-4">
-        <div class="card mb-3">
-            <div class="card-header"><h5 class="card-title text-danger"><i class="bi bi-exclamation-triangle"></i>Critical Alerts</h5></div>
-            <div class="card-body p-2">
-                @if (Model.CriticalAlerts.Any())
-                {
-                    foreach (var alert in Model.CriticalAlerts)
-                    {
-                        <div class="alert-item alert-item-@(alert.Severity == "Critical" ? "danger" : "warning") mb-2">
-                            <div class="alert-item-icon"><i class="bi bi-exclamation-circle"></i></div>
-                            <div class="alert-item-content">
-                                <div class="alert-item-title">@alert.Title</div>
-                                <div class="alert-item-desc">@alert.Description</div>
-                            </div>
-                            <a href="@alert.Link" class="alert-item-action">View</a>
+    <div class="exec-grid">
+        
+        <!-- 2. KPI CARDS -->
+        <div class="row row-kpi g-2">
+            <div class="col-12 col-md-3">
+                <div class="kpi-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <span class="kpi-title">Employees</span>
+                        <div class="kpi-icon-wrapper" style="border-color: #D1FAE5; background: #ECFDF5;">
+                            <div class="kpi-icon-inner" style="color: #059669; background: #D1FAE5;"><i class="bi bi-people"></i></div>
                         </div>
-                    }
-                }
-                else
-                {
-                    <p class="text-muted text-center py-3">No critical alerts.</p>
-                }
+                    </div>
+                    <div class="kpi-value">@Model.TotalEmployees</div>
+                </div>
             </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header"><h5 class="card-title"><i class="bi bi-list-task"></i>Action Queue</h5></div>
-            <div class="card-body p-2">
-                @if (Model.ActionQueue.Any())
-                {
-                    foreach (var action in Model.ActionQueue)
-                    {
-                        <div class="alert-item alert-item-info mb-2">
-                            <div class="alert-item-icon"><i class="bi bi-clock"></i></div>
-                            <div class="alert-item-content">
-                                <div class="alert-item-title">@action.Task</div>
-                            </div>
-                            <a href="@action.Link" class="alert-item-action">Go</a>
+            <div class="col-12 col-md-3">
+                <div class="kpi-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <span class="kpi-title">Active Prod. Orders</span>
+                        <div class="kpi-icon-wrapper" style="border-color: #FEF3C7; background: #FFFBEB;">
+                            <div class="kpi-icon-inner" style="color: #D97706; background: #FEF3C7;"><i class="bi bi-gear"></i></div>
                         </div>
-                    }
-                }
-                else
-                {
-                    <p class="text-muted text-center py-3">No pending actions.</p>
-                }
+                    </div>
+                    <div class="kpi-value">@Model.ActiveProductionOrders</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="kpi-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <span class="kpi-title">Today's Production</span>
+                        <div class="kpi-icon-wrapper" style="border-color: #DBEAFE; background: #EFF6FF;">
+                            <div class="kpi-icon-inner" style="color: #2563EB; background: #DBEAFE;"><i class="bi bi-box-seam"></i></div>
+                        </div>
+                    </div>
+                    <div class="kpi-value">@Model.TodayProducedQty.ToString("N0")</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="kpi-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <span class="kpi-title">Quality Pass Rate</span>
+                        <div class="kpi-icon-wrapper" style="border-color: #D1FAE5; background: #ECFDF5;">
+                            <div class="kpi-icon-inner" style="color: #059669; background: #D1FAE5;"><i class="bi bi-patch-check"></i></div>
+                        </div>
+                    </div>
+                    <div class="kpi-value">@Model.QualityPassRate.ToString("N1")%</div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- 10. AI Summary -->
-<div class="card mt-3">
-    <div class="card-header"><h5 class="card-title text-primary"><i class="bi bi-robot"></i>AI Summary</h5></div>
-    <div class="card-body">
-        <p class="mb-0 text-muted">@Model.AiSummary</p>
+        <!-- 3. MAIN CONTENT (Chart + Alerts/Actions) -->
+        <div class="row-main">
+            <!-- Left: Chart -->
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h5 class="dash-card-title"><i class="bi bi-graph-up text-success"></i> Production Trend (Last 7 Days)</h5>
+                </div>
+                <div class="dash-card-body p-0">
+                    <div class="chart-container"><canvas id="productionChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Right: Alerts & Actions -->
+            <div class="d-flex flex-column gap-2 h-100">
+                <!-- Critical Alerts -->
+                <div class="dash-card" style="flex: 1;">
+                    <div class="dash-card-header">
+                        <h5 class="dash-card-title text-danger"><i class="bi bi-exclamation-triangle"></i> Critical Alerts</h5>
+                    </div>
+                    <div class="dash-card-body p-2" style="overflow-y: auto;">
+                        @if (Model.CriticalAlerts.Any())
+                        {
+                            foreach (var alert in Model.CriticalAlerts)
+                            {
+                                var alertClass = alert.Severity == "Critical" ? "alert-item-danger" : "alert-item-warning";
+                                <div class="alert-item @alertClass p-2 mb-2" style="border-radius: 6px;">
+                                    <div class="alert-item-content flex-grow-1">
+                                        <div class="alert-item-title" style="font-size:11px; font-weight:600;">@alert.Title</div>
+                                        <div class="alert-item-desc" style="font-size:10px; color:#64748B;">@alert.Description</div>
+                                    </div>
+                                    <a href="@alert.Link" class="alert-item-action px-2 py-0" style="font-size:10px;">View</a>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted text-center py-2" style="font-size:11px;">No critical alerts.</p>
+                        }
+                    </div>
+                </div>
+
+                <!-- Action Queue -->
+                <div class="dash-card" style="flex: 1;">
+                    <div class="dash-card-header">
+                        <h5 class="dash-card-title"><i class="bi bi-list-task text-primary"></i> Action Queue</h5>
+                    </div>
+                    <div class="dash-card-body p-2" style="overflow-y: auto;">
+                        @if (Model.ActionQueue.Any())
+                        {
+                            foreach (var action in Model.ActionQueue)
+                            {
+                                <div class="alert-item alert-item-info p-2 mb-2" style="border-radius: 6px;">
+                                    <div class="alert-item-content flex-grow-1">
+                                        <div class="alert-item-title" style="font-size:11px; font-weight:600;">@action.Task</div>
+                                    </div>
+                                    <a href="@action.Link" class="alert-item-action px-2 py-0" style="font-size:10px;">Go</a>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted text-center py-2" style="font-size:11px;">No pending actions.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       
+
     </div>
 </div>
 
@@ -120,24 +215,39 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         const ctx = document.getElementById('productionChart').getContext('2d');
+        
+        // Gradient for Chart
+        let gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
+        gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+
         new Chart(ctx, {
-        type: 'line',
-        data: {
-        labels: @Json.Serialize(Model.ProductionTrend.Select(x => x.Label)),
-        datasets: [{
-        label: 'Production Qty',
-        data: @Json.Serialize(Model.ProductionTrend.Select(x => x.Value)),
-        borderColor: '#10B981',
-        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-        fill: true,
-        tension: 0.4
-        }]
-        },
-        options: {
-        responsive: true,
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true } }
-        }
+            type: 'line',
+            data: {
+                labels: @Json.Serialize(Model.ProductionTrend.Select(x => x.Label)),
+                datasets: [{
+                    label: 'Production Qty',
+                    data: @Json.Serialize(Model.ProductionTrend.Select(x => x.Value)),
+                    borderColor: '#10B981',
+                    backgroundColor: gradient,
+                    borderWidth: 2,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#10B981',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true, 
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { 
+                    y: { beginAtZero: true, grid: { color: '#F1F5F9' }, ticks: { color: '#64748B', font: { size: 10 } } },
+                    x: { grid: { display: false }, ticks: { color: '#64748B', font: { size: 10 } } }
+                }
+            }
         });
     </script>
 }

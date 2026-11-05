@@ -1,0 +1,129 @@
+﻿@{
+    ViewData["Title"] = $"Search: {ViewBag.Query}";
+}
+
+<style>
+    /* ✅ MICROSOFT FLUENT - PREMIUM SEARCH RESULTS (FIXED) */
+    .page-content { padding: 12px var(--content-x) 12px var(--content-x) !important; }
+
+    .search-dashboard {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        height: calc(100vh - 140px); /* Full height lock */
+        overflow: hidden; /* Scroll khatam */
+    }
+
+    /* Premium Header */
+    .search-header-card {
+        display: flex; align-items: center; justify-content: space-between;
+        background: #ffffff; border: 1px solid var(--border);
+        border-radius: var(--radius-card); padding: 12px 16px; flex-shrink: 0;
+    }
+    .header-icon { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #EFF6FF; color: #2563EB; border-radius: 8px; font-size: 18px; }
+    .header-title { font-size: 18px; font-weight: 700; color: var(--text-heading); margin: 0; line-height: 1.2; }
+    .header-subtitle { font-size: 11px; color: var(--text-muted); margin: 0; }
+
+    /* Result Card */
+    .search-result-card {
+        flex: 1;
+        background: #fff; border: 1px solid var(--border); border-radius: var(--radius-card);
+        display: flex; flex-direction: column; overflow: hidden; min-height: 0;
+    }
+    .search-result-header {
+        padding: 16px 20px; border-bottom: 1px solid var(--divider); flex-shrink: 0;
+    }
+    .search-count { font-size: 14px; color: var(--text-body); margin: 0; }
+    .search-count strong { color: var(--emerald-dark); }
+
+    /* Result List */
+    .result-list {
+        flex: 1; overflow-y: auto; padding: 12px;
+        display: flex; flex-direction: column; gap: 8px;
+    }
+
+    .result-item {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 16px; background: #fff; border: 1px solid var(--border); border-radius: 10px;
+        text-decoration: none; color: var(--text-body);
+        transition: all 0.2s ease;
+    }
+    .result-item:hover {
+        border-color: var(--emerald);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+        transform: translateX(2px);
+    }
+
+    .result-content { display: flex; flex-direction: column; gap: 4px; }
+    .result-type-badge {
+        display: inline-flex; align-items: center; gap: 4px;
+        padding: 3px 10px; border-radius: 999px;
+        font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+        width: fit-content;
+    }
+    .result-name { font-size: 15px; font-weight: 700; color: var(--text-heading); margin: 0; }
+    .result-desc { font-size: 12px; color: var(--text-muted); margin: 0; }
+
+    .result-arrow { color: var(--text-muted); font-size: 14px; transition: all 0.2s; }
+    .result-item:hover .result-arrow { color: var(--emerald); transform: translateX(4px); }
+
+    /* Empty State */
+    .empty-state-premium {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        padding: 60px 20px; text-align: center; height: 100%;
+    }
+    .empty-icon-circle {
+        width: 80px; height: 80px; background: #F1F5F9; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 36px; color: #94A3B8; margin-bottom: 20px;
+    }
+</style>
+
+<div class="search-dashboard">
+    <!-- 1. Header -->
+    <div class="search-header-card">
+        <div class="d-flex align-items-center gap-3">
+            <div class="header-icon"><i class="bi bi-search"></i></div>
+            <div>
+                <h1 class="header-title">Search Results</h1>
+                <p class="header-subtitle">Global Search</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Results Card -->
+    <div class="search-result-card">
+        @if (Model == null || Model.Count == 0)
+        {
+            <div class="empty-state-premium">
+                <div class="empty-icon-circle"><i class="bi bi-search"></i></div>
+                <h4 class="text-heading mb-2" style="font-size: 18px; font-weight: 700;">No Results Found</h4>
+                <p class="text-muted mb-0" style="font-size: 14px; max-width: 400px;">
+                    No results found for "@ViewBag.Query". Try searching by Product Name, Supplier, Order Number, or Employee Name.
+                </p>
+            </div>
+        }
+        else
+        {
+            <div class="search-result-header">
+                <p class="search-count">Found <strong>@Model.Count</strong> results for "@ViewBag.Query"</p>
+            </div>
+            
+            <div class="result-list">
+                @foreach (var item in Model)
+                {
+                    <a href="@item.Url" class="result-item">
+                        <div class="result-content">
+                            <span class="result-type-badge" style="background: #EFF6FF; color: #2563EB;">
+                                <i class="bi bi-tag-fill" style="font-size: 8px;"></i> @item.Type
+                            </span>
+                            <h6 class="result-name">@item.Name</h6>
+                            <p class="result-desc">@item.Desc</p>
+                        </div>
+                        <i class="bi bi-chevron-right result-arrow"></i>
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</div>

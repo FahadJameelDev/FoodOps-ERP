@@ -1,10 +1,59 @@
-﻿@* Top-Notch Page Header (BBJAN Style) *@
+﻿@{
+    var title = ViewData["Title"]?.ToString() ?? "";
+    var icon = "bi-box-seam"; // default
+
+    // ====================== GROUP 2: Supply Chain & Inventory ======================
+    if (title.Contains("Supplier Management") || title.Contains("Suppliers")) icon = "bi-building";
+    else if (title.Contains("Purchase Management") || title.Contains("Purchase Orders")) icon = "bi-cart-check";
+    else if (title.Contains("Goods Receiving")) icon = "bi-truck";
+    else if (title.Contains("Incoming QC")) icon = "bi-clipboard-check";
+    else if (title.Contains("Stock Management")) icon = "bi-box-seam";
+    else if (title.Contains("Stock Movements")) icon = "bi-arrow-left-right";
+    else if (title.Contains("Lot & Expiry Tracking") || title.Contains("Lots & Expiry")) icon = "bi-calendar2-x";
+    else if (title.Contains("Material Issue")) icon = "bi-box-arrow-up";
+    else if (title.Contains("Inventory Wastage") || title.Contains("Wastage")) icon = "bi-trash";
+
+    // ====================== GROUP 3: Manufacturing & Quality ======================
+    else if (title.Contains("Product Catalogue") || title.Contains("Products")) icon = "bi-box2";
+    else if (title.Contains("Packaging")) icon = "bi-box-seam";
+    else if (title.Contains("Recipe")) icon = "bi-journal-text";
+    else if (title.Contains("Demand Management") || title.Contains("Demands")) icon = "bi-graph-up-arrow";
+    else if (title.Contains("Production Planning") || title.Contains("Production Plans")) icon = "bi-calendar2-week";
+    else if (title.Contains("Batch Management") || title.Contains("Production Orders")) icon = "bi-gear-wide-connected";
+    else if (title.Contains("QC Setup") || title.Contains("QC Parameters")) icon = "bi-sliders";
+    else if (title.Contains("Production QC")) icon = "bi-clipboard-data";
+    else if (title.Contains("Quality Decision")) icon = "bi-check2-square";
+    else if (title.Contains("Release Control")) icon = "bi-shield-check";
+    else if (title.Contains("Quality Records")) icon = "bi-journal-check";
+    else if (title.Contains("Batch Costing") || title.Contains("Cost Components") || title.Contains("Unit Cost") || title.Contains("Variance") || title.Contains("Loss Analysis")) icon = "bi-calculator";
+
+    // ====================== GROUP 4: Workforce & HR ======================
+    else if (title.Contains("Employee Management") || title.Contains("Employees")) icon = "bi-people";
+    else if (title.Contains("Workforce Setup")) icon = "bi-person-workspace";
+    else if (title.Contains("Compensation")) icon = "bi-cash-stack";
+    else if (title.Contains("Leave Management") || title.Contains("Leave")) icon = "bi-calendar2-event";
+    else if (title.Contains("Attendance")) icon = "bi-calendar-check";
+    else if (title.Contains("Overtime")) icon = "bi-clock-history";
+    else if (title.Contains("Payroll")) icon = "bi-wallet2";
+
+    // ====================== GROUP 5: AI ======================
+    else if (title.Contains("AI Assistant") || title.Contains("AI Hub") || title.Contains("Assistant")) icon = "bi-robot";
+    else if (title.Contains("AI Safety") || title.Contains("AI Evidence") || title.Contains("AI Audit")) icon = "bi-shield-lock";
+
+    // ====================== GROUP 1: Executive ======================
+    else if (title.Contains("Factory Overview") || title.Contains("Dashboard") || title.Contains("Overview")) icon = "bi-speedometer2";
+    else if (title.Contains("KPI") || title.Contains("Reports")) icon = "bi-bar-chart";
+    else if (title.Contains("Alert") || title.Contains("Action Queue")) icon = "bi-exclamation-triangle";
+    else if (title.Contains("Role")) icon = "bi-shield-lock";
+}
+
 <div class="ph">
     <div class="ph__title-row">
-        <span class="ph__icon"><i class="bi bi-box-seam"></i></span>
-        <h1 class="ph__title">@ViewData["Title"]</h1>
+        <span class="ph__icon">
+            <i class="bi @icon"></i>
+        </span>
+        <h1 class="ph__title">@title</h1>
     </div>
     <div class="ph__actions">
-        @* Yahan right side ke actions aa sakte hain, filhal khali hai *@
     </div>
 </div>

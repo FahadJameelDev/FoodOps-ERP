@@ -2,41 +2,54 @@
 @{
     var bins = ViewData["Bins"] as List<SelectListItem> ?? new List<SelectListItem>();
 }
+
 <form asp-action="Create" method="post" data-spa-form data-reload-url="@Url.Action("Index")" data-refresh="#grid-card" novalidate>
     <div class="fo-modal__body">
         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
         <input type="hidden" asp-for="POID" />
         <input type="hidden" asp-for="POCode" />
         <input type="hidden" asp-for="SupplierName" />
-        <input type="hidden" asp-for="SupplierID" /> <!-- SupplierID zaroori hai -->
+        <input type="hidden" asp-for="SupplierID" />
 
-        <div class="info-strip">
-            <div><span>Purchase order</span><b>@Model.POCode</b></div>
-            <div><span>Supplier</span><b>@Model.SupplierName</b></div>
+        <!-- ✅ Premium Header Info -->
+        <div class="grn-info-grid mb-4">
+            <div class="grn-info-box">
+                <span class="grn-label">Purchase Order</span>
+                <span class="grn-value">@Model.POCode</span>
+            </div>
+            <div class="grn-info-box">
+                <span class="grn-label">Supplier</span>
+                <span class="grn-value">@Model.SupplierName</span>
+            </div>
         </div>
-        <div class="row g-3 mb-3">
+
+        <!-- ✅ Form Fields Row -->
+        <div class="row g-3 mb-4">
             <div class="col-md-4">
-                <label asp-for="ReceivedDate" class="form-label">Received date <span class="text-danger">*</span></label>
-                <input asp-for="ReceivedDate" type="date" class="form-control" /><span asp-validation-for="ReceivedDate"></span>
+                <label asp-for="ReceivedDate" class="form-label">Received Date <span class="text-danger">*</span></label>
+                <input asp-for="ReceivedDate" type="date" class="form-control" />
+                <span asp-validation-for="ReceivedDate" class="text-danger small"></span>
             </div>
             <div class="col-md-8">
                 <label asp-for="Remarks" class="form-label">Remarks</label>
-                <input asp-for="Remarks" class="form-control" placeholder="Delivery note, vehicle, condition…" /><span asp-validation-for="Remarks"></span>
+                <input asp-for="Remarks" class="form-control" placeholder="Delivery note, vehicle condition, etc." />
+                <span asp-validation-for="Remarks" class="text-danger small"></span>
             </div>
         </div>
 
-        <div class="table-responsive">
-            <table class="table mb-0">
+        <!-- ✅ Premium Table -->
+        <div class="table-responsive" style="border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
+            <table class="table mb-0 grn-table">
                 <thead>
                     <tr>
-                        <th>Product</th>
-                        <th class="num">Ordered</th>
-                        <th class="num">Received</th>
-                        <th style="width:120px">Receive now</th>
-                        <th style="width:150px">Batch #</th>
-                        <th style="width:140px">Mfg date</th>
-                        <th style="width:140px">Expiry</th>
-                        <th style="width:170px">Bin</th>
+                        <th style="min-width: 180px;">Product</th>
+                        <th class="text-end" style="width: 80px;">Ordered</th>
+                        <th class="text-end" style="width: 80px;">Received</th>
+                        <th style="width: 120px;">Receive Now</th>
+                        <th style="width: 140px;">Batch #</th>
+                        <th style="width: 150px;">Mfg Date</th>
+                        <th style="width: 150px;">Expiry Date</th>
+                        <th style="width: 160px;">Bin</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -52,24 +65,80 @@
                                 <input type="hidden" asp-for="Items[i].ReceivedQty" />
                                 <strong>@Model.Items[i].ProductName</strong>
                             </td>
-                            <td class="num">@Fmt.Qty(Model.Items[i].OrderedQty)</td>
-                            <td class="num">@Fmt.Qty(Model.Items[i].ReceivedQty)</td>
+                            <td class="text-end align-middle">@Fmt.Qty(Model.Items[i].OrderedQty)</td>
+                            <td class="text-end align-middle">@Fmt.Qty(Model.Items[i].ReceivedQty)</td>
                             
-                            <!-- ✅ FIX: Name changed to ReceivingQty -->
-                            <td><input asp-for="Items[i].ReceivingQty" type="number" step="0.0001" min="0" max="@Math.Max(Model.Items[i].OrderedQty - Model.Items[i].ReceivedQty, 0)" class="form-control num" /><span asp-validation-for="Items[i].ReceivingQty"></span></td>
+                            <td>
+                                <input asp-for="Items[i].ReceivingQty" type="number" step="0.0001" min="0" max="@Math.Max(Model.Items[i].OrderedQty - Model.Items[i].ReceivedQty, 0)" class="form-control form-control-sm text-end" />
+                                <span asp-validation-for="Items[i].ReceivingQty" class="text-danger small"></span>
+                            </td>
                             
-                            <td><input asp-for="Items[i].BatchNumber" class="form-control" placeholder="Batch no." /><span asp-validation-for="Items[i].BatchNumber"></span></td>
-                            <td><input asp-for="Items[i].ManufacturingDate" type="date" class="form-control" /></td>
-                            <td><input asp-for="Items[i].ExpiryDate" type="date" class="form-control" /><span asp-validation-for="Items[i].ExpiryDate"></span></td>
-                            <td><select asp-for="Items[i].BinID" asp-items="bins" class="form-select"><option value="">Select bin…</option></select></td>
+                            <td><input asp-for="Items[i].BatchNumber" class="form-control form-control-sm" placeholder="Batch no." /></td>
+                            <td><input asp-for="Items[i].ManufacturingDate" type="date" class="form-control form-control-sm" /></td>
+                            <td>
+                                <input asp-for="Items[i].ExpiryDate" type="date" class="form-control form-control-sm" />
+                                <span asp-validation-for="Items[i].ExpiryDate" class="text-danger small"></span>
+                            </td>
+                            <td>
+                                <select asp-for="Items[i].BinID" asp-items="bins" class="form-select form-select-sm">
+                                    <option value="">Select bin…</option>
+                                </select>
+                            </td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
     </div>
-    <div class="fo-modal__footer">
-        <button type="button" class="btn btn-outline-secondary" data-modal-close>Cancel</button>
-        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i><span>Confirm receipt</span></button>
+    
+    <!-- ✅ Premium Footer -->
+    <div class="fo-modal__footer" style="background: #F8FAFC; border-top: 1px solid var(--border); padding: 16px 24px;">
+        <button type="button" class="btn btn-outline-secondary px-4" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-lg me-1"></i> Confirm Receipt</button>
     </div>
 </form>
+
+<style>
+    /* ✅ MICROSOFT FLUENT - PREMIUM GRN FORM STYLING */
+    
+    /* Info Grid */
+    .grn-info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    .grn-info-box {
+        background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
+        padding: 12px 16px; display: flex; flex-direction: column; gap: 4px;
+    }
+    .grn-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+    .grn-value { font-size: 15px; font-weight: 700; color: var(--text-heading); }
+
+    /* Form Elements */
+    .form-label { font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 6px; }
+    .form-control, .form-select {
+        height: 38px; border-radius: 8px; border: 1px solid var(--line-strong);
+        font-size: 13px; color: var(--text-body); transition: all 0.2s;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: var(--emerald); box-shadow: 0 0 0 3px var(--emerald-glow);
+    }
+
+    /* Table Styling */
+    .grn-table thead th {
+        background: var(--surface-2); color: var(--text-muted); font-size: 11px; font-weight: 600;
+        text-transform: uppercase; letter-spacing: 0.05em; padding: 10px 12px;
+        border-bottom: 1px solid var(--line); white-space: nowrap;
+    }
+    .grn-table tbody td {
+        padding: 8px 12px; vertical-align: middle; font-size: 13px;
+        border-bottom: 1px solid var(--divider);
+    }
+    .grn-table tbody tr:last-child td { border-bottom: none; }
+    .grn-table tbody tr:hover td { background: var(--surface-2); }
+
+    /* Table ke andar inputs chote */
+    .grn-table .form-control-sm, .grn-table .form-select-sm {
+        height: 32px; font-size: 12px; padding: 4px 8px; border-radius: 6px;
+    }
+</style>

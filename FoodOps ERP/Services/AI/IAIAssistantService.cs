@@ -1,9 +1,10 @@
 ﻿using FoodOpsERP.Models.AI.ViewModels;
+using System.Threading.Tasks;
 
-namespace FoodOpsERP.Services.AI;
-
-public interface IAIAssistantService
+namespace FoodOpsERP.Services.AI
 {
-    // Dummy AI response generator (Baad mein OpenAI se replace hoga)
-    Task<string> AskAssistantAsync(string domainContext, string question, int userId);
+    public interface IAIAssistantService
+    {
+        Task<string> AskAssistantAsync(string domainContext, string question, int userId);
+    }
 }

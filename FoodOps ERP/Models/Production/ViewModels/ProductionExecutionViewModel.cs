@@ -1,4 +1,6 @@
-﻿namespace FoodOpsERP.Models.Manufacturing.Production.ViewModels;
+﻿using Microsoft.AspNetCore.Mvc.Rendering; // ✅ Yeh add karein
+
+namespace FoodOpsERP.Models.Manufacturing.Production.ViewModels;
 
 public class ProductionExecutionViewModel
 {
@@ -12,4 +14,9 @@ public class ProductionExecutionViewModel
     public decimal ProducedQty { get; set; }
     public decimal RejectedQty { get; set; }
     public int? PackagingConfigID { get; set; }
+
+    // ✅ NAYA: Dropdowns ke liye strongly-typed lists
+    public IEnumerable<SelectListItem>? BatchList { get; set; }
+    public IEnumerable<SelectListItem>? RecipeItemList { get; set; }
+    public IEnumerable<SelectListItem>? PackagingConfigList { get; set; }
 }

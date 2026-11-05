@@ -3,134 +3,218 @@
     ViewData["Title"] = "Factory Overview";
 }
 
-<div class="page-header">
-    <div class="page-title-row">
-        <div class="page-title-icon"><i class="bi bi-building" aria-hidden="true"></i></div>
-        <h1 class="page-title">Factory Overview</h1>
-    </div>
-    <p class="page-subtitle">Manufacturing Operations</p>
-</div>
+<style>
+    /* ✅ MICROSOFT FLUENT - FULL SCREEN FILL LOCK */
+    /* Page content ka padding kam kiya taake jagah bache */
+    .page-content { padding: 12px var(--content-x) 12px var(--content-x) !important; }
 
-<div class="row g-3 mb-3">
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="kpi-card h-100">
-            <div class="kpi-header"><span class="kpi-title">Production Target Achievement</span><div class="kpi-icon kpi-emerald"><i class="bi bi-bar-chart"></i></div></div>
-            <div class="kpi-value">@Model.Production.AchievementPercent.ToString("N0")%</div>
-            <div class="kpi-meta">Actual: @Model.Production.Actual.ToString("N0") / @Model.Production.Target.ToString("N0") units</div>
-            <div class="kpi-progress"><div class="kpi-progress-bar" style="width: @Model.Production.AchievementPercent%"></div></div>
-        </div>
-    </div>
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="kpi-card h-100">
-            <div class="kpi-header"><span class="kpi-title">Low-stock Materials</span><div class="kpi-icon kpi-amber"><i class="bi bi-box-seam"></i></div></div>
-            <div class="kpi-value">@Model.Inventory.LowStockCount.ToString("D2")</div>
-            <div class="kpi-meta">Items below reorder level</div>
-            <a href="/Stock/Balance" class="kpi-action action-amber">View Shortages</a>
-        </div>
-    </div>
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="kpi-card h-100">
-            <div class="kpi-header"><span class="kpi-title">Batches on QC Hold</span><div class="kpi-icon kpi-red"><i class="bi bi-shield-exclamation"></i></div></div>
-            <div class="kpi-value">@Model.Quality.QcHoldCount.ToString("D2")</div>
-            <div class="kpi-meta">Awaiting quality decision</div>
-            <a href="/IncomingQC" class="kpi-action action-red">View Batches</a>
-        </div>
-    </div>
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="kpi-card h-100">
-            <div class="kpi-header"><span class="kpi-title">Attendance Recorded</span><div class="kpi-icon kpi-emerald"><i class="bi bi-people"></i></div></div>
-            <div class="kpi-value">@Model.Attendance.PresentPercent.ToString("N0")%</div>
-            <div class="kpi-meta">Present: @Model.Attendance.Present / @Model.Attendance.Total employees</div>
-            <div class="kpi-progress"><div class="kpi-progress-bar" style="width: @Model.Attendance.PresentPercent%"></div></div>
-        </div>
-    </div>
-</div>
+    /* Main Wrapper ko poori height lene do */
+    .dashboard-wrapper { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 8px; 
+        height: 100%; /* ✅ 100% height li taake khali jagah na bache */
+        min-height: 0;
+    }
 
-<div class="row g-3 mb-3">
-    <div class="col-12 col-lg-8">
-        <div class="card h-100">
-            <div class="card-header">
-                <h5 class="card-title"><i class="bi bi-bar-chart-line"></i> Production Performance</h5>
-                <div class="d-flex gap-3">
-                    <span class="d-flex align-items-center gap-2"><span style="width:10px;height:10px;border-radius:50%;background:#3B82F6;"></span><small class="text-muted">Planned</small></span>
-                    <span class="d-flex align-items-center gap-2"><span style="width:10px;height:10px;border-radius:50%;background:#10B981;"></span><small class="text-muted">Actual</small></span>
+    /* Header */
+    .dashboard-header {
+        display: flex; align-items: center; justify-content: space-between;
+        background: #ffffff; border: 1px solid var(--border);
+        border-radius: var(--radius-card); padding: 10px 16px; flex-shrink: 0;
+    }
+    .header-icon { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #ECFDF5; color: var(--emerald-dark); border-radius: 8px; font-size: 18px; }
+    .header-title { font-size: 18px; font-weight: 700; color: var(--text-heading); margin: 0; line-height: 1.2; }
+    .header-subtitle { font-size: 11px; color: var(--text-muted); margin: 0; }
+
+    /* Main Grid */
+    .dashboard-grid { display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; }
+    
+    /* Row Heights */
+    .row-kpi { flex: 0 0 auto; flex-shrink: 0; }
+    /* ✅ Yahan flex: 1 diya hai taake bachi hui jagah bhar lein */
+    .row-middle { flex: 1; display: grid; grid-template-columns: 2fr 1fr; gap: 8px; min-height: 0; }
+    .row-bottom { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; min-height: 0; }
+
+    /* Universal Card */
+    .dash-card { display: flex; flex-direction: column; height: 100%; border-radius: var(--radius-card); border: 1px solid var(--border); background: #fff; overflow: hidden; }
+    .dash-card-header { padding: 8px 12px; background: #fff; border-bottom: 1px solid var(--divider); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .dash-card-title { font-size: 12px; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 6px; color: var(--text-heading); }
+    .dash-card-body { flex: 1; padding: 8px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; }
+    .dash-card-body.p-0 { padding: 0; display: block; overflow-y: auto; } /* ✅ Table ke liye scroll */
+
+    /* KPI Cards */
+    .kpi-card { padding: 12px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; border-radius: var(--radius-card); border: 1px solid var(--border); background: #fff; }
+    .kpi-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+    .kpi-value { font-size: 24px; font-weight: 700; color: var(--text-heading); margin: 0; line-height: 1; }
+    
+    /* Double Border Icons */
+    .kpi-icon-wrapper { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; border: 2px solid; padding: 2px; }
+    .kpi-icon-inner { width: 100%; height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+
+    /* Chart Container */
+    .chart-container { position: absolute; top: 0; left: 0; right: 0; bottom: 0; padding: 8px; }
+    .donut-container { height: 100px; position: relative; margin: 0 auto; max-width: 120px; }
+
+    /* Table */
+    .compact-table th { font-size: 10px; padding: 6px 10px; background: var(--surface-2); color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--line); }
+    .compact-table td { font-size: 11px; padding: 8px 10px; vertical-align: middle; border-bottom: 1px solid var(--divider); }
+</style>
+
+<div class="dashboard-wrapper">
+    
+    <!-- 1. HEADER -->
+    <div class="dashboard-header">
+        <div class="d-flex align-items-center gap-3">
+            <div class="header-icon"><i class="bi bi-buildings"></i></div>
+            <div>
+                <h1 class="header-title">Factory Overview</h1>
+                <p class="header-subtitle">Manufacturing Operations</p>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-surface-2 text-muted border px-3 py-2" style="font-size: 11px; border-radius: 6px; font-weight: 500;">
+                <i class="bi bi-clock-history text-success"></i> Live Data
+            </span>
+            <button type="button" class="btn btn-outline-secondary btn-sm py-2 px-3" onclick="location.reload()" style="font-size: 11px;">
+                <i class="bi bi-arrow-clockwise"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        
+        <!-- 2. KPI CARDS -->
+        <div class="row row-kpi g-2">
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="kpi-card">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <span class="kpi-title">Production Target</span>
+                        <div class="kpi-icon-wrapper" style="border-color: #D1FAE5; background: #ECFDF5;">
+                            <div class="kpi-icon-inner" style="color: #059669; background: #D1FAE5;"><i class="bi bi-bar-chart"></i></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="kpi-value">@Model.Production.AchievementPercent.ToString("N0")%</div>
+                        <div class="progress mt-1" style="height: 3px;"><div class="progress-bar bg-success" style="width: @Model.Production.AchievementPercent%"></div></div>
+                    </div>
                 </div>
             </div>
-            <div class="card-body p-3">
-                <div class="row g-3 align-items-center">
-                    <div class="col-12 col-md-7">
-                        <div style="height: 240px; position: relative;"><canvas id="productionChart"></canvas></div>
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="kpi-card">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <span class="kpi-title">Low-stock Items</span>
+                        <div class="kpi-icon-wrapper" style="border-color: #FEF3C7; background: #FFFBEB;">
+                            <div class="kpi-icon-inner" style="color: #D97706; background: #FEF3C7;"><i class="bi bi-box-seam"></i></div>
+                        </div>
                     </div>
-                    <div class="col-12 col-md-5 text-center">
-                        <div style="height: 200px; position: relative;"><canvas id="donutChart"></canvas></div>
-                        <div class="fw-semibold mt-2" style="font-size: var(--fs-sm);">Target Achievement</div>
-                        <div class="text-muted" style="font-size: var(--fs-xs);">Planned: @Model.Production.Target.ToString("N0") · Actual: @Model.Production.Actual.ToString("N0")</div>
+                    <div>
+                        <div class="kpi-value">@Model.Inventory.LowStockCount.ToString("D2")</div>
+                        <a href="/Stock/Balance" class="text-warning" style="font-size: 10px; font-weight: 600; text-decoration: none;">View Shortages</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="kpi-card">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <span class="kpi-title">Batches on QC Hold</span>
+                        <div class="kpi-icon-wrapper" style="border-color: #FEE2E2; background: #FEF2F2;">
+                            <div class="kpi-icon-inner" style="color: #DC2626; background: #FEE2E2;"><i class="bi bi-shield-exclamation"></i></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="kpi-value">@Model.Quality.QcHoldCount.ToString("D2")</div>
+                        <a href="/IncomingQC" class="text-danger" style="font-size: 10px; font-weight: 600; text-decoration: none;">View Batches</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="kpi-card">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <span class="kpi-title">Attendance</span>
+                        <div class="kpi-icon-wrapper" style="border-color: #D1FAE5; background: #ECFDF5;">
+                            <div class="kpi-icon-inner" style="color: #059669; background: #D1FAE5;"><i class="bi bi-people"></i></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="kpi-value">@Model.Attendance.PresentPercent.ToString("N0")%</div>
+                        <div class="progress mt-1" style="height: 3px;"><div class="progress-bar bg-success" style="width: @Model.Attendance.PresentPercent%"></div></div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-12 col-lg-4">
-        <div class="card h-100">
-            <div class="card-header"><h5 class="card-title"><i class="bi bi-exclamation-triangle"></i> Attention Required</h5><a href="/Dashboard/Alerts" class="btn btn-sm btn-outline-secondary">View All</a></div>
-            <div class="card-body p-3">
-                @if (Model.AttentionRequired.Any())
-                {
-                    foreach (var alert in Model.AttentionRequired)
-                    {
-                        var alertClass = alert.Severity switch { "Critical" => "alert-item-danger", "Warning" => "alert-item-warning", _ => "alert-item-info" };
-                        var iconClass = alert.Severity switch { "Critical" => "bi-exclamation-circle", "Warning" => "bi-exclamation-triangle", _ => "bi-info-circle" };
-                        <div class="alert-item @alertClass">
-                            <div class="alert-item-icon"><i class="bi @iconClass"></i></div>
-                            <div class="alert-item-content">
-                                <div class="alert-item-title">@alert.Title</div>
-                                <div class="alert-item-desc">@alert.Description</div>
-                                <div class="alert-item-time">@alert.TimeAgo</div>
-                            </div>
-                            <div class="d-flex align-items-center gap-2">
-                                <a href="@alert.ActionUrl" class="alert-item-action">@alert.ActionText</a>
-                                <i class="bi bi-chevron-right text-muted" style="font-size:10px;"></i>
+        <!-- 3. MIDDLE ROW: Chart + AI Assistant -->
+        <div class="row-middle">
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h5 class="dash-card-title"><i class="bi bi-bar-chart-line"></i> Production Performance</h5>
+                </div>
+                <div class="dash-card-body p-0">
+                    <div class="row h-100 m-0">
+                        <div class="col-8 h-100 position-relative">
+                            <div class="chart-container"><canvas id="productionChart"></canvas></div>
+                        </div>
+                        <div class="col-4 h-100 d-flex flex-column justify-content-center border-start">
+                            <div class="donut-container"><canvas id="donutChart"></canvas></div>
+                            <div class="text-center mt-1">
+                                <div class="fw-bold" style="font-size: 10px;">Target Achievement</div>
                             </div>
                         </div>
-                    }
-                }
-                else
-                {
-                    <p class="text-muted text-center py-3">No alerts found.</p>
-                }
+                    </div>
+                </div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h5 class="dash-card-title"><i class="bi bi-stars text-ai"></i> AI Assistant</h5>
+                    <a href="/AIAssistant" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size:10px;">Chat</a>
+                </div>
+                <div class="dash-card-body d-flex flex-column justify-content-between">
+                    <div class="d-flex align-items-start gap-2 mb-2">
+                        <div class="user-avatar" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); width:20px; height:20px; font-size:10px;"><i class="bi bi-robot"></i></div>
+                        <div style="font-size:11px; font-weight:600;">How can I help you?</div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-1 mb-2">
+                        <a href="/AIAssistant/Production" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size:9px;">Target?</a>
+                        <a href="/AIAssistant/Inventory" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size:9px;">Stock?</a>
+                        <a href="/AIAssistant/Quality" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size:9px;">QC?</a>
+                    </div>
+                    <form asp-controller="AIAssistant" asp-action="Index" method="get" class="position-relative mt-auto">
+                        <input type="text" name="q" class="form-control form-control-sm pe-4" placeholder="Ask..." style="font-size:11px; height: 26px;" />
+                        <button type="submit" class="btn btn-primary btn-sm" style="position: absolute; right: 2px; top: 2px; padding: 2px 6px; height:22px;"><i class="bi bi-send" style="font-size:9px;"></i></button>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-</div>
 
-<div class="row g-3">
-    <div class="col-12 col-lg-8">
-        <div class="card h-100">
-            <div class="card-header"><h5 class="card-title"><i class="bi bi-boxes"></i> Active Production Batches</h5><a href="/ProductionOrders" class="btn btn-sm btn-outline-secondary">View All</a></div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
+        <!-- 4. BOTTOM ROW: Table + Alerts -->
+        <div class="row-bottom">
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h5 class="dash-card-title"><i class="bi bi-boxes"></i> Active Batches</h5>
+                    <a href="/ProductionOrders" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size:10px;">View All</a>
+                </div>
+                <div class="dash-card-body p-0">
+                    <table class="table table-hover mb-0 compact-table">
                         <thead>
-                            <tr><th>Batch #</th><th>Product</th><th>Stage</th><th>Progress</th><th>Status</th><th class="text-end">Actions</th></tr>
+                            <tr><th>Batch #</th><th>Product</th><th>Progress</th><th>Status</th><th class="text-end">Action</th></tr>
                         </thead>
                         <tbody>
                             @foreach (var batch in Model.ActiveBatches)
                             {
                                 <tr>
                                     <td><strong>@batch.BatchNumber</strong></td>
-                                    <td><i class="bi @batch.ProductIcon me-2 text-success"></i>@batch.ProductName</td>
-                                    <td>@batch.Stage</td>
-                                    <td style="min-width: 120px;">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="kpi-progress flex-grow-1" style="margin: 0;"><div class="kpi-progress-bar" style="width: @batch.Progress%"></div></div>
-                                            <small class="text-muted">@batch.Progress%</small>
+                                    <td><i class="bi @batch.ProductIcon me-1 text-success"></i>@batch.ProductName</td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-1">
+                                            <div class="progress flex-grow-1" style="height: 3px;"><div class="progress-bar bg-success" style="width: @batch.Progress%"></div></div>
+                                            <span style="font-size: 9px;">@batch.Progress%</span>
                                         </div>
                                     </td>
-                                    <td><span class="badge @batch.StatusBadgeClass">@batch.Status</span></td>
+                                    <td><span class="badge @batch.StatusBadgeClass" style="font-size:8px;">@batch.Status</span></td>
                                     <td class="text-end">
-                                        <!-- ✅ FIX: batch.Id use kiya -->
-                                        <a href="/ProductionOrders/Details/@batch.Id" class="btn btn-sm btn-outline-secondary">View</a>
+                                        <a href="/ProductionOrders/Details/@batch.Id" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size:9px;">View</a>
                                     </td>
                                 </tr>
                             }
@@ -138,88 +222,84 @@
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="col-12 col-lg-4">
-        <div class="card h-100">
-            <div class="card-header"><h5 class="card-title"><i class="bi bi-stars text-ai"></i> FoodOps AI Assistant <span class="badge bg-info ms-2">Beta</span></h5><a href="/AIAssistant" class="btn btn-sm btn-outline-secondary">View Insights</a></div>
-            <div class="card-body p-3 d-flex flex-column justify-content-between">
-                <div class="mb-2 d-flex align-items-start gap-2">
-                    <div class="user-avatar" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);"><i class="bi bi-robot"></i></div>
-                    <div>
-                        <div class="fw-semibold">How can I help you today?</div>
-                        <small class="text-muted">Ask about production, inventory, quality, cost or workforce data.</small>
-                    </div>
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h5 class="dash-card-title"><i class="bi bi-exclamation-triangle"></i> Attention Required</h5>
+                    <a href="/Dashboard/Alerts" class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size:10px;">View All</a>
                 </div>
-                <div class="mb-2">
-                    <a href="/AIAssistant/Production" class="btn btn-sm btn-outline-secondary me-1 mb-1">Why did target fall short?</a>
-                    <a href="/AIAssistant/Inventory" class="btn btn-sm btn-outline-secondary me-1 mb-1">Which materials are low?</a>
-                    <a href="/AIAssistant/Quality" class="btn btn-sm btn-outline-secondary me-1 mb-1">Show QC holds.</a>
-                    <a href="/AIAssistant/Payroll" class="btn btn-sm btn-outline-secondary me-1 mb-1">Attendance rate?</a>
+                <div class="dash-card-body p-2">
+                    @if (Model.AttentionRequired.Any())
+                    {
+                        foreach (var alert in Model.AttentionRequired)
+                        {
+                            var alertClass = alert.Severity switch { "Critical" => "alert-item-danger", "Warning" => "alert-item-warning", _ => "alert-item-info" };
+                            <div class="alert-item @alertClass p-1 mb-1" style="border-radius: 6px; display: flex; align-items: center;">
+                                <div class="alert-item-content ms-1 flex-grow-1">
+                                    <div class="alert-item-title" style="font-size:10px; font-weight:600;">@alert.Title</div>
+                                    <div class="alert-item-desc" style="font-size:9px; color:#64748B;">@alert.Description</div>
+                                </div>
+                                <a href="@alert.ActionUrl" class="alert-item-action px-2 py-0" style="font-size:9px;">@alert.ActionText</a>
+                            </div>
+                        }
+                    }
                 </div>
-                <form asp-controller="AIAssistant" asp-action="Index" method="get" class="position-relative mt-2">
-                    <input type="text" name="q" class="form-control form-control-sm pe-5" placeholder="Ask a question..." />
-                    <button type="submit" class="btn btn-primary btn-sm" style="position: absolute; right: 3px; top: 3px; padding: 2px 8px;"><i class="bi bi-send"></i></button>
-                </form>
             </div>
         </div>
     </div>
 </div>
 
-<div class="text-muted text-end mt-2" style="font-size: 10px;">Live data from database</div>
-
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-        const labels  = @Html.Raw(Model.ProductionChart.LabelsJson);
-        const planned = @Html.Raw(Model.ProductionChart.PlannedJson);
-        const actual  = @Html.Raw(Model.ProductionChart.ActualJson);
-        const achievement = @Model.Production.AchievementPercent;
+            const labels  = @Html.Raw(Model.ProductionChart.LabelsJson);
+            const planned = @Html.Raw(Model.ProductionChart.PlannedJson);
+            const actual  = @Html.Raw(Model.ProductionChart.ActualJson);
+            const achievement = @Model.Production.AchievementPercent;
 
-        const ctx = document.getElementById('productionChart');
-        if (ctx) {
-        new Chart(ctx, {
-        type: 'bar',
-        data: {
-        labels: labels,
-        datasets: [
-        { label: 'Planned', data: planned, backgroundColor: '#3B82F6', borderRadius: 4, barThickness: 24 },
-        { label: 'Actual',  data: actual,  backgroundColor: '#10B981', borderRadius: 4, barThickness: 24 }
-        ]
-        },
-        options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-        y: { beginAtZero: true, grid: { color: '#F1F5F9' }, ticks: { color: '#64748B', font: { size: 10 } } },
-        x: { grid: { display: false }, ticks: { color: '#64748B', font: { size: 10 } } }
-        }
-        }
-        });
-        }
+            const ctx = document.getElementById('productionChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            { label: 'Planned', data: planned, backgroundColor: '#3B82F6', borderRadius: 2, barThickness: 10 },
+                            { label: 'Actual',  data: actual,  backgroundColor: '#10B981', borderRadius: 2, barThickness: 10 }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: '#F1F5F9' }, ticks: { color: '#64748B', font: { size: 9 } } },
+                            x: { grid: { display: false }, ticks: { color: '#64748B', font: { size: 9 } } }
+                        }
+                    }
+                });
+            }
 
-        const dctx = document.getElementById('donutChart');
-        if (dctx) {
-        new Chart(dctx, {
-        type: 'doughnut',
-        data: { datasets: [{ data: [achievement, 100 - achievement], backgroundColor: ['#10B981', '#E5E7EB'], borderWidth: 0, cutout: '75%' }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } } },
-        plugins: [{
-        id: 'centerText',
-        afterDraw(chart) {
-        const { ctx, chartArea } = chart;
-        const centerX = (chartArea.left + chartArea.right) / 2;
-        const centerY = (chartArea.top + chartArea.bottom) / 2;
-        ctx.save(); ctx.font = 'bold 24px Inter, sans-serif'; ctx.fillStyle = '#0F172A';
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText(achievement.toFixed(0) + '%', centerX, centerY);
-        ctx.restore();
-        }
-        }]
-        });
-        }
+            const dctx = document.getElementById('donutChart');
+            if (dctx) {
+                new Chart(dctx, {
+                    type: 'doughnut',
+                    data: { datasets: [{ data: [achievement, 100 - achievement], backgroundColor: ['#10B981', '#E5E7EB'], borderWidth: 0, cutout: '75%' }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } } },
+                    plugins: [{
+                        id: 'centerText',
+                        afterDraw(chart) {
+                            const { ctx, chartArea } = chart;
+                            const centerX = (chartArea.left + chartArea.right) / 2;
+                            const centerY = (chartArea.top + chartArea.bottom) / 2;
+                            ctx.save(); ctx.font = 'bold 14px Inter, sans-serif'; ctx.fillStyle = '#0F172A';
+                            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                            ctx.fillText(achievement.toFixed(0) + '%', centerX, centerY);
+                            ctx.restore();
+                        }
+                    }]
+                });
+            }
         });
     </script>
 }

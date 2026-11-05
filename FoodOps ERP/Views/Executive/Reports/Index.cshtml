@@ -3,14 +3,115 @@
     ViewData["Title"] = "Reports & Analytics";
     ViewData["Subtitle"] = "Generate business reports";
 }
-<partial name="_PageHeader" />
 
-<div class="card">
-    <div class="card-body">
+<style>
+    /* ✅ MICROSOFT FLUENT - SINGLE PAGE LOCKED REPORTS */
+    .page-content { padding: 12px var(--content-x) 12px var(--content-x) !important; overflow: hidden !important; }
+
+    .reports-dashboard { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 12px; 
+        height: 100%; /* Screen Lock */
+        min-height: 0;
+    }
+
+    /* Premium Header */
+    .reports-header-card {
+        display: flex; align-items: center; justify-content: space-between;
+        background: #ffffff; border: 1px solid var(--border);
+        border-radius: var(--radius-card); padding: 12px 16px; flex-shrink: 0;
+    }
+    .header-icon { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #ECFDF5; color: var(--emerald-dark); border-radius: 8px; font-size: 18px; }
+    .header-title { font-size: 18px; font-weight: 700; color: var(--text-heading); margin: 0; line-height: 1.2; }
+    .header-subtitle { font-size: 11px; color: var(--text-muted); margin: 0; }
+
+    /* Filter Card */
+    .filter-card {
+        background: #fff; border: 1px solid var(--border); border-radius: var(--radius-card);
+        padding: 20px; flex-shrink: 0;
+    }
+    .form-label { font-size: 12px; font-weight: 600; color: var(--text-heading); margin-bottom: 6px; }
+    .form-control, .form-select { height: 42px; border-radius: 8px; border: 1px solid var(--line-strong); font-size: 13px; color: var(--text-body); }
+    .btn-primary { height: 42px; padding: 0 24px; font-weight: 600; font-size: 13px; border-radius: 8px; }
+
+    /* ✅ Bottom Grid - Fills remaining space */
+    .bottom-grid {
+        flex: 1; /* Bachi hui jagah le lega */
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 12px;
+        min-height: 0;
+    }
+
+    .info-card {
+        background: #fff; border: 1px solid var(--border); border-radius: var(--radius-card);
+        padding: 16px; display: flex; flex-direction: column;
+        min-height: 0;
+        overflow: hidden; /* ✅ No inner scroll */
+    }
+    .info-card-title { font-size: 14px; font-weight: 600; color: var(--text-heading); margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+    /* Recent Reports List - Flex to fill space */
+    .recent-list { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 8px; 
+        flex: 1;
+        min-height: 0;
+    }
+    .recent-item {
+        display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--divider);
+        border-radius: 8px; background: var(--surface-2); transition: all 0.2s;
+        flex: 1; /* Har item barabar jagah le */
+    }
+    .recent-item:hover { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .recent-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .recent-text { flex-grow: 1; }
+    .recent-title { font-size: 13px; font-weight: 600; color: var(--text-heading); margin: 0; }
+    .recent-date { font-size: 11px; color: var(--text-muted); margin: 0; }
+
+    /* Quick Actions List - Flex to fill space */
+    .quick-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        flex: 1;
+        min-height: 0;
+    }
+    .quick-btn {
+        display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid var(--border);
+        border-radius: 8px; background: #fff; color: var(--text-body); text-decoration: none;
+        font-size: 13px; font-weight: 600; transition: all 0.2s; width: 100%;
+        flex: 1; /* Har button barabar jagah le */
+    }
+    .quick-btn:hover { background: var(--surface-2); border-color: var(--line-strong); color: var(--text-heading); }
+    .quick-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+</style>
+
+<div class="reports-dashboard">
+    
+    <!-- 1. PREMIUM HEADER -->
+    <div class="reports-header-card">
+        <div class="d-flex align-items-center gap-3">
+            <div class="header-icon"><i class="bi bi-file-earmark-bar-graph"></i></div>
+            <div>
+                <h1 class="header-title">Reports & Analytics</h1>
+                <p class="header-subtitle">Generate business reports</p>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-surface-2 text-muted border px-3 py-2" style="font-size: 11px; border-radius: 6px; font-weight: 500;">
+                <i class="bi bi-clock-history text-success"></i> Live Data
+            </span>
+        </div>
+    </div>
+
+    <!-- 2. FILTER CARD -->
+    <div class="filter-card">
         <form asp-action="Generate" method="post">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-
-            <div class="row g-3">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+            <div class="row g-3 align-items-end">
                 <div class="col-md-4">
                     <label asp-for="ReportType" class="form-label">Report Type</label>
                     <select asp-for="ReportType" class="form-select">
@@ -22,26 +123,81 @@
                         <option value="Executive">Executive Summary</option>
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label asp-for="StartDate" class="form-label">Start Date</label>
                     <input asp-for="StartDate" type="date" class="form-control" />
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label asp-for="EndDate" class="form-label">End Date</label>
                     <input asp-for="EndDate" type="date" class="form-control" />
                 </div>
                 <div class="col-md-2">
                     <label asp-for="PlantID" class="form-label">Plant</label>
-                    <!-- ✅ Updated: asp-items Model se -->
                     <select asp-for="PlantID" asp-items="Model.PlantList" class="form-select">
                         <option value="">All Plants</option>
                     </select>
                 </div>
-            </div>
-
-            <div class="mt-4">
-                <button type="submit" class="btn btn-primary"><i class="bi bi-file-earmark-bar-graph"></i> Generate Report</button>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-file-earmark-arrow-down me-1"></i> Generate
+                    </button>
+                </div>
             </div>
         </form>
     </div>
+
+    <!-- ✅ 3. BOTTOM GRID (Fills empty space) -->
+    <div class="bottom-grid">
+        
+        <!-- Left: Recent Reports -->
+        <div class="info-card">
+            <h5 class="info-card-title"><i class="bi bi-clock-history text-primary"></i> Recent Reports</h5>
+            <div class="recent-list">
+                <div class="recent-item">
+                    <div class="recent-icon" style="background: #ECFDF5; color: #059669;"><i class="bi bi-box-seam"></i></div>
+                    <div class="recent-text">
+                        <p class="recent-title">Production Summary - October 2026</p>
+                        <p class="recent-date">Generated 2 hours ago</p>
+                    </div>
+                    <a href="#" class="btn btn-sm btn-outline-secondary py-1 px-3" style="font-size:11px;">View</a>
+                </div>
+                <div class="recent-item">
+                    <div class="recent-icon" style="background: #EFF6FF; color: #2563EB;"><i class="bi bi-clipboard-data"></i></div>
+                    <div class="recent-text">
+                        <p class="recent-title">Inventory Status Report</p>
+                        <p class="recent-date">Generated yesterday</p>
+                    </div>
+                    <a href="#" class="btn btn-sm btn-outline-secondary py-1 px-3" style="font-size:11px;">View</a>
+                </div>
+                <div class="recent-item">
+                    <div class="recent-icon" style="background: #FEF3C7; color: #D97706;"><i class="bi bi-people"></i></div>
+                    <div class="recent-text">
+                        <p class="recent-title">Workforce Attendance - Week 42</p>
+                        <p class="recent-date">Generated 3 days ago</p>
+                    </div>
+                    <a href="#" class="btn btn-sm btn-outline-secondary py-1 px-3" style="font-size:11px;">View</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Quick Actions -->
+        <div class="info-card">
+            <h5 class="info-card-title"><i class="bi bi-lightning-charge text-warning"></i> Quick Actions</h5>
+            <div class="quick-list">
+                <a href="#" class="quick-btn">
+                    <div class="quick-icon" style="background: #ECFDF5; color: #059669;"><i class="bi bi-file-earmark-excel"></i></div>
+                    Export All Data (Excel)
+                </a>
+                <a href="#" class="quick-btn">
+                    <div class="quick-icon" style="background: #EFF6FF; color: #2563EB;"><i class="bi bi-calendar-check"></i></div>
+                    Schedule Recurring Report
+                </a>
+                <a href="#" class="quick-btn">
+                    <div class="quick-icon" style="background: #FEF3C7; color: #D97706;"><i class="bi bi-envelope"></i></div>
+                    Email Latest Report
+                </a>
+            </div>
+        </div>
+    </div>
+
 </div>

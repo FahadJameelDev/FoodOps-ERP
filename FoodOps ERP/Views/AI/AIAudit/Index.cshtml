@@ -3,38 +3,190 @@
     ViewData["Title"] = "AI Audit Logs";
     ViewData["Subtitle"] = "History of all AI Assistant interactions";
 }
-<partial name="_PageHeader" />
 
-<div class="card" id="grid-card">
-    @Html.GridToolbar("Search logs...", "logs", Model.Count, "All|Inventory|Production|Quality|Cost|Payroll|Management", @<text>
-        <a href="@Url.Action("Evidence")" class="btn btn-outline-secondary btn-sm"><i class="bi bi-file-earmark-text"></i> Evidence</a>
-        <a href="@Url.Action("Safety")" class="btn btn-outline-secondary btn-sm"><i class="bi bi-shield-check"></i> Safety Rules</a>
-    </text>)
+<style>
+    .page-content { padding: 12px var(--content-x) 12px var(--content-x) !important; }
 
-<div class="table-scroll">
-        @if (Model.Any())
-        {
-            <table class="table table-hover mb-0">
-                <thead><tr><th>Date</th><th>User</th><th>Domain</th><th>Question</th><th>Success</th><th>Time (ms)</th></tr></thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
+    .audit-dashboard {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        height: calc(100vh - 140px);
+    }
+
+    .audit-header-card {
+        display: flex; align-items: center; justify-content: space-between;
+        background: #ffffff; border: 1px solid var(--border);
+        border-radius: var(--radius-card); padding: 12px 16px; flex-shrink: 0;
+    }
+    .header-icon { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #EFF6FF; color: #2563EB; border-radius: 8px; font-size: 18px; }
+    .header-title { font-size: 18px; font-weight: 700; color: var(--text-heading); margin: 0; line-height: 1.2; }
+    .header-subtitle { font-size: 11px; color: var(--text-muted); margin: 0; }
+
+    /* Toolbar */
+    .toolbar-card {
+        background: #fff; border: 1px solid var(--border); border-radius: var(--radius-card) var(--radius-card) 0 0;
+        padding: 12px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .search-wrapper { position: relative; flex: 0 1 300px; }
+    .search-wrapper i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94A3B8; font-size: 14px; }
+    .search-wrapper input {
+        width: 100%; height: 36px; padding: 0 12px 0 36px; border: 1px solid var(--line-strong);
+        border-radius: 8px; background: var(--surface-2); font-size: 13px;
+    }
+    .search-wrapper input:focus { outline: none; background: #fff; border-color: var(--emerald); }
+
+    /* Filter Chips */
+    .filter-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .filter-chip {
+        padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line);
+        background: #fff; color: #475569; font-size: 12px; font-weight: 600;
+        cursor: pointer; transition: all 0.2s;
+    }
+    .filter-chip:hover { background: var(--surface-2); }
+    .filter-chip.active { background: #E7F8F0; border-color: rgba(16,185,129,.5); color: #065F46; }
+
+    /* Table Card */
+    .table-card {
+        flex: 1;
+        background: #fff; border: 1px solid var(--border); border-top: none;
+        border-radius: 0 0 var(--radius-card) var(--radius-card);
+        overflow: hidden; display: flex; flex-direction: column;
+    }
+    .table-scroll { flex: 1; overflow-y: auto; }
+
+    .premium-table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 0; }
+    .premium-table th {
+        background: var(--surface-2); color: var(--text-muted); font-size: 11px; font-weight: 600;
+        text-transform: uppercase; letter-spacing: 0.05em; padding: 12px 16px;
+        text-align: left; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 2;
+    }
+    .premium-table td {
+        padding: 12px 16px; font-size: 13px; color: var(--text-body);
+        border-bottom: 1px solid var(--divider); vertical-align: middle;
+    }
+    .premium-table tr:last-child td { border-bottom: none; }
+    .premium-table tr:hover td { background: var(--surface-2); }
+</style>
+
+<div class="audit-dashboard">
+    <!-- 1. Header -->
+    <div class="audit-header-card">
+        <div class="d-flex align-items-center gap-3">
+            <div class="header-icon"><i class="bi bi-list-columns-reverse"></i></div>
+            <div>
+                <h1 class="header-title">AI Audit Logs</h1>
+                <p class="header-subtitle">History of all AI Assistant interactions</p>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a asp-action="Evidence" class="btn btn-outline-secondary btn-sm py-2 px-3" style="font-size: 12px;">
+                <i class="bi bi-file-earmark-text me-1"></i> Evidence
+            </a>
+            <a asp-action="Safety" class="btn btn-outline-secondary btn-sm py-2 px-3" style="font-size: 12px;">
+                <i class="bi bi-shield-check me-1"></i> Safety Rules
+            </a>
+        </div>
+    </div>
+
+    <!-- 2. Toolbar -->
+    <div class="toolbar-card">
+        <div class="search-wrapper">
+            <i class="bi bi-search"></i>
+            <input type="text" id="logSearchInput" placeholder="Search logs..." onkeyup="filterTable()" />
+        </div>
+        <div class="filter-chips" id="filterChips">
+            <button class="filter-chip active" data-filter="all">All</button>
+            <button class="filter-chip" data-filter="inventory">Inventory</button>
+            <button class="filter-chip" data-filter="production">Production</button>
+            <button class="filter-chip" data-filter="quality">Quality</button>
+            <button class="filter-chip" data-filter="cost">Cost</button>
+            <button class="filter-chip" data-filter="payroll">Payroll</button>
+            <button class="filter-chip" data-filter="management">Management</button>
+        </div>
+        <span class="badge bg-surface-2 text-muted border px-3 py-2 ms-auto" style="font-size: 12px; border-radius: 6px;">
+            @Model.Count() Logs
+        </span>
+    </div>
+
+    <!-- 3. Table -->
+    <div class="table-card">
+        <div class="table-scroll">
+            @if (Model.Any())
+            {
+                <table class="premium-table" id="logsTable">
+                    <thead>
                         <tr>
-                            <td>@item.CreatedAt.ToString("dd MMM yyyy HH:mm")</td>
-                            <td>@item.UserName</td>
-                            <td><partial name="_StatusPill" model="item.DomainContext" /></td>
-                            <td class="text-truncate" style="max-width: 300px;" title="@item.QuestionSummary">@item.QuestionSummary</td>
-                            <td>@(item.IsSuccess ? "Yes" : "No")</td>
-                            <td class="num">@item.ExecutionTimeMs</td>
+                            <th>Date</th>
+                            <th>User</th>
+                            <th>Domain</th>
+                            <th>Question</th>
+                            <th>Success</th>
+                            <th>Time (ms)</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        }
-        else
-        {
-
-            <partial name="_EmptyState" model='"No AI audit logs found."' />
-        }
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            var domainLower = item.DomainContext?.ToLower() ?? "";
+                            <tr data-domain="@domainLower">
+                                <td>@item.CreatedAt.ToString("dd MMM yyyy HH:mm")</td>
+                                <td>@item.UserName</td>
+                                <td>
+                                    <span class="badge bg-surface-2 text-muted border px-2 py-1" style="font-size: 11px;">
+                                        @item.DomainContext
+                                    </span>
+                                </td>
+                                <td class="text-truncate" style="max-width: 300px;" title="@item.QuestionSummary">@item.QuestionSummary</td>
+                                <td>
+                                    @if (item.IsSuccess)
+                                    {
+                                        <span class="badge" style="background:#ECFDF5; color:#059669;">Yes</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge" style="background:#FEF2F2; color:#DC2626;">No</span>
+                                    }
+                                </td>
+                                <td class="num">@item.ExecutionTimeMs</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="d-flex flex-column align-items-center justify-content-center h-100 py-5">
+                    <i class="bi bi-inbox text-muted" style="font-size: 48px;"></i>
+                    <h5 class="mt-3 text-heading" style="font-size: 16px; font-weight: 600;">No Logs Found</h5>
+                    <p class="text-muted mb-0" style="font-size: 13px;">No AI audit logs have been recorded yet.</p>
+                </div>
+            }
+        </div>
     </div>
 </div>
+
+<script>
+    let currentFilter = 'all';
+    
+    document.querySelectorAll('.filter-chip').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentFilter = this.dataset.filter;
+            filterTable();
+        });
+    });
+
+    function filterTable() {
+        const searchText = document.getElementById('logSearchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('#logsTable tbody tr');
+        
+        rows.forEach(row => {
+            const textMatch = row.textContent.toLowerCase().includes(searchText);
+            const domainMatch = (currentFilter === 'all' || row.dataset.domain.includes(currentFilter));
+            
+            row.style.display = (textMatch && domainMatch) ? '' : 'none';
+        });
+    }
+</script>
