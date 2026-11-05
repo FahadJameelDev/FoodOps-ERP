@@ -12,37 +12,41 @@ A robust, enterprise-grade Food Manufacturing ERP system built using **ASP.NET C
 
 ## 🏗️ Architecture Overview
 
-The system is designed following **Clean Architecture** principles within a single ASP.NET Core MVC project, enforcing a strict separation of concerns. The architecture cleanly decouples the UI, Business Logic, and Data Access layers.
+The system is designed following **Clean Architecture** principles within a Single ASP.NET Core MVC project. This ensures a strict separation of concerns, decoupling the UI from the Business Logic and Data Access layers.
 
 ```mermaid
-flowchart TD
-    %% Custom Styling for Premium Look
-    classDef layer fill:#f8fafc,stroke:#cbd5e1,stroke-width:2px,color:#0f172a,rx:8,ry:8;
-    classDef highlight fill:#10b981,stroke:#059669,stroke-width:2px,color:#ffffff,rx:8,ry:8;
-    classDef db fill:#3b82f6,stroke:#2563eb,stroke-width:2px,color:#ffffff,rx:8,ry:8;
+graph TD
+    classDef ui fill:#d4edda,stroke:#28a745,stroke-width:2px;
+    classDef logic fill:#cce5ff,stroke:#007bff,stroke-width:2px;
+    classDef data fill:#f8d7da,stroke:#dc3545,stroke-width:2px;
+    classDef models fill:#fff3cd,stroke:#ffc107,stroke-width:2px;
 
-    %% Nodes
-    Client["🌐 Client Browser<br/>(HTML, CSS, Vanilla JS)"]
-    UI["🖥️ Presentation Layer<br/>(Razor Views & SPA Router)"]:::layer
-    Controllers["🎮 Controllers<br/>(MVC Endpoints & APIs)"]:::layer
-    Services["⚙️ Business Logic Layer<br/>(Services & AI Assistant)"]:::highlight
-    Data["🗄️ Data Access Layer<br/>(EF Core & DbContext)"]:::layer
-    SQL["💾 SQL Server Database"]:::db
+    subgraph Presentation Layer
+        V[Razor Views .cshtml]:::ui
+        JS[wwwroot/ - spa-router.js, ui.js]:::ui
+        C[Controllers/]:::ui
+    end
 
-    %% Connections
-    Client -->|HTTP Request| UI
-    UI --> Controllers
-    Controllers -->|Method Calls| Services
-    Services -->|Entity Operations| Data
-    Data -->|Queries| SQL
-    SQL -.->|Returns Data| Data
-    Data -.->|Objects| Services
-    Services -.->|ViewModels| Controllers
-    Controllers -.->|Rendered HTML| UI
+    subgraph Business Logic Layer
+        S[Services/ - Inventory, AI, HR]:::logic
+        I[Infrastructure/ - AppController, Middlewares]:::logic
+    end
 
+    subgraph Data Access Layer
+        D[Data/ - ApplicationDbContext]:::data
+        DB[(SQL Server Database)]:::data
+    end
 
+    subgraph Domain Models
+        M[Models/ - Entities, ViewModels]:::models
+    end
 
-* **Presentation Layer:** Razor Views and Custom SPA Router (`spa-router.js`) for seamless UI.
-* **Business Logic:** Service classes (`Services/`) handle domain rules and AI integration (`AIAssistantService`).
-* **Data Access:** Entity Framework Core (`Data/`) manages SQL Server migrations and DbContext.
-* **Infrastructure:** Custom middlewares (`GlobalExceptionHandlingMiddleware`) and helper classes (`GridHtml.cs`).
+    V --> C
+    JS --> C
+    C --> S
+    S --> D
+    D --> DB
+    S --> M
+    C --> M
+    D --> M
+    I --> C
