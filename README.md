@@ -160,6 +160,15 @@ The system features an automated, transactional auditing design at the database 
 *   **Append-Only Logs:** Tables like `ProductionStatusHistory` and `InventoryTransactions` are designed as immutable logs (no updates or deletes allowed) for strict traceability.
 ```
 
+Fahad bhai, **Allah kasam aapne bilkul sahi kaha.** Main samajh gaya. Aap chahte hain ke Architecture Overview bilkul waisa hi **Top-Notch** aur professional diagram ho jaisa aapne screenshot mein dikhaya hai, lekin usme **aapke project ke asal folders** (Controllers, Services, Data, Models, wwwroot) hon, na ke fake `ERPSystem.API` waghera.
+
+Aur aapne jo kaha ke **dbdiagram.io** use kar sakte hain, woh bilkul sahi hai, lekin **Architecture diagram** ke liye hum **Mermaid.js** use karenge jo GitHub mein hi built-in hota hai (bina kisi external website par jaye). Yeh bilkul waisa hi professional dikhega.
+
+Yeh lijiye **Architecture Overview ka Final aur Top-Notch Code**. Isme maine aapke asal project ke folders use kiye hain aur unko boxes mein dikhaya hai (jaise aapke screenshot mein hain).
+
+Aap apni `README.md` file mein **Architecture Overview** wale hisse ko delete karein aur yeh naya code paste kar dein:
+
+```markdown
 ## 🏗️ Architecture Overview
 
 The system is designed following **Clean Architecture** principles within a Single ASP.NET Core MVC project. This ensures a strict separation of concerns, decoupling the UI from the Business Logic and Data Access layers.
@@ -198,5 +207,23 @@ graph TD
     D --> DB
     S --> M
     C --> M
+    D --> M
+    I --> C
+```
 
+*   **Presentation Layer:** Razor Views, Custom Vanilla JS (SPA Router), and MVC Controllers handle the UI/UX.
+*   **Business Logic Layer:** Service classes (`Services/`) and cross-cutting concerns (`Infrastructure/`) handle domain logic, AI integration, and global exception handling.
+*   **Data Access Layer:** EF Core `ApplicationDbContext` manages database operations.
+*   **Domain Models:** Core Entities and ViewModels used across all layers.
+```
+
+---
+
+### 🚦 Aap Ab Kya Karein? (Exact Steps)
+1. GitHub par **Pencil (Edit)** icon par click karein.
+2. Purana Architecture wala code (jo aapne paste kiya tha) **delete** kar dein.
+3. Upar wala yeh naya ````mermaid```` wala code **paste** karein.
+4. Neeche green button **"Commit changes"** par click karein.
+
+Ab jab aap page refresh karenge, toh aapko bilkul **Top-Notch professional boxes** nazar aayenge jo aapke project ke asal folders ko dikhayenge (bilkul aapke screenshot jaisa premium look)! ✅
 
