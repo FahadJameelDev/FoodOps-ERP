@@ -53,25 +53,3 @@ graph TD
 
 
 
-### 📂 Backend Project Breakdown
-
-The backend is structured to maintain a clean separation of concerns using standard ASP.NET Core MVC conventions:
-
-*   **`Controllers/`**: The entry point for all HTTP requests. It houses the MVC controllers, organized by domain (e.g., `AI/`, `Manufacturing/`, `SupplyChain/`, `Workforce/`). It handles routing, authorization (`[Authorize]`), and returns Razor Views or JSON responses.
-*   **`Services/`**: The core Business Logic Layer. It contains the service classes (e.g., `AIAssistantService`, `InventoryService`) and their interfaces. This layer communicates with the `ApplicationDbContext` to process business rules.
-*   **`Data/`**: The Data Access Layer. Contains the `ApplicationDbContext` which manages all Entity Framework Core configurations, relationships, and migrations.
-*   **`Models/`**: The Domain Layer. Contains all database Entities (e.g., `Product`, `Employee`, `ProductionOrder`), Enums, and ViewModels used to transfer data securely to the Views.
-*   **`Infrastructure/`**: Contains cross-cutting concerns such as the `AppController` base class (for accessing current user context), Custom HTML Helpers (`GridHtml`), and the `ModuleViewLocationExpander` for modular view routing.
-*   **`Middlewares/`**: Contains the `GlobalExceptionHandlingMiddleware` that catches unhandled exceptions across the entire application and gracefully displays the custom error page.
-
-### 🎨 Frontend Integration
-
-The frontend is highly customized and built directly into the ASP.NET Core MVC pipeline, eliminating the need for heavy JavaScript frameworks (like React or Angular):
-
-*   **Razor Views (`.cshtml`)**: The presentation layer uses Server-Side Rendering (SSR). Layouts (`_Layout.cshtml`), Partials (`_Sidebar.cshtml`, `_Topbar.cshtml`), and View Components are used extensively to build a modular UI.
-*   **Custom CSS (`wwwroot/css/site.css`)**: A custom "Fluent Design" system built on top of **Bootstrap 5**, using CSS Variables (Design Tokens) for colors, spacing, and typography to achieve a premium Microsoft-like look.
-*   **Vanilla JS SPA Engine (`wwwroot/js/`)**: We implemented a custom Single Page Application experience using pure JavaScript:
-    *   `spa-router.js`: Intercepts link clicks and form submissions, fetches HTML fragments asynchronously, and updates the DOM without reloading the page.
-    *   `ui.js`: Handles custom Modals, Toasts, Confirmation Dialogs, and dynamic table operations (search, sort, pagination).
-    *   `shell.js`: Manages the collapsible Sidebar, active menu state, and global keyboard shortcuts (like `Ctrl+K`).
-*   **AI Integration**: The frontend Chat interface communicates with the `AIAssistantController` via asynchronous `fetch` API calls, streaming real-time database insights from Google Gemini.
