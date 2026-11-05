@@ -69,3 +69,37 @@ graph TD
     D --> DB
     S --> M
     C --> M
+
+
+---
+
+## 🗄️ Database Entity-Relationship (ER) Diagrams
+
+To keep the diagrams readable and comprehensive, the database model is categorized into logical modules. These diagrams are written in **Mermaid.js** syntax and render natively.
+
+### 1. Master Data & Catalog (Core)
+Tracks the basic master records that populate the rest of the business documents.
+
+```mermaid
+erDiagram
+    Plants ||--o{ Users : "has"
+    Plants ||--o{ Warehouses : "has"
+    Categories ||--o{ Products : "contains"
+    UnitsOfMeasure ||--o{ Products : "measures"
+    Products ||--o{ PackagingConfigs : "has"
+    
+    Plants {
+        int PlantID PK
+        string PlantName
+        string Location
+    }
+    Products {
+        int ProductID PK
+        string ProductName
+        string ProductCode
+        int CategoryID FK
+    }
+    Categories {
+        int CategoryID PK
+        string CategoryName
+    }
