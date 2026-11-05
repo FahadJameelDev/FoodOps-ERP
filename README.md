@@ -161,12 +161,6 @@ The system features an automated, transactional auditing design at the database 
 *   **AI Audit Logs:** Every AI interaction is tracked in the `AIAssistantLogs` table, storing the `DomainContext`, `QuestionSummary`, and `ExecutionTimeMs` for performance and usage monitoring.
 *   **Append-Only Logs:** Tables like `ProductionStatusHistory` and `InventoryTransactions` are designed as immutable logs (no updates or deletes allowed) for strict traceability.
 ```
-
-
-
-
-
-
 ## 🏗️ Architecture Overview
 
 The system is designed following **Clean Architecture** principles within a Single ASP.NET Core MVC project. This ensures a strict separation of concerns, decoupling the UI from the Business Logic and Data Access layers.
@@ -178,23 +172,23 @@ graph TD
     classDef data fill:#f8d7da,stroke:#dc3545,stroke-width:2px;
     classDef models fill:#fff3cd,stroke:#ffc107,stroke-width:2px;
 
-    subgraph Presentation_Layer [Presentation Layer]
+    subgraph Presentation Layer
         V[Razor Views .cshtml]:::ui
         JS[wwwroot/ - spa-router.js, ui.js]:::ui
         C[Controllers/]:::ui
     end
 
-    subgraph Business_Logic_Layer [Business Logic Layer]
+    subgraph Business Logic Layer
         S[Services/ - Inventory, AI, HR]:::logic
         I[Infrastructure/ - AppController, Middlewares]:::logic
     end
 
-    subgraph Data_Access_Layer [Data Access Layer]
+    subgraph Data Access Layer
         D[Data/ - ApplicationDbContext]:::data
         DB[(SQL Server Database)]:::data
     end
 
-    subgraph Domain_Models [Domain Models]
+    subgraph Domain Models
         M[Models/ - Entities, ViewModels]:::models
     end
 
@@ -205,13 +199,5 @@ graph TD
     D --> DB
     S --> M
     C --> M
-    D --> M
-    I --> C
-```
 
-*   **Presentation Layer:** Razor Views, Custom Vanilla JS (SPA Router), and MVC Controllers handle the UI/UX.
-*   **Business Logic Layer:** Service classes (`Services/`) and cross-cutting concerns (`Infrastructure/`) handle domain logic, AI integration, and global exception handling.
-*   **Data Access Layer:** EF Core `ApplicationDbContext` manages database operations.
-*   **Domain Models:** Core Entities and ViewModels used across all layers.
-```
 
