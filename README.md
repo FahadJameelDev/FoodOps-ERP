@@ -67,3 +67,6 @@ erDiagram
         int CategoryID PK
         string CategoryName
     }
+
+2. Supply Chain & Inventory (Procurement)
+Manages trade transactions with Suppliers and tracks real-time stock batches.<img width="3729" height="2120" alt="deepseek_mermaid_20261105_cc3a6b" src="https://github.com/user-attachments/assets/465bb829-b190-46ae-ab56-f6ef2f69ffe6" />
