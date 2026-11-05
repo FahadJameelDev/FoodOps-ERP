@@ -48,22 +48,3 @@ graph TD
     D --> DB
     S --> M
     C --> M
-
-### 🏗️ Architecture & Layers
-
-This project follows a clean **N-Tier Architecture** with clear separation of concerns:
-
-1. **Presentation Layer:** 
-   Razor Views, Custom Vanilla JS (SPA Router), and MVC Controllers handle the UI/UX and client-side interactions.
-
-2. **Business Logic Layer:** 
-   Service classes (`Services/`) and cross-cutting concerns (`Infrastructure/`) handle domain logic, AI integration, and global exception handling.
-
-3. **Data Access Layer:** 
-   EF Core `ApplicationDbContext` manages database operations, migrations, and query execution.
-
-4. **Domain Models:** 
-   Core Entities and ViewModels are shared across all layers to ensure type safety and consistency.
-
-
-
